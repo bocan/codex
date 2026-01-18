@@ -65,7 +65,11 @@ jobs:
     
     - name: Install server dependencies
       working-directory: ./server
-      run: npm ci
+      run: |
+        npm ci
+        echo "Verifying installation..."
+        ls node_modules/express > /dev/null && echo "✓ express installed" || echo "✗ express missing"
+        ls node_modules/@types/express > /dev/null && echo "✓ @types/express installed" || echo "✗ @types/express missing"
     
     - name: Install client dependencies
       working-directory: ./client
