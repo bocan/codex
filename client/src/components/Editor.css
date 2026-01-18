@@ -1,0 +1,75 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-primary);
+}
+
+.editor.empty {
+  justify-content: center;
+  align-items: center;
+  background: var(--bg-tertiary);
+}
+
+.editor.empty .empty-state {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.editor-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.editor-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.save-status {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.editor-actions button {
+  padding: 6px 12px;
+  font-size: 13px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.editor-actions button:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.editor-actions button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.editor-textarea {
+  flex: 1;
+  padding: 20px;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}

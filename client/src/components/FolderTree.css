@@ -1,0 +1,111 @@
+.folder-tree {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary);
+}
+
+.folder-tree-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-primary);
+}
+
+.folder-tree-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.refresh-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.refresh-btn:hover {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.folder-tree-item {
+  user-select: none;
+}
+
+.folder-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 8px;
+  cursor: pointer;
+  position: relative;
+}
+
+.folder-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.folder-item.selected {
+  background: rgba(102, 126, 234, 0.2);
+}
+
+.folder-toggle {
+  width: 20px;
+  display: inline-block;
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.folder-name {
+  flex: 1;
+  color: var(--text-primary);
+}
+
+.folder-children {
+  padding-left: 20px;
+}
+
+.folder-item input {
+  flex: 1;
+  padding: 2px 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.context-menu {
+  position: absolute;
+  right: 5px;
+  top: 100%;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px var(--shadow);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+}
+
+.context-menu button {
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.context-menu button:last-child {
+  border-bottom: none;
+}
+
+.context-menu button:hover {
+  background: var(--bg-secondary);
+}
