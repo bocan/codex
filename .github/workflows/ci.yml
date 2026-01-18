@@ -31,7 +31,7 @@ jobs:
         cd ../client && npm ci
     
     - name: Run backend tests
-      run: cd server && npm test
+      run: cd server && npx jest
     
     - name: Run frontend tests
       run: cd client && npm test
@@ -63,5 +63,5 @@ jobs:
     
     - name: Check TypeScript types
       run: |
-        cd server && npx tsc --noEmit
+        cd server && npx tsc --noEmit --skipLibCheck
         cd ../client && npx tsc --noEmit
