@@ -71,10 +71,10 @@ jobs:
       working-directory: ./client
       run: npm ci
     
-    - name: Check TypeScript types (server)
+    - name: Type check server
       working-directory: ./server
-      run: npx tsc --noEmit
+      run: npm run build
     
-    - name: Check TypeScript types (client)
+    - name: Type check client
       working-directory: ./client
-      run: npx tsc --noEmit
+      run: npm run build
