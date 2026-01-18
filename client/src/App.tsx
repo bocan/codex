@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FolderTree } from './components/FolderTree';
 import { PageList } from './components/PageList';
 import { Editor } from './components/Editor';
