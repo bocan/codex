@@ -1,0 +1,282 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #fafafa;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --border-color: #dddddd;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --header-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+[data-theme="dark"] {
+  --bg-primary: #1e1e1e;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #252525;
+  --text-primary: #e0e0e0;
+  --text-secondary: #b0b0b0;
+  --border-color: #404040;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --header-bg: linear-gradient(135deg, #4a5f8f 0%, #5a3a72 100%);
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-header {
+  background: var(--header-bg);
+  color: white;
+  padding: 15px 20px;
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-left h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.header-left .tagline {
+  margin: 5px 0 0 0;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.breadcrumbs {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 20px;
+  font-size: 14px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.breadcrumb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.breadcrumb-link {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.breadcrumb-link:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.breadcrumb-link:disabled {
+  cursor: default;
+  font-weight: 600;
+  opacity: 1;
+}
+
+.breadcrumb-separator {
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 2px;
+}
+
+.theme-toggle {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  font-size: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.app-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.left-pane,
+.right-pane {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.left-pane {
+  background: var(--bg-secondary);
+}
+
+.left-pane.collapsed {
+  transition: width 0.3s ease;
+}
+
+.right-pane {
+  background: var(--bg-primary);
+  border-left: 1px solid var(--border-color);
+}
+
+.right-pane.collapsed {
+  transition: width 0.3s ease;
+}
+
+.center-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.pane-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.folder-tree-section {
+  flex-shrink: 0;
+  overflow-y: auto;
+  position: relative;
+}
+
+.page-list-section {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 100px;
+}
+
+.collapse-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  width: 24px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--text-secondary);
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+.left-pane .collapse-btn {
+  right: -12px;
+}
+
+.right-pane .collapse-btn {
+  left: -12px;
+}
+
+.collapse-btn:hover {
+  background: var(--bg-tertiary);
+}
+
+/* Resize handles */
+.resize-handle {
+  z-index: 10;
+  transition: background-color 0.2s;
+}
+
+.resize-handle:hover {
+  background-color: rgba(102, 126, 234, 0.3);
+}
+
+.resize-handle:active {
+  background-color: rgba(102, 126, 234, 0.5);
+}
+
+/* Vertical resize handles (left/right panes) */
+.resize-handle-right,
+.resize-handle-left {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  cursor: col-resize;
+}
+
+.resize-handle-right {
+  right: 0;
+}
+
+.resize-handle-left {
+  left: 0;
+}
+
+/* Horizontal resize handle (folder tree / page list) */
+.resize-handle-horizontal {
+  position: relative;
+  width: 100%;
+  height: 5px;
+  cursor: row-resize;
+  flex-shrink: 0;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

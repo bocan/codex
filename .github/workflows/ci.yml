@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd server && npm ci
+        cd ../client && npm ci
+    
+    - name: Run backend tests
+      run: cd server && npm test
+    
+    - name: Run frontend tests
+      run: cd client && npm test
+    
+    - name: Build server
+      run: cd server && npm run build
+    
+    - name: Build client
+      run: cd client && npm run build
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd server && npm ci
+        cd ../client && npm ci
+    
+    - name: Check TypeScript types
+      run: |
+        cd server && npx tsc --noEmit
+        cd ../client && npx tsc --noEmit
