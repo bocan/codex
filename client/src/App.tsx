@@ -194,20 +194,20 @@ function App() {
 
   const getBreadcrumbs = () => {
     if (!selectedFolder) return [];
-    
+
     if (selectedFolder === '/') {
       return [{ name: 'Root', path: '/' }];
     }
 
     const parts = selectedFolder.split('/').filter(Boolean);
     const breadcrumbs = [{ name: 'Root', path: '/' }];
-    
+
     let currentPath = '';
     for (const part of parts) {
       currentPath += (currentPath ? '/' : '') + part;
       breadcrumbs.push({ name: part, path: currentPath });
     }
-    
+
     return breadcrumbs;
   };
 
