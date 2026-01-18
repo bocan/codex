@@ -12,14 +12,14 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
-    "react": "^18.2.0",
+    "react": "^19.2.3",
     "react-dom": "^18.2.0",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.0",
     "axios": "^1.6.5"
   },
   "devDependencies": {
-    "@types/react": "^18.2.48",
+    "@types/react": "^19.2.8",
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^5.1.2",
     "typescript": "^5.3.3",
