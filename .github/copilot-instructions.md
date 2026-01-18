@@ -74,4 +74,4 @@ Self-documenting API available at `GET /api` returns all endpoints with examples
 
 ## CI/CD Notes
 
-GitHub Actions runs `npm ci` at root level, then runs tests/builds in subdirectories. Dependabot monitors all three package locations weekly.
+GitHub Actions runs `npm ci` at root level (Node 24.x), then runs tests/builds in subdirectories. Dependabot monitors the root package.json weekly (npm workspaces means one lock file manages all deps).
