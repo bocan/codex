@@ -1,7 +1,36 @@
 import request from 'supertest';
-import app from '../src/index';
+import app, { setServices } from '../src/index';
+import { FileSystemService } from '../src/services/fileSystem';
+import { GitService } from '../src/services/gitService';
+import fs from 'fs/promises';
+import path from 'path';
+
+const TEST_DATA_DIR = path.join(__dirname, '../test-data');
 
 describe('Authentication', () => {
+  beforeAll(async () => {
+    // Create test directory and initialize services
+    await fs.mkdir(TEST_DATA_DIR, { recursive: true });
+
+    const testGitService = new GitService(TEST_DATA_DIR);
+    const testFileSystemService = new FileSystemService(TEST_DATA_DIR, testGitService);
+
+    await testFileSystemService.initialize();
+    await testGitService.initialize();
+
+    // Override the app's services with test services
+    setServices(testGitService, testFileSystemService);
+  });
+
+  afterAll(async () => {
+    // Clean up test data
+    try {
+      await fs.rm(TEST_DATA_DIR, { recursive: true, force: true });
+    } catch (error) {
+      // Ignore errors
+    }
+  });
+
   describe('POST /api/auth/login', () => {
     it('should reject login without password', async () => {
       const response = await request(app)
