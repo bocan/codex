@@ -21,7 +21,7 @@ description: Modern React UI patterns for loading states, error handling, and da
 
 ```typescript
 // CORRECT - Only show loading when no data exists
-const { data, loading, error } = useGetItemsQuery();
+const { data, loading, error, refetch } = useGetItemsQuery();
 
 if (error) return <ErrorState error={error} onRetry={refetch} />;
 if (loading && !data) return <LoadingState />;
@@ -207,7 +207,7 @@ const MyForm = () => {
   };
 
   return (
-    <form>
+    <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
       <Input
         value={values.name}
         onChange={handleChange('name')}
@@ -215,7 +215,6 @@ const MyForm = () => {
       />
       <Button
         type="submit"
-        onClick={handleSubmit}
         disabled={!isValid || loading}
         isLoading={loading}
       >
@@ -231,7 +230,7 @@ const MyForm = () => {
 ### Loading States
 
 ```typescript
-// WRONG - Spinner when data exists (causes flash)
+// WRONG - Spinner when data exists (causes flashing on refetch when cached data is available)
 if (loading) return <Spinner />;
 
 // CORRECT - Only show loading without data
