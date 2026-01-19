@@ -136,7 +136,7 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
         spellCheck={false}
         disabled={isSaving}
       />
-      
+
       {showHistory && (
         <VersionHistory
           pagePath={pagePath}
