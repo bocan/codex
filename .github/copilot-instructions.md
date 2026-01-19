@@ -72,6 +72,33 @@ Self-documenting API available at `GET /api` returns all endpoints with examples
 3. Create `Component.test.tsx` alongside
 4. Import in parent component
 
+## Code Quality Standards
+
+### TypeScript
+- **Never use `any` type** - Use `unknown` for truly dynamic types, then narrow with type guards
+- Always enable strict mode in tsconfig.json
+- Prefer interfaces over type aliases for object shapes
+- Use proper typing for all function parameters and return values
+
+### Security
+- **Never commit secrets** - Use environment variables for sensitive data (see `.env.example`)
+- Always validate and sanitize user input on both client and server
+- Use parameterized queries to prevent injection attacks
+- Keep dependencies up to date (monitored by Dependabot)
+
+### Testing
+- Write tests before pushing code
+- Maintain test coverage for critical paths
+- Tests must be deterministic and clean up after themselves
+- Use descriptive test names that explain the behavior being tested
+
+## Boundaries - Do NOT Modify
+
+- **Never modify** files in `node_modules/` or `dist/` directories
+- **Never modify** the root `package-lock.json` directly (use `npm install` commands)
+- **Do not remove** existing tests unless they are explicitly broken by intended changes
+- **Do not change** the npm workspace structure without discussion
+
 ## CI/CD Notes
 
 GitHub Actions runs `npm ci` at root level (Node 24.x), then runs tests/builds in subdirectories. Dependabot monitors the root package.json weekly (npm workspaces means one lock file manages all deps).
