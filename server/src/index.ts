@@ -1,20 +1,70 @@
 import express, { Express, Request, Response } from 'express';
+import session from 'express-session';
 import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
 import path from 'path';
 import folderRoutes from './routes/folders';
 import pageRoutes from './routes/pages';
+import authRoutes from './routes/auth';
+import { requireAuth } from './middleware/auth';
+import { GitService } from './services/gitService';
+import { FileSystemService } from './services/fileSystem';
 
 const app: Express = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
-app.use(cors());
+// Initialize Git service
+const DATA_DIR = process.env.TEST_DATA_DIR || path.join(__dirname, '../../data');
+export let gitService = new GitService(DATA_DIR);
+export let fileSystemService = new FileSystemService(DATA_DIR, gitService);
+
+// Allow tests to override services
+export function setServices(git: GitService, fs: FileSystemService) {
+  gitService = git;
+  fileSystemService = fs;
+}
+
+// Initialize Git repository on startup (skip in test mode)
+if (!process.env.TEST_DATA_DIR) {
+  (async () => {
+    try {
+      await gitService.initialize();
+      await gitService.commitPendingChanges();
+      console.log('Git repository initialized and pending changes committed');
+    } catch (error) {
+      console.error('Failed to initialize Git repository:', error);
+    }
+  })();
+}
+
+// Security middleware
+app.use(helmet());
+
+// HTTP request logging
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+
+// CORS and body parsing
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  credentials: true, // Allow cookies
+}));
 app.use(express.json());
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'disnotion-dev-secret-change-in-production',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  },
+}));
 
 // API Documentation
 app.get('/api', (req: Request, res: Response) => {
   const baseUrl = `${req.protocol}://${req.get('host')}`;
-  
+
   res.json({
     name: 'Disnotion API',
     version: '1.0.0',
@@ -77,6 +127,21 @@ app.get('/api', (req: Request, res: Response) => {
           example: `curl -X PUT ${baseUrl}/api/pages/move -H "Content-Type: application/json" -d '{"oldPath": "folder1/page.md", "newFolderPath": "folder2"}'`
         }
       },
+      auth: {
+        'POST /api/auth/login': {
+          description: 'Login with password',
+          body: { password: 'your-password' },
+          example: `curl -X POST ${baseUrl}/api/auth/login -H "Content-Type: application/json" -d '{"password": "your-password"}' -c cookies.txt`
+        },
+        'POST /api/auth/logout': {
+          description: 'Logout and destroy session',
+          example: `curl -X POST ${baseUrl}/api/auth/logout -b cookies.txt`
+        },
+        'GET /api/auth/status': {
+          description: 'Check authentication status',
+          example: `curl ${baseUrl}/api/auth/status -b cookies.txt`
+        }
+      },
       system: {
         'GET /api/health': {
           description: 'Health check endpoint',
@@ -99,8 +164,9 @@ app.get('/api', (req: Request, res: Response) => {
 });
 
 // Routes
-app.use('/api/folders', folderRoutes);
-app.use('/api/pages', pageRoutes);
+app.use('/api/auth', authRoutes); // Auth routes (public)
+app.use('/api/folders', requireAuth, folderRoutes); // Protected
+app.use('/api/pages', requireAuth, pageRoutes); // Protected
 
 // Health check
 app.get('/api/health', (req: Request, res: Response) => {

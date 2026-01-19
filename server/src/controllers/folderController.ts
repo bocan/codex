@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import fileSystemService from '../services/fileSystem';
+import { fileSystemService } from '../index';
 
 export const getFolderTree = async (req: Request, res: Response) => {
   try {
