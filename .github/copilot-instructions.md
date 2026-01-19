@@ -83,7 +83,7 @@ Self-documenting API available at `GET /api` returns all endpoints with examples
 ### Security
 - **Never commit secrets** - Use environment variables for sensitive data (see `.env.example`)
 - Always validate and sanitize user input on both client and server
-- Use parameterized queries to prevent injection attacks
+- Sanitize file paths and validate user input to prevent path traversal attacks
 - Keep dependencies up to date (monitored by Dependabot)
 
 ### Testing
