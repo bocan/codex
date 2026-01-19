@@ -1,16 +1,28 @@
 import request from 'supertest';
-import app from '../src/index';
-import fileSystemService from '../src/services/fileSystem';
+import app, { setServices } from '../src/index';
+import { FileSystemService } from '../src/services/fileSystem';
+import { GitService } from '../src/services/gitService';
 import fs from 'fs/promises';
 import path from 'path';
 
 const TEST_DATA_DIR = path.join(__dirname, '../test-data');
+let testGitService: GitService;
+let testFileSystemService: FileSystemService;
 
 describe('API Tests', () => {
   beforeAll(async () => {
-    // Use a test data directory
-    (fileSystemService as any).dataDir = TEST_DATA_DIR;
-    await fileSystemService.initialize();
+    // Create test directory first
+    await fs.mkdir(TEST_DATA_DIR, { recursive: true });
+
+    // Then create Git and FileSystem services
+    testGitService = new GitService(TEST_DATA_DIR);
+    testFileSystemService = new FileSystemService(TEST_DATA_DIR, testGitService);
+
+    await testFileSystemService.initialize();
+    await testGitService.initialize();
+
+    // Override the app's services with test services
+    setServices(testGitService, testFileSystemService);
   });
 
   afterAll(async () => {
@@ -27,6 +39,7 @@ describe('API Tests', () => {
     try {
       await fs.rm(TEST_DATA_DIR, { recursive: true, force: true });
       await fs.mkdir(TEST_DATA_DIR, { recursive: true });
+      await testGitService.initialize();
     } catch (error) {
       // Ignore errors
     }
@@ -53,7 +66,7 @@ describe('API Tests', () => {
 
     it('should delete a folder', async () => {
       // Create folder first
-      await fileSystemService.createFolder('test-folder');
+      await testFileSystemService.createFolder('test-folder');
 
       const response = await request(app)
         .delete('/api/folders/test-folder');
@@ -64,7 +77,7 @@ describe('API Tests', () => {
 
     it('should rename a folder', async () => {
       // Create folder first
-      await fileSystemService.createFolder('old-name');
+      await testFileSystemService.createFolder('old-name');
 
       const response = await request(app)
         .put('/api/folders/rename')
@@ -87,7 +100,7 @@ describe('API Tests', () => {
 
     it('should get a page', async () => {
       // Create page first
-      await fileSystemService.createPage('test-page.md', '# Test Content');
+      await testFileSystemService.createPage('test-page.md', '# Test Content');
 
       const response = await request(app)
         .get('/api/pages/test-page.md');
@@ -99,7 +112,7 @@ describe('API Tests', () => {
 
     it('should update a page', async () => {
       // Create page first
-      await fileSystemService.createPage('test-page.md', '# Old Content');
+      await testFileSystemService.createPage('test-page.md', '# Old Content');
 
       const response = await request(app)
         .put('/api/pages/test-page.md')
@@ -108,13 +121,13 @@ describe('API Tests', () => {
       expect(response.status).toBe(200);
 
       // Verify content was updated
-      const content = await fileSystemService.getPageContent('test-page.md');
+      const content = await testFileSystemService.getPageContent('test-page.md');
       expect(content).toBe('# New Content');
     });
 
     it('should delete a page', async () => {
       // Create page first
-      await fileSystemService.createPage('test-page.md', '# Content');
+      await testFileSystemService.createPage('test-page.md', '# Content');
 
       const response = await request(app)
         .delete('/api/pages/test-page.md');
@@ -124,9 +137,9 @@ describe('API Tests', () => {
 
     it('should list pages in a folder', async () => {
       // Create folder and pages
-      await fileSystemService.createFolder('test-folder');
-      await fileSystemService.createPage('test-folder/page1.md', '# Page 1');
-      await fileSystemService.createPage('test-folder/page2.md', '# Page 2');
+      await testFileSystemService.createFolder('test-folder');
+      await testFileSystemService.createPage('test-folder/page1.md', '# Page 1');
+      await testFileSystemService.createPage('test-folder/page2.md', '# Page 2');
 
       const response = await request(app)
         .get('/api/pages?folder=test-folder');
@@ -138,7 +151,7 @@ describe('API Tests', () => {
 
     it('should rename a page', async () => {
       // Create page first
-      await fileSystemService.createPage('old-page.md', '# Content');
+      await testFileSystemService.createPage('old-page.md', '# Content');
 
       const response = await request(app)
         .put('/api/pages/rename/file')
@@ -149,9 +162,9 @@ describe('API Tests', () => {
 
     it('should move a page to a different folder', async () => {
       // Create folder and page first
-      await fileSystemService.createFolder('source-folder');
-      await fileSystemService.createFolder('dest-folder');
-      await fileSystemService.createPage('source-folder/test-page.md', '# Test Content');
+      await testFileSystemService.createFolder('source-folder');
+      await testFileSystemService.createFolder('dest-folder');
+      await testFileSystemService.createPage('source-folder/test-page.md', '# Test Content');
 
       const response = await request(app)
         .put('/api/pages/move')
@@ -162,7 +175,7 @@ describe('API Tests', () => {
       expect(response.body).toHaveProperty('newPath', 'dest-folder/test-page.md');
 
       // Verify file was moved
-      const content = await fileSystemService.getPageContent('dest-folder/test-page.md');
+      const content = await testFileSystemService.getPageContent('dest-folder/test-page.md');
       expect(content).toBe('# Test Content');
     });
   });
@@ -172,6 +185,83 @@ describe('API Tests', () => {
       const response = await request(app).get('/api/health');
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('status', 'ok');
+    });
+  });
+
+  describe('Version History', () => {
+    it('should track page creation and updates in Git', async () => {
+      // Create a page
+      await testFileSystemService.createPage('history-test.md', '# Version 1');
+
+      // Update it
+      await testFileSystemService.updatePage('history-test.md', '# Version 2');
+      await testFileSystemService.updatePage('history-test.md', '# Version 3');
+
+      // Get history
+      const history = await testGitService.getFileHistory('history-test.md');
+
+      expect(history.length).toBeGreaterThanOrEqual(3);
+      expect(history[0].message).toContain('Updated page');
+      expect(history[history.length - 1].message).toContain('Created page');
+    });
+
+    it('should get page history via API', async () => {
+      await testFileSystemService.createPage('api-history-test.md', '# Content');
+      await testFileSystemService.updatePage('api-history-test.md', '# Updated');
+
+      const response = await request(app).get('/api/pages/api-history-test.md/history');
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBeGreaterThanOrEqual(2);
+      expect(response.body[0]).toHaveProperty('hash');
+      expect(response.body[0]).toHaveProperty('date');
+      expect(response.body[0]).toHaveProperty('message');
+      expect(response.body[0]).toHaveProperty('author');
+    });
+
+    it('should get a specific version of a page', async () => {
+      await testFileSystemService.createPage('version-test.md', '# Original');
+      const history = await testGitService.getFileHistory('version-test.md');
+      const originalHash = history[0].hash;
+
+      await testFileSystemService.updatePage('version-test.md', '# Modified');
+
+      const response = await request(app).get(`/api/pages/version-test.md/versions/${originalHash}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('content', '# Original');
+      expect(response.body).toHaveProperty('hash', originalHash);
+    });
+
+    it('should handle manually added files', async () => {
+      // Simulate manually adding a file
+      const manualFilePath = path.join(TEST_DATA_DIR, 'manual-file.md');
+      await fs.writeFile(manualFilePath, '# Manually added file');
+
+      // Commit pending changes
+      await testGitService.commitPendingChanges();
+
+      // Verify it was committed
+      const history = await testGitService.getFileHistory('manual-file.md');
+      expect(history.length).toBeGreaterThanOrEqual(1);
+      expect(history[0].message).toContain('External changes');
+    });
+
+    it('should restore a page to a previous version', async () => {
+      await testFileSystemService.createPage('restore-test.md', '# Version 1');
+      const history1 = await testGitService.getFileHistory('restore-test.md');
+      const version1Hash = history1[0].hash;
+
+      await testFileSystemService.updatePage('restore-test.md', '# Version 2');
+
+      const response = await request(app).post(`/api/pages/restore-test.md/restore/${version1Hash}`);
+
+      expect(response.status).toBe(200);
+
+      // Verify content was restored
+      const content = await testFileSystemService.getPageContent('restore-test.md');
+      expect(content).toBe('# Version 1');
     });
   });
 });

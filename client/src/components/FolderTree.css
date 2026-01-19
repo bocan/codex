@@ -106,6 +106,22 @@
   border-bottom: none;
 }
 
-.context-menu button:hover {
+.context-menu button:hover:not(:disabled) {
   background: var(--bg-secondary);
+}
+
+.context-menu button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.folder-item.busy {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.folder-creating {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-style: italic;
 }

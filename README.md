@@ -2,7 +2,9 @@
 
 > A Notion-like wiki and document store built with React and Express.
 
-A full-stack TypeScript application that provides a beautiful, intuitive interface for creating and managing markdown documents organized in a hierarchical folder structure. Think of it as your personal knowledge base with a clean three-pane layout and powerful API.
+**Single-user personal knowledge base** - A full-stack TypeScript application that provides a beautiful, intuitive interface for creating and managing markdown documents organized in a hierarchical folder structure.
+
+> ⚠️ **Note**: Disnotion is designed as a **single-user application**. It does not support concurrent multi-user editing or collaboration features. Perfect for personal wikis, note-taking, and documentation.
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18.2-61dafb)](https://reactjs.org/)
@@ -22,6 +24,83 @@ A full-stack TypeScript application that provides a beautiful, intuitive interfa
 - ✅ **Tested**: Comprehensive test suite for both backend and frontend
 - 🎯 **Collapsible Panes**: Hide sidebars for distraction-free writing
 - 🚀 **Fast & Lightweight**: Built with Vite for lightning-fast development
+- 🔐 **Password Protection**: Simple password-based authentication to secure your data
+- 🛡️ **Security Features**: Rate limiting, request logging, and security headers
+
+## 🔐 Security & Logging
+
+Disnotion includes several security features to protect your data:
+
+### Authentication
+- **Password-based login** with bcrypt hashing (10 salt rounds)
+- **Session management** using httpOnly cookies (24-hour expiration)
+- Authentication can be disabled by not setting `AUTH_PASSWORD` (not recommended for public deployments)
+
+### Rate Limiting
+- **Login endpoint** is rate-limited to 5 attempts per 15 minutes per IP address
+- Prevents brute force password attacks
+- Returns `429 Too Many Requests` when limit is exceeded
+
+### Logging
+All login attempts are logged with timestamps and IP addresses:
+- `✓ Successful login from 192.168.1.100` - Successful authentication
+- `✗ Failed login attempt from 192.168.1.100` - Invalid password
+- `Login attempt without password from 192.168.1.100` - Missing password
+- `Login attempt when auth disabled from 192.168.1.100` - Auth not configured
+
+HTTP request logging (via morgan):
+- **Development**: Concise colored output showing method, URL, status, and response time
+- **Production**: Combined Apache-style logs with full details
+
+### Security Headers
+Helmet middleware provides:
+- Content Security Policy (CSP)
+- X-Frame-Options (clickjacking protection)
+- X-Content-Type-Options (MIME sniffing protection)
+- Strict-Transport-Security (HTTPS enforcement in production)
+- And other security headers
+
+### Best Practices
+- Always set a strong `AUTH_PASSWORD` for deployments
+- Use a unique `SESSION_SECRET` in production
+- Enable HTTPS in production (`NODE_ENV=production`)
+- Monitor logs for suspicious login patterns
+- Consider deploying behind a reverse proxy (nginx, Caddy) for additional security
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/bocan/disnotion.git
+cd disnotion
+
+# Install dependencies
+make install
+```
+
+### Configuration
+
+Create a `.env` file in the root directory:
+
+```env
+# Required: Set your password
+AUTH_PASSWORD=your-secure-password-here
+
+# Optional: Server port (default: 3001)
+PORT=3001
+```
+
+### Running
+
+```bash
+# Start both server and client
+make dev
+
+# Visit http://localhost:3000
+# Login with your AUTH_PASSWORD
+```
 
 ## 🛠️ Development
 

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import fileSystemService from '../services/fileSystem';
+import { fileSystemService, gitService } from '../index';
 
 export const movePage = async (req: Request, res: Response) => {
   try {
@@ -104,5 +104,59 @@ export const renamePage = async (req: Request, res: Response) => {
     res.json({ message: 'Page renamed successfully', oldPath, newPath });
   } catch (error) {
     res.status(500).json({ error: 'Failed to rename page', message: (error as Error).message });
+  }
+};
+
+export const getPageHistory = async (req: Request, res: Response) => {
+  try {
+    const { path } = req.params;
+
+    if (!path) {
+      return res.status(400).json({ error: 'Path is required' });
+    }
+
+    const history = await gitService.getFileHistory(path);
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get page history', message: (error as Error).message });
+  }
+};
+
+export const getPageVersion = async (req: Request, res: Response) => {
+  try {
+    const { path, hash } = req.params;
+
+    if (!path || !hash) {
+      return res.status(400).json({ error: 'Path and hash are required' });
+    }
+
+    const version = await gitService.getFileAtCommit(path, hash);
+
+    if (!version) {
+      return res.status(404).json({ error: 'Version not found' });
+    }
+
+    res.json(version);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get page version', message: (error as Error).message });
+  }
+};
+
+export const restorePageVersion = async (req: Request, res: Response) => {
+  try {
+    const { path, hash } = req.params;
+
+    if (!path || !hash) {
+      return res.status(400).json({ error: 'Path and hash are required' });
+    }
+
+    await gitService.restoreFileToCommit(path, hash);
+
+    // Commit the restoration
+    await gitService.commitFile(path, `Restored ${path} to version ${hash.substring(0, 7)}`);
+
+    res.json({ message: 'Page restored successfully', path, hash });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to restore page version', message: (error as Error).message });
   }
 };

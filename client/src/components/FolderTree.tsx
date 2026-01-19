@@ -15,9 +15,12 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({ node, onSelectFolder, selec
   const [isRenaming, setIsRenaming] = useState(false);
   const [newName, setNewName] = useState(node.name);
   const [showContextMenu, setShowContextMenu] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const isSelected = selectedFolder === node.path;
   const hasChildren = node.children.length > 0;
+  const isBusy = isCreating || isDeleting;
 
   const handleToggle = () => {
     setIsExpanded(!isExpanded);
@@ -30,15 +33,21 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({ node, onSelectFolder, selec
   const handleCreateFolder = async () => {
     const folderName = prompt('Enter folder name:');
     if (folderName) {
+      setIsCreating(true);
+      setShowContextMenu(false);
       try {
         const newPath = node.path === '/' ? folderName : `${node.path}/${folderName}`;
         await api.createFolder(newPath);
         onRefresh();
-      } catch (error) {
-        alert('Failed to create folder');
+      } catch (err) {
+        console.error('Failed to create folder:', err);
+        // Show inline error feedback
+      } finally {
+        setIsCreating(false);
       }
+    } else {
+      setShowContextMenu(false);
     }
-    setShowContextMenu(false);
   };
 
   const handleRename = () => {
@@ -53,8 +62,9 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({ node, onSelectFolder, selec
         const newPath = parentPath ? `${parentPath}/${newName}` : newName;
         await api.renameFolder(node.path, newPath);
         onRefresh();
-      } catch (error) {
-        alert('Failed to rename folder');
+      } catch (err) {
+        console.error('Failed to rename folder:', err);
+        setNewName(node.name); // Reset to original
       }
     }
     setIsRenaming(false);
@@ -62,14 +72,19 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({ node, onSelectFolder, selec
 
   const handleDelete = async () => {
     if (confirm(`Delete folder "${node.name}" and all its contents?`)) {
+      setIsDeleting(true);
+      setShowContextMenu(false);
       try {
         await api.deleteFolder(node.path);
         onRefresh();
-      } catch (error) {
-        alert('Failed to delete folder');
+      } catch (err) {
+        console.error('Failed to delete folder:', err);
+      } finally {
+        setIsDeleting(false);
       }
+    } else {
+      setShowContextMenu(false);
     }
-    setShowContextMenu(false);
   };
 
   const handleContextMenu = (e: React.MouseEvent) => {
@@ -81,9 +96,9 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({ node, onSelectFolder, selec
   return (
     <div className="folder-tree-item">
       <div
-        className={`folder-item ${isSelected ? 'selected' : ''}`}
+        className={`folder-item ${isSelected ? 'selected' : ''} ${isBusy ? 'busy' : ''}`}
         onClick={handleSelect}
-        onContextMenu={handleContextMenu}
+        onContextMenu={(e) => !isBusy && handleContextMenu(e)}
       >
         <span className="folder-toggle" onClick={(e) => { e.stopPropagation(); handleToggle(); }}>
           {hasChildren && (isExpanded ? '▼' : '▶')}
@@ -103,15 +118,22 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({ node, onSelectFolder, selec
             autoFocus
           />
         ) : (
-          <span className="folder-name">📁 {node.name}</span>
+          <span className="folder-name">
+            {isDeleting ? '⏳' : '📁'} {node.name}
+            {isCreating && <span className="folder-creating"> (creating...)</span>}
+          </span>
         )}
-        {showContextMenu && (
+        {showContextMenu && !isBusy && (
           <div className="context-menu" onClick={(e) => e.stopPropagation()}>
-            <button onClick={handleCreateFolder}>New Folder</button>
+            <button onClick={handleCreateFolder} disabled={isCreating}>
+              {isCreating ? 'Creating...' : 'New Folder'}
+            </button>
             {node.path !== '/' && (
               <>
                 <button onClick={handleRename}>Rename</button>
-                <button onClick={handleDelete}>Delete</button>
+                <button onClick={handleDelete} disabled={isDeleting}>
+                  {isDeleting ? 'Deleting...' : 'Delete'}
+                </button>
               </>
             )}
           </div>

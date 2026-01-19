@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { GitService } from './gitService';
 
 const DATA_DIR = path.join(__dirname, '../../..', 'data');
 
@@ -18,9 +19,11 @@ export interface FileNode {
 
 export class FileSystemService {
   private dataDir: string;
+  private gitService: GitService | null;
 
-  constructor(dataDir: string = DATA_DIR) {
+  constructor(dataDir: string = DATA_DIR, gitService: GitService | null = null) {
     this.dataDir = dataDir;
+    this.gitService = gitService;
   }
 
   async initialize(): Promise<void> {
@@ -43,7 +46,8 @@ export class FileSystemService {
     const children: FolderNode[] = [];
 
     for (const entry of entries) {
-      if (entry.isDirectory()) {
+      // Skip hidden folders like .git
+      if (entry.isDirectory() && !entry.name.startsWith('.')) {
         const childPath = path.join(relativePath, entry.name);
         const child = await this.getFolderTree(childPath);
         children.push(child);
@@ -103,6 +107,19 @@ export class FileSystemService {
     await fs.mkdir(dir, { recursive: true });
 
     await fs.writeFile(fullPath, content, 'utf-8');
+
+    // Commit the new page (non-blocking in production, blocking in tests)
+    if (this.gitService) {
+      if (process.env.TEST_DATA_DIR) {
+        // In test mode, wait for commit and let errors propagate
+        await this.gitService.commitFile(relativePath, `Created page: ${relativePath}`);
+      } else {
+        // In production, fire and forget
+        this.gitService.commitFile(relativePath, `Created page: ${relativePath}`).catch(err =>
+          console.error('Git commit failed:', err)
+        );
+      }
+    }
   }
 
   async getPageContent(relativePath: string): Promise<string> {
@@ -113,11 +130,37 @@ export class FileSystemService {
   async updatePage(relativePath: string, content: string): Promise<void> {
     const fullPath = path.join(this.dataDir, relativePath);
     await fs.writeFile(fullPath, content, 'utf-8');
+
+    // Commit the update (non-blocking in production, blocking in tests)
+    if (this.gitService) {
+      if (process.env.TEST_DATA_DIR) {
+        // In test mode, wait for commit and let errors propagate
+        await this.gitService.commitFile(relativePath, `Updated page: ${relativePath}`);
+      } else {
+        // In production, fire and forget
+        this.gitService.commitFile(relativePath, `Updated page: ${relativePath}`).catch(err =>
+          console.error('Git commit failed:', err)
+        );
+      }
+    }
   }
 
   async deletePage(relativePath: string): Promise<void> {
     const fullPath = path.join(this.dataDir, relativePath);
     await fs.unlink(fullPath);
+
+    // Commit the deletion (non-blocking in production, blocking in tests)
+    if (this.gitService) {
+      if (process.env.TEST_DATA_DIR) {
+        // In test mode, wait for commit and let errors propagate
+        await this.gitService.commitFile(relativePath, `Deleted page: ${relativePath}`);
+      } else {
+        // In production, fire and forget
+        this.gitService.commitFile(relativePath, `Deleted page: ${relativePath}`).catch(err =>
+          console.error('Git commit failed:', err)
+        );
+      }
+    }
   }
 
   async renamePage(oldPath: string, newPath: string): Promise<void> {
@@ -129,6 +172,19 @@ export class FileSystemService {
     await fs.mkdir(newDir, { recursive: true });
 
     await fs.rename(oldFullPath, newFullPath);
+
+    // Commit the rename (non-blocking in production, blocking in tests)
+    if (this.gitService) {
+      if (process.env.TEST_DATA_DIR) {
+        // In test mode, wait for commit and let errors propagate
+        await this.gitService.commitFiles([oldPath, newPath], `Renamed page: ${oldPath} → ${newPath}`);
+      } else {
+        // In production, fire and forget
+        this.gitService.commitFiles([oldPath, newPath], `Renamed page: ${oldPath} → ${newPath}`).catch(err =>
+          console.error('Git commit failed:', err)
+        );
+      }
+    }
   }
 
   async movePage(oldPath: string, newFolderPath: string): Promise<string> {
@@ -155,8 +211,20 @@ export class FileSystemService {
     }
 
     await fs.rename(oldFullPath, newFullPath);
+
+    // Commit the move (non-blocking in production, blocking in tests)
+    if (this.gitService) {
+      if (process.env.TEST_DATA_DIR) {
+        // In test mode, wait for commit and let errors propagate
+        await this.gitService.commitFiles([oldPath, newPath], `Moved page: ${oldPath} → ${newPath}`);
+      } else {
+        // In production, fire and forget
+        this.gitService.commitFiles([oldPath, newPath], `Moved page: ${oldPath} → ${newPath}`).catch(err =>
+          console.error('Git commit failed:', err)
+        );
+      }
+    }
+
     return newPath;
   }
 }
-
-export default new FileSystemService();

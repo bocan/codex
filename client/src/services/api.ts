@@ -1,9 +1,26 @@
 import axios from 'axios';
-import { FolderNode, FileNode, Page } from '../types';
+import { FolderNode, FileNode, Page, CommitInfo, VersionContent } from '../types';
 
 const API_BASE = '/api';
 
+// Enable cookies for session authentication
+axios.defaults.withCredentials = true;
+
 export const api = {
+  // Auth operations
+  checkAuthStatus: async (): Promise<{ authEnabled: boolean; authenticated: boolean }> => {
+    const response = await axios.get(`${API_BASE}/auth/status`);
+    return response.data;
+  },
+
+  login: async (password: string): Promise<void> => {
+    await axios.post(`${API_BASE}/auth/login`, { password });
+  },
+
+  logout: async (): Promise<void> => {
+    await axios.post(`${API_BASE}/auth/logout`);
+  },
+
   // Folder operations
   getFolderTree: async (): Promise<FolderNode> => {
     const response = await axios.get(`${API_BASE}/folders`);
@@ -54,5 +71,20 @@ export const api = {
   movePage: async (oldPath: string, newFolderPath: string): Promise<{ newPath: string }> => {
     const response = await axios.put(`${API_BASE}/pages/move`, { oldPath, newFolderPath });
     return response.data;
+  },
+
+  // Version history operations
+  getPageHistory: async (path: string): Promise<CommitInfo[]> => {
+    const response = await axios.get(`${API_BASE}/pages/${path}/history`);
+    return response.data;
+  },
+
+  getPageVersion: async (path: string, hash: string): Promise<VersionContent> => {
+    const response = await axios.get(`${API_BASE}/pages/${path}/versions/${hash}`);
+    return response.data;
+  },
+
+  restorePageVersion: async (path: string, hash: string): Promise<void> => {
+    await axios.post(`${API_BASE}/pages/${path}/restore/${hash}`);
   },
 };

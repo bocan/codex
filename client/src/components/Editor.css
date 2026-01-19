@@ -14,6 +14,58 @@
 .editor.empty .empty-state {
   text-align: center;
   color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.editor.empty .empty-icon,
+.editor.loading .loading-spinner,
+.editor.error .error-icon {
+  font-size: 48px;
+}
+
+.editor.loading,
+.editor.error {
+  justify-content: center;
+  align-items: center;
+  background: var(--bg-tertiary);
+}
+
+.editor .loading-state,
+.editor .error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-secondary);
+}
+
+.editor .error-state {
+  color: #e74c3c;
+  cursor: pointer;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.editor .error-state:hover {
+  background: rgba(231, 76, 60, 0.1);
+}
+
+.editor .loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-color);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .editor-header {
@@ -40,6 +92,36 @@
 .save-status {
   font-size: 12px;
   color: var(--text-secondary);
+}
+
+.save-status.saving {
+  color: #667eea;
+}
+
+.history-btn {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.history-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-color);
+}
+
+.save-error {
+  font-size: 12px;
+  color: #e74c3c;
+  cursor: pointer;
+}
+
+.save-error:hover {
+  text-decoration: underline;
 }
 
 .editor-actions button {

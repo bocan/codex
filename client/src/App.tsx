@@ -3,6 +3,7 @@ import { FolderTree } from './components/FolderTree';
 import { PageList } from './components/PageList';
 import { Editor } from './components/Editor';
 import { Preview } from './components/Preview';
+import { Login } from './components/Login';
 import { api } from './services/api';
 import { FolderNode } from './types';
 import './App.css';
@@ -16,6 +17,10 @@ const MIN_FOLDER_HEIGHT = 150;
 const MAX_FOLDER_HEIGHT = 800;
 
 function App() {
+  // Auth state
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null = loading
+  const [authEnabled, setAuthEnabled] = useState(false);
+
   const [folderTree, setFolderTree] = useState<FolderNode | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [selectedPage, setSelectedPage] = useState<string | null>(null);
@@ -47,9 +52,43 @@ function App() {
   const isResizingFolderTree = useRef(false);
   const leftPaneRef = useRef<HTMLDivElement>(null);
 
+  // Check auth status on mount
   useEffect(() => {
-    loadFolderTree();
+    checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    try {
+      const status = await api.checkAuthStatus();
+      setAuthEnabled(status.authEnabled);
+      setIsAuthenticated(status.authenticated);
+    } catch (err) {
+      console.error('Failed to check auth status:', err);
+      setIsAuthenticated(false);
+    }
+  };
+
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
+    loadFolderTree();
+  };
+
+  const handleLogout = async () => {
+    try {
+      await api.logout();
+      setIsAuthenticated(false);
+      setFolderTree(null);
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
+
+  // Only load folder tree if authenticated (or auth is disabled)
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadFolderTree();
+    }
+  }, [isAuthenticated]);
 
   // Save pane widths to localStorage
   useEffect(() => {
@@ -211,13 +250,30 @@ function App() {
     return breadcrumbs;
   };
 
+  // Show loading state while checking auth
+  if (isAuthenticated === null) {
+    return (
+      <div className="app loading">
+        <div className="loading-state">
+          <div className="loading-spinner"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login screen if not authenticated
+  if (!isAuthenticated) {
+    return <Login onLoginSuccess={handleLoginSuccess} />;
+  }
+
   return (
     <div className="app">
       <header className="app-header">
         <div className="header-content">
           <div className="header-left">
             <h1>📝 Disnotion</h1>
-            <p className="tagline">Your personal wiki & document store</p>
+            <p className="tagline">Your Personal Wiki & Document Store</p>
           </div>
           <div className="breadcrumbs">
             {getBreadcrumbs().map((crumb, index, arr) => (
@@ -233,13 +289,24 @@ function App() {
               </span>
             ))}
           </div>
-          <button
-            className="theme-toggle"
-            onClick={cycleTheme}
-            title={`Theme: ${theme} (click to cycle)`}
-          >
-            {getThemeIcon()}
-          </button>
+          <div className="header-actions">
+            <button
+              className="theme-toggle"
+              onClick={cycleTheme}
+              title={`Theme: ${theme} (click to cycle)`}
+            >
+              {getThemeIcon()}
+            </button>
+            {authEnabled && (
+              <button
+                className="logout-button"
+                onClick={handleLogout}
+                title="Logout"
+              >
+                🚪 Logout
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
