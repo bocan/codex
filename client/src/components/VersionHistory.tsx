@@ -104,13 +104,13 @@ export default function VersionHistory({ pagePath, onClose, onRestore }: Version
             if (lines[lines.length - 1] === '') {
               lines.pop();
             }
-            
+
             return lines.map((line, lineIndex) => {
-              const className = part.added ? 'diff-line-added' : 
-                              part.removed ? 'diff-line-removed' : 
+              const className = part.added ? 'diff-line-added' :
+                              part.removed ? 'diff-line-removed' :
                               'diff-line-unchanged';
               const marker = part.added ? '+' : part.removed ? '-' : ' ';
-              
+
               return (
                 <div key={`${index}-${lineIndex}`} className={className}>
                   <span className="diff-marker">{marker}</span>
