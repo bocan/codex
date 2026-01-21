@@ -1,30 +1,30 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { FolderTree } from '../components/FolderTree';
-import { FolderNode } from '../types';
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { FolderTree } from "../components/FolderTree";
+import { FolderNode } from "../types";
 
 const mockTree: FolderNode = {
-  name: 'root',
-  path: '/',
-  type: 'folder',
+  name: "root",
+  path: "/",
+  type: "folder",
   children: [
     {
-      name: 'Projects',
-      path: 'Projects',
-      type: 'folder',
+      name: "Projects",
+      path: "Projects",
+      type: "folder",
       children: [],
     },
     {
-      name: 'Notes',
-      path: 'Notes',
-      type: 'folder',
+      name: "Notes",
+      path: "Notes",
+      type: "folder",
       children: [],
     },
   ],
 };
 
-describe('FolderTree', () => {
-  it('renders folder tree', () => {
+describe("FolderTree", () => {
+  it("renders folder tree", () => {
     const onSelect = vi.fn();
     const onRefresh = vi.fn();
 
@@ -34,7 +34,7 @@ describe('FolderTree', () => {
         onSelectFolder={onSelect}
         selectedFolder={null}
         onRefresh={onRefresh}
-      />
+      />,
     );
 
     expect(screen.getByText(/root/i)).toBeInTheDocument();
@@ -42,7 +42,7 @@ describe('FolderTree', () => {
     expect(screen.getByText(/Notes/i)).toBeInTheDocument();
   });
 
-  it('calls onSelectFolder when folder is clicked', async () => {
+  it("calls onSelectFolder when folder is clicked", async () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
     const onRefresh = vi.fn();
@@ -53,12 +53,12 @@ describe('FolderTree', () => {
         onSelectFolder={onSelect}
         selectedFolder={null}
         onRefresh={onRefresh}
-      />
+      />,
     );
 
     const projectsFolder = screen.getByText(/Projects/i);
     await user.click(projectsFolder);
 
-    expect(onSelect).toHaveBeenCalledWith('Projects');
+    expect(onSelect).toHaveBeenCalledWith("Projects");
   });
 });

@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeSlug from 'rehype-slug';
-import { asBlob } from 'html-docx-js-typescript';
-import { api } from '../services/api';
-import { TableOfContents } from './TableOfContents';
-import './Preview.css';
+import React, { useState, useEffect, useRef } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeSlug from "rehype-slug";
+import { asBlob } from "html-docx-js-typescript";
+import { api } from "../services/api";
+import { TableOfContents } from "./TableOfContents";
+import "./Preview.css";
 
 interface PreviewProps {
   pagePath: string | null;
@@ -14,8 +14,13 @@ interface PreviewProps {
   scrollPercent?: number;
 }
 
-export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavigate, scrollPercent }) => {
-  const [content, setContent] = useState('');
+export const Preview: React.FC<PreviewProps> = ({
+  pagePath,
+  liveContent,
+  onNavigate,
+  scrollPercent,
+}) => {
+  const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -26,7 +31,7 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
     if (pagePath) {
       loadPage();
     } else {
-      setContent('');
+      setContent("");
     }
   }, [pagePath]);
 
@@ -45,7 +50,7 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
       const page = await api.getPage(pagePath);
       setContent(page.content);
     } catch (error) {
-      console.error('Failed to load page for preview:', error);
+      console.error("Failed to load page for preview:", error);
     } finally {
       setLoading(false);
     }
@@ -70,36 +75,40 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
     if (!showExportMenu) return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (exportMenuRef.current && !exportMenuRef.current.contains(event.target as Node)) {
+      if (
+        exportMenuRef.current &&
+        !exportMenuRef.current.contains(event.target as Node)
+      ) {
         setShowExportMenu(false);
       }
     };
 
     const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         setShowExportMenu(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscapeKey);
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscapeKey);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscapeKey);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscapeKey);
     };
   }, [showExportMenu]);
 
   // Open preview in new window
   const openInNewWindow = () => {
     setShowExportMenu(false);
-    const newWindow = window.open('', '_blank', 'width=900,height=700');
+    const newWindow = window.open("", "_blank", "width=900,height=700");
     if (!newWindow) return;
 
     // Detect current theme
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-    const isDark = currentTheme === 'dark';
-    const isHighContrast = currentTheme === 'high-contrast';
+    const currentTheme =
+      document.documentElement.getAttribute("data-theme") || "light";
+    const isDark = currentTheme === "dark";
+    const isHighContrast = currentTheme === "high-contrast";
 
     const html = `
       <!DOCTYPE html>
@@ -107,7 +116,7 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${pagePath || 'Preview'}</title>
+          <title>${pagePath || "Preview"}</title>
           <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
           <style>
             * {
@@ -116,10 +125,10 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
             body {
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
               line-height: 1.6;
-              color: ${isHighContrast ? '#ffffff' : isDark ? '#f0f0f0' : '#1a1a1a'};
+              color: ${isHighContrast ? "#ffffff" : isDark ? "#f0f0f0" : "#1a1a1a"};
               margin: 0;
               padding: 0;
-              background: ${isHighContrast ? '#000000' : isDark ? '#1a1a1a' : '#fff'};
+              background: ${isHighContrast ? "#000000" : isDark ? "#1a1a1a" : "#fff"};
             }
 
             /* Header */
@@ -128,7 +137,7 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
               top: 0;
               left: 0;
               right: 0;
-              background: ${isHighContrast ? '#000000' : `linear-gradient(135deg, ${isDark ? '#4a5f8f 0%, #5a3a72 100%' : '#667eea 0%, #764ba2 100%'})`};
+              background: ${isHighContrast ? "#000000" : `linear-gradient(135deg, ${isDark ? "#4a5f8f 0%, #5a3a72 100%" : "#667eea 0%, #764ba2 100%"})`};
               color: white;
               padding: 16px 20px;
               box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -136,7 +145,7 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
               justify-content: space-between;
               align-items: center;
               z-index: 100;
-              ${isHighContrast ? 'border-bottom: 2px solid #ffffff;' : ''}
+              ${isHighContrast ? "border-bottom: 2px solid #ffffff;" : ""}
             }
             .header h1 {
               margin: 0;
@@ -182,8 +191,8 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
               position: absolute;
               top: calc(100% + 8px);
               right: 0;
-              background: ${isHighContrast ? '#000000' : isDark ? '#1a1a1a' : '#fff'};
-              border: 1px solid ${isHighContrast ? '#ffffff' : isDark ? '#4a4a4a' : '#ddd'};
+              background: ${isHighContrast ? "#000000" : isDark ? "#1a1a1a" : "#fff"};
+              border: 1px solid ${isHighContrast ? "#ffffff" : isDark ? "#4a4a4a" : "#ddd"};
               border-radius: 8px;
               box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
               min-width: 280px;
@@ -210,7 +219,7 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
               padding: 6px 8px;
               background: transparent;
               border: none;
-              color: ${isHighContrast ? '#ffff00' : isDark ? '#c0c0c0' : '#4a4a4a'};
+              color: ${isHighContrast ? "#ffff00" : isDark ? "#c0c0c0" : "#4a4a4a"};
               text-align: left;
               text-decoration: none;
               border-radius: 4px;
@@ -221,8 +230,8 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
               cursor: pointer;
             }
             .toc-link:hover {
-              color: ${isHighContrast ? '#00ffff' : isDark ? '#f0f0f0' : '#1a1a1a'};
-              background: ${isHighContrast ? '#1a1a1a' : isDark ? '#363636' : '#eee'};
+              color: ${isHighContrast ? "#00ffff" : isDark ? "#f0f0f0" : "#1a1a1a"};
+              background: ${isHighContrast ? "#1a1a1a" : isDark ? "#363636" : "#eee"};
             }
             .toc-level-1 { padding-left: 0; }
             .toc-level-2 { padding-left: 12px; }
@@ -243,41 +252,41 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
               margin-bottom: 16px;
               font-weight: 600;
               line-height: 1.25;
-              color: ${isHighContrast ? '#ffffff' : isDark ? '#f0f0f0' : '#1a1a1a'};
+              color: ${isHighContrast ? "#ffffff" : isDark ? "#f0f0f0" : "#1a1a1a"};
             }
-            h1 { font-size: 2em; border-bottom: 1px solid ${isHighContrast ? '#ffffff' : isDark ? '#4a4a4a' : '#d0d0d0'}; padding-bottom: 0.3em; }
-            h2 { font-size: 1.5em; border-bottom: 1px solid ${isHighContrast ? '#ffffff' : isDark ? '#4a4a4a' : '#d0d0d0'}; padding-bottom: 0.3em; }
+            h1 { font-size: 2em; border-bottom: 1px solid ${isHighContrast ? "#ffffff" : isDark ? "#4a4a4a" : "#d0d0d0"}; padding-bottom: 0.3em; }
+            h2 { font-size: 1.5em; border-bottom: 1px solid ${isHighContrast ? "#ffffff" : isDark ? "#4a4a4a" : "#d0d0d0"}; padding-bottom: 0.3em; }
             h3 { font-size: 1.25em; }
             h4 { font-size: 1em; }
             h5 { font-size: 0.875em; }
-            h6 { font-size: 0.85em; color: ${isHighContrast ? '#ffff00' : isDark ? '#c0c0c0' : '#4a4a4a'}; }
+            h6 { font-size: 0.85em; color: ${isHighContrast ? "#ffff00" : isDark ? "#c0c0c0" : "#4a4a4a"}; }
             code {
-              background: ${isHighContrast ? '#1a1a1a' : isDark ? '#2a2a2a' : '#f5f5f5'};
+              background: ${isHighContrast ? "#1a1a1a" : isDark ? "#2a2a2a" : "#f5f5f5"};
               padding: 0.2em 0.4em;
               border-radius: 3px;
               font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
               font-size: 85%;
-              color: ${isHighContrast ? '#00ffff' : isDark ? '#f0f0f0' : '#1a1a1a'};
-              ${isHighContrast ? 'border: 1px solid #ffffff;' : ''}
+              color: ${isHighContrast ? "#00ffff" : isDark ? "#f0f0f0" : "#1a1a1a"};
+              ${isHighContrast ? "border: 1px solid #ffffff;" : ""}
             }
             pre {
-              background: ${isHighContrast ? '#1a1a1a' : isDark ? '#2a2a2a' : '#f5f5f5'};
+              background: ${isHighContrast ? "#1a1a1a" : isDark ? "#2a2a2a" : "#f5f5f5"};
               padding: 16px;
               border-radius: 6px;
               overflow-x: auto;
               line-height: 1.45;
-              ${isHighContrast ? 'border: 1px solid #ffffff;' : ''}
+              ${isHighContrast ? "border: 1px solid #ffffff;" : ""}
             }
             pre code {
               background: none;
               padding: 0;
               font-size: 100%;
-              ${isHighContrast ? 'border: none;' : ''}
+              ${isHighContrast ? "border: none;" : ""}
             }
             blockquote {
-              border-left: 4px solid ${isHighContrast ? '#ffff00' : isDark ? '#4a4a4a' : '#d0d0d0'};
+              border-left: 4px solid ${isHighContrast ? "#ffff00" : isDark ? "#4a4a4a" : "#d0d0d0"};
               padding-left: 1em;
-              color: ${isHighContrast ? '#ffff00' : isDark ? '#c0c0c0' : '#4a4a4a'};
+              color: ${isHighContrast ? "#ffff00" : isDark ? "#c0c0c0" : "#4a4a4a"};
               margin-left: 0;
             }
             table {
@@ -286,24 +295,24 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
               margin: 16px 0;
             }
             th, td {
-              border: 1px solid ${isHighContrast ? '#ffffff' : isDark ? '#4a4a4a' : '#d0d0d0'};
+              border: 1px solid ${isHighContrast ? "#ffffff" : isDark ? "#4a4a4a" : "#d0d0d0"};
               padding: 8px 13px;
               text-align: left;
             }
             th {
-              background: ${isHighContrast ? '#1a1a1a' : isDark ? '#2a2a2a' : '#f5f5f5'};
+              background: ${isHighContrast ? "#1a1a1a" : isDark ? "#2a2a2a" : "#f5f5f5"};
               font-weight: 600;
             }
             tr:nth-child(even) {
-              background: ${isHighContrast ? '#0d0d0d' : isDark ? '#222222' : '#fafafa'};
+              background: ${isHighContrast ? "#0d0d0d" : isDark ? "#222222" : "#fafafa"};
             }
             a {
-              color: ${isHighContrast ? '#00ffff' : isDark ? '#8a9ff0' : '#5568d3'};
+              color: ${isHighContrast ? "#00ffff" : isDark ? "#8a9ff0" : "#5568d3"};
               text-decoration: underline;
             }
             a:hover {
-              text-decoration: ${isHighContrast ? 'none' : 'underline'};
-              ${isHighContrast ? 'color: #ffff00;' : ''}
+              text-decoration: ${isHighContrast ? "none" : "underline"};
+              ${isHighContrast ? "color: #ffff00;" : ""}
             }
             img {
               max-width: 100%;
@@ -317,7 +326,7 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
             }
             hr {
               border: 0;
-              border-top: 1px solid ${isHighContrast ? '#ffffff' : isDark ? '#4a4a4a' : '#d0d0d0'};
+              border-top: 1px solid ${isHighContrast ? "#ffffff" : isDark ? "#4a4a4a" : "#d0d0d0"};
               margin: 24px 0;
             }
             input[type="checkbox"] {
@@ -327,7 +336,7 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
         </head>
         <body>
           <div class="header">
-            <h1>📖 ${pagePath?.split('/').pop()?.replace('.md', '') || 'Reading Mode'}</h1>
+            <h1>📖 ${pagePath?.split("/").pop()?.replace(".md", "") || "Reading Mode"}</h1>
             <div class="header-actions">
               <div class="toc-container">
                 <button class="toc-toggle" id="tocToggle">☰ Contents</button>
@@ -347,7 +356,7 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
             contentDiv.innerHTML = marked.parse(markdown);
 
             // Convert attachment links to absolute URLs
-            const folderPath = ${JSON.stringify(pagePath ? pagePath.substring(0, pagePath.lastIndexOf('/')) || '' : '')};
+            const folderPath = ${JSON.stringify(pagePath ? pagePath.substring(0, pagePath.lastIndexOf("/")) || "" : "")};
             contentDiv.querySelectorAll('img[src^=".attachments/"]').forEach(function(img) {
               const filename = img.getAttribute('src').replace('.attachments/', '');
               img.src = window.location.origin + '/api/attachments/' + encodeURIComponent(filename) + '?folder=' + encodeURIComponent(folderPath);
@@ -470,13 +479,13 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
     const images = clone.querySelectorAll('img[src*="/api/attachments/"]');
 
     for (const img of Array.from(images)) {
-      const src = img.getAttribute('src');
+      const src = img.getAttribute("src");
       if (src) {
         try {
           // Fetch the image as blob (URL already includes credentials)
-          const response = await fetch(src, { credentials: 'include' });
+          const response = await fetch(src, { credentials: "include" });
           if (!response.ok) {
-            console.error('Failed to fetch image:', src, response.status);
+            console.error("Failed to fetch image:", src, response.status);
             continue;
           }
           const blob = await response.blob();
@@ -502,19 +511,19 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
           }
 
           // Create canvas and draw resized image
-          const canvas = document.createElement('canvas');
+          const canvas = document.createElement("canvas");
           canvas.width = width;
           canvas.height = height;
-          const ctx = canvas.getContext('2d');
+          const ctx = canvas.getContext("2d");
           if (ctx) {
             ctx.drawImage(image, 0, 0, width, height);
-            const base64 = canvas.toDataURL(blob.type || 'image/jpeg', 0.9);
-            img.setAttribute('src', base64);
+            const base64 = canvas.toDataURL(blob.type || "image/jpeg", 0.9);
+            img.setAttribute("src", base64);
           }
 
           URL.revokeObjectURL(imageUrl);
         } catch (error) {
-          console.error('Failed to embed image:', src, error);
+          console.error("Failed to embed image:", src, error);
         }
       }
     }
@@ -523,15 +532,15 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
     // Even though ReactMarkdown converts them, we need to ensure they have the full origin
     const links = clone.querySelectorAll('a[href*="/api/attachments/"]');
     for (const link of Array.from(links)) {
-      const href = link.getAttribute('href');
-      if (href && !href.startsWith('http://') && !href.startsWith('https://')) {
+      const href = link.getAttribute("href");
+      if (href && !href.startsWith("http://") && !href.startsWith("https://")) {
         // Add the origin if it's a relative URL
         const absoluteUrl = `${window.location.origin}${href}`;
-        link.setAttribute('href', absoluteUrl);
+        link.setAttribute("href", absoluteUrl);
       } else if (href && !href.includes(window.location.origin)) {
         // Ensure it has the current origin
         const url = new URL(href, window.location.origin);
-        link.setAttribute('href', url.href);
+        link.setAttribute("href", url.href);
       }
     }
 
@@ -543,7 +552,7 @@ export const Preview: React.FC<PreviewProps> = ({ pagePath, liveContent, onNavig
 <html>
 <head>
   <meta charset="utf-8">
-  <title>${pagePath || 'Document'}</title>
+  <title>${pagePath || "Document"}</title>
   <style>
     body {
       font-family: 'Calibri', 'Arial', sans-serif;
@@ -646,15 +655,19 @@ ${htmlContent}
     const docxBlob = await asBlob(htmlDoc);
 
     // Ensure it's a proper Blob (library returns Buffer in browser)
-    const blob = docxBlob instanceof Blob ? docxBlob : new Blob([new Uint8Array(docxBlob as any)], {
-      type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    });
+    const blob =
+      docxBlob instanceof Blob
+        ? docxBlob
+        : new Blob([new Uint8Array(docxBlob as any)], {
+            type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          });
 
     // Download the file
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    const fileName = pagePath?.split('/').pop()?.replace('.md', '') || 'document';
+    const fileName =
+      pagePath?.split("/").pop()?.replace(".md", "") || "document";
     a.download = `${fileName}.docx`;
     document.body.appendChild(a);
     a.click();
@@ -664,35 +677,39 @@ ${htmlContent}
 
   // Handle link clicks in preview
   const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    const href = event.currentTarget.getAttribute('href');
+    const href = event.currentTarget.getAttribute("href");
     if (!href) return;
 
     // Handle anchor links (same document)
-    if (href.startsWith('#')) {
+    if (href.startsWith("#")) {
       event.preventDefault();
       const targetId = href.substring(1);
       // Look for the element within the preview content
-      const previewContent = event.currentTarget.closest('.preview-content');
+      const previewContent = event.currentTarget.closest(".preview-content");
       if (previewContent) {
         const element = previewContent.querySelector(`#${targetId}`);
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
         }
       }
       return;
     }
 
     // Handle internal markdown links
-    if (href.endsWith('.md') && !href.startsWith('http://') && !href.startsWith('https://')) {
+    if (
+      href.endsWith(".md") &&
+      !href.startsWith("http://") &&
+      !href.startsWith("https://")
+    ) {
       event.preventDefault();
 
       // Resolve relative path
       let targetPath = href;
-      if (pagePath && !href.startsWith('/')) {
+      if (pagePath && !href.startsWith("/")) {
         // Relative path - resolve from current page's directory
-        const currentDir = pagePath.substring(0, pagePath.lastIndexOf('/'));
+        const currentDir = pagePath.substring(0, pagePath.lastIndexOf("/"));
         targetPath = currentDir ? `${currentDir}/${href}` : href;
-      } else if (href.startsWith('/')) {
+      } else if (href.startsWith("/")) {
         // Absolute path - remove leading slash
         targetPath = href.substring(1);
       }
@@ -718,9 +735,22 @@ ${htmlContent}
     <article className="preview" aria-label="Markdown preview">
       <div className="preview-header">
         <h3>Preview</h3>
-        <div className="preview-actions" role="toolbar" aria-label="Preview controls">
+        <div
+          className="preview-actions"
+          role="toolbar"
+          aria-label="Preview controls"
+        >
           {content && <TableOfContents content={content} />}
-          {loading && <span className="loading-indicator" role="status" aria-label="Loading" aria-live="polite"><span aria-hidden="true">●</span></span>}
+          {loading && (
+            <span
+              className="loading-indicator"
+              role="status"
+              aria-label="Loading"
+              aria-live="polite"
+            >
+              <span aria-hidden="true">●</span>
+            </span>
+          )}
           <div className="export-dropdown" ref={exportMenuRef}>
             <button
               className="export-dropdown-btn"
@@ -730,23 +760,39 @@ ${htmlContent}
               aria-expanded={showExportMenu}
               aria-haspopup="true"
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                <path d="M9 2L9 3L12.3 3L6 9.3L6.7 10L13 3.7L13 7L14 7L14 2L9 2z"/>
-                <path d="M12 12L4 12L4 4L7 4L7 3L3 3L3 13L13 13L13 9L12 9L12 12z"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M9 2L9 3L12.3 3L6 9.3L6.7 10L13 3.7L13 7L14 7L14 2L9 2z" />
+                <path d="M12 12L4 12L4 4L7 4L7 3L3 3L3 13L13 13L13 9L12 9L12 12z" />
               </svg>
               <span aria-hidden="true">▼</span>
             </button>
             {showExportMenu && (
-              <div className="export-menu" role="menu" aria-label="Export options menu">
+              <div
+                className="export-menu"
+                role="menu"
+                aria-label="Export options menu"
+              >
                 <button
                   className="export-menu-item"
                   onClick={openInNewWindow}
                   role="menuitem"
                   aria-label="Open in new window"
                 >
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                    <path d="M9 2L9 3L12.3 3L6 9.3L6.7 10L13 3.7L13 7L14 7L14 2L9 2z"/>
-                    <path d="M12 12L4 12L4 4L7 4L7 3L3 3L3 13L13 13L13 9L12 9L12 12z"/>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 16 16"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path d="M9 2L9 3L12.3 3L6 9.3L6.7 10L13 3.7L13 7L14 7L14 2L9 2z" />
+                    <path d="M12 12L4 12L4 4L7 4L7 3L3 3L3 13L13 13L13 9L12 9L12 12z" />
                   </svg>
                   Open in New Window
                 </button>
@@ -756,9 +802,15 @@ ${htmlContent}
                   role="menuitem"
                   aria-label="Export to Word document"
                 >
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                    <path d="M2 2v12h12V2H2zm11 11H3V3h10v10z"/>
-                    <path d="M4 5h8v1H4V5zm0 2h8v1H4V7zm0 2h5v1H4V9z"/>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 16 16"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path d="M2 2v12h12V2H2zm11 11H3V3h10v10z" />
+                    <path d="M4 5h8v1H4V5zm0 2h8v1H4V7zm0 2h5v1H4V9z" />
                   </svg>
                   Export to Word
                 </button>
@@ -779,43 +831,62 @@ ${htmlContent}
           </button>
         </div>
       </div>
-      <div ref={contentRef} className="preview-content" role="region" aria-label="Rendered markdown content">
+      <div
+        ref={contentRef}
+        className="preview-content"
+        role="region"
+        aria-label="Rendered markdown content"
+      >
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeSlug]}
           components={{
             a: ({ node: _node, ...props }) => {
-              const href = props.href || '';
+              const href = props.href || "";
               // Handle attachment links
-              if (href.startsWith('.attachments/')) {
-                const folderPath = pagePath ? pagePath.substring(0, pagePath.lastIndexOf('/')) || '' : '';
-                const filename = href.replace('.attachments/', '');
+              if (href.startsWith(".attachments/")) {
+                const folderPath = pagePath
+                  ? pagePath.substring(0, pagePath.lastIndexOf("/")) || ""
+                  : "";
+                const filename = href.replace(".attachments/", "");
                 const fullUrl = api.getAttachmentUrl(folderPath, filename);
-                return <a {...props} href={fullUrl} target="_blank" rel="noopener noreferrer" download />;
+                return (
+                  <a
+                    {...props}
+                    href={fullUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                  />
+                );
               }
               return <a {...props} onClick={handleLinkClick} />;
             },
             img: ({ node: _node, ...props }) => {
-              const src = props.src || '';
-              const alt = props.alt || '';
+              const src = props.src || "";
+              const alt = props.alt || "";
 
               // Handle attachment images
-              if (src.startsWith('.attachments/')) {
-                const folderPath = pagePath ? pagePath.substring(0, pagePath.lastIndexOf('/')) || '' : '';
-                const filename = src.replace('.attachments/', '');
+              if (src.startsWith(".attachments/")) {
+                const folderPath = pagePath
+                  ? pagePath.substring(0, pagePath.lastIndexOf("/")) || ""
+                  : "";
+                const filename = src.replace(".attachments/", "");
                 const fullUrl = api.getAttachmentUrl(folderPath, filename);
 
                 // Wrap in figure with caption if alt text exists
                 if (alt) {
                   return (
-                    <figure style={{ margin: '16px 0', textAlign: 'center' }}>
+                    <figure style={{ margin: "16px 0", textAlign: "center" }}>
                       <img {...props} src={fullUrl} alt={alt} />
-                      <figcaption style={{
-                        marginTop: '8px',
-                        fontSize: '0.9em',
-                        color: 'var(--text-secondary)',
-                        fontStyle: 'italic'
-                      }}>
+                      <figcaption
+                        style={{
+                          marginTop: "8px",
+                          fontSize: "0.9em",
+                          color: "var(--text-secondary)",
+                          fontStyle: "italic",
+                        }}
+                      >
                         {alt}
                       </figcaption>
                     </figure>
@@ -827,14 +898,16 @@ ${htmlContent}
               // For non-attachment images, still show caption if alt text exists
               if (alt) {
                 return (
-                  <figure style={{ margin: '16px 0', textAlign: 'center' }}>
+                  <figure style={{ margin: "16px 0", textAlign: "center" }}>
                     <img {...props} />
-                    <figcaption style={{
-                      marginTop: '8px',
-                      fontSize: '0.9em',
-                      color: 'var(--text-secondary)',
-                      fontStyle: 'italic'
-                    }}>
+                    <figcaption
+                      style={{
+                        marginTop: "8px",
+                        fontSize: "0.9em",
+                        color: "var(--text-secondary)",
+                        fontStyle: "italic",
+                      }}
+                    >
                       {alt}
                     </figcaption>
                   </figure>
@@ -842,7 +915,7 @@ ${htmlContent}
               }
 
               return <img {...props} />;
-            }
+            },
           }}
         >
           {content}

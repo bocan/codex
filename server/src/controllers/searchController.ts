@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import { FileSystemService } from '../services/fileSystem';
+import { Request, Response } from "express";
+import { FileSystemService } from "../services/fileSystem";
 
 const fileSystemService = new FileSystemService();
 
@@ -20,8 +20,11 @@ export const searchPages = async (req: Request, res: Response) => {
     }> = [];
 
     // Get all folders recursively
-    const getAllFolders = async (node: any, folders: string[] = []): Promise<string[]> => {
-      folders.push(node.path || '');
+    const getAllFolders = async (
+      node: any,
+      folders: string[] = [],
+    ): Promise<string[]> => {
+      folders.push(node.path || "");
       if (node.children) {
         for (const child of node.children) {
           await getAllFolders(child, folders);
@@ -43,28 +46,33 @@ export const searchPages = async (req: Request, res: Response) => {
           const lowerContent = content.toLowerCase();
 
           // Count matches
-          const matches = (lowerContent.match(new RegExp(searchTerm, 'g')) || []).length;
+          const matches = (
+            lowerContent.match(new RegExp(searchTerm, "g")) || []
+          ).length;
 
           if (matches > 0) {
             // Find snippet with context
             const index = lowerContent.indexOf(searchTerm);
             const start = Math.max(0, index - 50);
-            const end = Math.min(content.length, index + searchTerm.length + 50);
+            const end = Math.min(
+              content.length,
+              index + searchTerm.length + 50,
+            );
             let snippet = content.substring(start, end);
 
             // Add ellipsis
-            if (start > 0) snippet = '...' + snippet;
-            if (end < content.length) snippet = snippet + '...';
+            if (start > 0) snippet = "..." + snippet;
+            if (end < content.length) snippet = snippet + "...";
 
             // Highlight the match with HTML <strong> tags
-            const regex = new RegExp(`(${searchTerm})`, 'gi');
-            snippet = snippet.replace(regex, '<strong>$1</strong>');
+            const regex = new RegExp(`(${searchTerm})`, "gi");
+            snippet = snippet.replace(regex, "<strong>$1</strong>");
 
             results.push({
               path: page.path,
-              title: page.name.replace('.md', ''),
+              title: page.name.replace(".md", ""),
               snippet,
-              matches
+              matches,
             });
           }
         } catch (error) {
@@ -78,7 +86,7 @@ export const searchPages = async (req: Request, res: Response) => {
 
     res.json(results);
   } catch (error) {
-    console.error('Search error:', error);
-    res.status(500).json({ error: 'Search failed' });
+    console.error("Search error:", error);
+    res.status(500).json({ error: "Search failed" });
   }
 };

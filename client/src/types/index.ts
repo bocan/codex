@@ -1,14 +1,14 @@
 export interface FolderNode {
   name: string;
   path: string;
-  type: 'folder';
+  type: "folder";
   children: FolderNode[];
 }
 
 export interface FileNode {
   name: string;
   path: string;
-  type: 'file';
+  type: "file";
 }
 
 export interface Page {

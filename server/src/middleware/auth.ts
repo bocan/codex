@@ -1,14 +1,18 @@
-import { Request, Response, NextFunction } from 'express';
-import { authConfig } from '../config/auth';
+import { Request, Response, NextFunction } from "express";
+import { authConfig } from "../config/auth";
 
 // Extend Express session type
-declare module 'express-session' {
+declare module "express-session" {
   interface SessionData {
     authenticated?: boolean;
   }
 }
 
-export const requireAuth = (req: Request, res: Response, next: NextFunction): void => {
+export const requireAuth = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void => {
   // If auth is disabled, allow all requests
   if (!authConfig.isAuthEnabled()) {
     next();
@@ -22,5 +26,5 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction): vo
   }
 
   // Not authenticated
-  res.status(401).json({ error: 'Authentication required' });
+  res.status(401).json({ error: "Authentication required" });
 };

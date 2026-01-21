@@ -114,8 +114,7 @@ format: ## Format code (if prettier is configured)
 
 lint: ## Lint code (if eslint is configured)
 	@echo "$(GREEN)Linting code...$(NC)"
-	@cd server && npx eslint "src/**/*.ts" || true
-	@cd client && npx eslint "src/**/*.{ts,tsx}" || true
+	@npm run lint || true
 
 check: test lint ## Run tests and linting
 

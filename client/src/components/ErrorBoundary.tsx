@@ -1,4 +1,4 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
@@ -20,21 +20,23 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{
-          padding: '20px',
-          backgroundColor: '#fff3cd',
-          border: '1px solid #ffc107',
-          borderRadius: '4px',
-          margin: '20px'
-        }}>
+        <div
+          style={{
+            padding: "20px",
+            backgroundColor: "#fff3cd",
+            border: "1px solid #ffc107",
+            borderRadius: "4px",
+            margin: "20px",
+          }}
+        >
           <h2>⚠️ Something went wrong</h2>
-          <details style={{ whiteSpace: 'pre-wrap', marginTop: '10px' }}>
+          <details style={{ whiteSpace: "pre-wrap", marginTop: "10px" }}>
             <summary>Error details</summary>
             {this.state.error?.toString()}
             {this.state.error?.stack}
@@ -42,13 +44,13 @@ class ErrorBoundary extends Component<Props, State> {
           <button
             onClick={() => window.location.reload()}
             style={{
-              marginTop: '10px',
-              padding: '8px 16px',
-              backgroundColor: '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
+              marginTop: "10px",
+              padding: "8px 16px",
+              backgroundColor: "#007bff",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
             }}
           >
             Reload Page

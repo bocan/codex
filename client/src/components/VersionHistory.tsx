@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import * as Diff from 'diff';
-import { api } from '../services/api';
-import { CommitInfo, VersionContent } from '../types';
-import './VersionHistory.css';
+import { useEffect, useState } from "react";
+import * as Diff from "diff";
+import { api } from "../services/api";
+import { CommitInfo, VersionContent } from "../types";
+import "./VersionHistory.css";
 
 interface VersionHistoryProps {
   pagePath: string;
@@ -10,12 +10,20 @@ interface VersionHistoryProps {
   onRestore: () => void;
 }
 
-export default function VersionHistory({ pagePath, onClose, onRestore }: VersionHistoryProps) {
+export default function VersionHistory({
+  pagePath,
+  onClose,
+  onRestore,
+}: VersionHistoryProps) {
   const [history, setHistory] = useState<CommitInfo[]>([]);
-  const [selectedVersion, setSelectedVersion] = useState<VersionContent | null>(null);
-  const [compareVersion, setCompareVersion] = useState<VersionContent | null>(null);
+  const [selectedVersion, setSelectedVersion] = useState<VersionContent | null>(
+    null,
+  );
+  const [compareVersion, setCompareVersion] = useState<VersionContent | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     loadHistory();
@@ -26,9 +34,9 @@ export default function VersionHistory({ pagePath, onClose, onRestore }: Version
       setLoading(true);
       const data = await api.getPageHistory(pagePath);
       setHistory(data);
-      setError('');
+      setError("");
     } catch (err) {
-      setError('Failed to load version history');
+      setError("Failed to load version history");
       console.error(err);
     } finally {
       setLoading(false);
@@ -41,27 +49,31 @@ export default function VersionHistory({ pagePath, onClose, onRestore }: Version
       setSelectedVersion(version);
       setCompareVersion(null);
     } catch (err) {
-      setError('Failed to load version');
+      setError("Failed to load version");
       console.error(err);
     }
   };
 
   const handleCompare = async (hash: string) => {
     if (!selectedVersion) {
-      setError('Select a version first');
+      setError("Select a version first");
       return;
     }
     try {
       const version = await api.getPageVersion(pagePath, hash);
       setCompareVersion(version);
     } catch (err) {
-      setError('Failed to load comparison version');
+      setError("Failed to load comparison version");
       console.error(err);
     }
   };
 
   const handleRestore = async (hash: string) => {
-    if (!confirm('Are you sure you want to restore this version? This will create a new commit.')) {
+    if (
+      !confirm(
+        "Are you sure you want to restore this version? This will create a new commit.",
+      )
+    ) {
       return;
     }
     try {
@@ -69,26 +81,29 @@ export default function VersionHistory({ pagePath, onClose, onRestore }: Version
       onRestore();
       onClose();
     } catch (err) {
-      setError('Failed to restore version');
+      setError("Failed to restore version");
       console.error(err);
     }
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const renderDiff = () => {
     if (!selectedVersion || !compareVersion) return null;
 
-    const diff = Diff.diffLines(compareVersion.content, selectedVersion.content);
+    const diff = Diff.diffLines(
+      compareVersion.content,
+      selectedVersion.content,
+    );
 
     return (
       <div className="diff-view">
@@ -99,22 +114,24 @@ export default function VersionHistory({ pagePath, onClose, onRestore }: Version
         </div>
         <div className="diff-content">
           {diff.map((part, index) => {
-            const lines = part.value.split('\n');
+            const lines = part.value.split("\n");
             // Remove empty last line if exists
-            if (lines[lines.length - 1] === '') {
+            if (lines[lines.length - 1] === "") {
               lines.pop();
             }
 
             return lines.map((line, lineIndex) => {
-              const className = part.added ? 'diff-line-added' :
-                              part.removed ? 'diff-line-removed' :
-                              'diff-line-unchanged';
-              const marker = part.added ? '+' : part.removed ? '-' : ' ';
+              const className = part.added
+                ? "diff-line-added"
+                : part.removed
+                  ? "diff-line-removed"
+                  : "diff-line-unchanged";
+              const marker = part.added ? "+" : part.removed ? "-" : " ";
 
               return (
                 <div key={`${index}-${lineIndex}`} className={className}>
                   <span className="diff-marker">{marker}</span>
-                  <span className="diff-text">{line || ' '}</span>
+                  <span className="diff-text">{line || " "}</span>
                 </div>
               );
             });
@@ -126,10 +143,15 @@ export default function VersionHistory({ pagePath, onClose, onRestore }: Version
 
   return (
     <div className="version-history-overlay" onClick={onClose}>
-      <div className="version-history-modal" onClick={e => e.stopPropagation()}>
+      <div
+        className="version-history-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="version-history-header">
           <h2>📜 Version History</h2>
-          <button className="close-btn" onClick={onClose}>×</button>
+          <button className="close-btn" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         {error && <div className="error-message">{error}</div>}
@@ -147,27 +169,38 @@ export default function VersionHistory({ pagePath, onClose, onRestore }: Version
                 {history.map((commit, index) => (
                   <div
                     key={commit.hash}
-                    className={`commit-item ${selectedVersion?.hash === commit.hash ? 'selected' : ''}`}
+                    className={`commit-item ${selectedVersion?.hash === commit.hash ? "selected" : ""}`}
                     onClick={() => handleViewVersion(commit.hash)}
                   >
                     <div className="commit-header">
-                      <span className="commit-badge">{index === 0 ? 'Latest' : `v${history.length - index}`}</span>
-                      <span className="commit-date">{formatDate(commit.date)}</span>
+                      <span className="commit-badge">
+                        {index === 0 ? "Latest" : `v${history.length - index}`}
+                      </span>
+                      <span className="commit-date">
+                        {formatDate(commit.date)}
+                      </span>
                     </div>
                     <div className="commit-message">{commit.message}</div>
                     <div className="commit-author">by {commit.author}</div>
                     <div className="commit-actions">
-                      {selectedVersion && selectedVersion.hash !== commit.hash && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); handleCompare(commit.hash); }}
-                          className="btn-small"
-                        >
-                          Compare
-                        </button>
-                      )}
+                      {selectedVersion &&
+                        selectedVersion.hash !== commit.hash && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCompare(commit.hash);
+                            }}
+                            className="btn-small"
+                          >
+                            Compare
+                          </button>
+                        )}
                       {index > 0 && (
                         <button
-                          onClick={(e) => { e.stopPropagation(); handleRestore(commit.hash); }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRestore(commit.hash);
+                          }}
                           className="btn-small btn-restore"
                         >
                           Restore
@@ -194,10 +227,13 @@ export default function VersionHistory({ pagePath, onClose, onRestore }: Version
                     <div className="version-info">
                       <h3>{selectedVersion.message}</h3>
                       <p className="version-meta">
-                        {formatDate(selectedVersion.date)} by {selectedVersion.author}
+                        {formatDate(selectedVersion.date)} by{" "}
+                        {selectedVersion.author}
                       </p>
                     </div>
-                    <pre className="version-text">{selectedVersion.content}</pre>
+                    <pre className="version-text">
+                      {selectedVersion.content}
+                    </pre>
                   </div>
                 )}
 
@@ -205,7 +241,10 @@ export default function VersionHistory({ pagePath, onClose, onRestore }: Version
                 {selectedVersion && compareVersion && (
                   <div className="compare-view">
                     <div className="compare-header">
-                      <button onClick={() => setCompareVersion(null)} className="btn-small">
+                      <button
+                        onClick={() => setCompareVersion(null)}
+                        className="btn-small"
+                      >
                         ← Back to single view
                       </button>
                     </div>
