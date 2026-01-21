@@ -1,8 +1,9 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { GitService } from './gitService';
+import { CacheService } from './cache';
 
-const DATA_DIR = path.join(__dirname, '../../..', 'data');
+export const DATA_DIR = path.join(__dirname, '../../..', 'data');
 
 export interface FolderNode {
   name: string;
@@ -20,10 +21,15 @@ export interface FileNode {
 export class FileSystemService {
   private dataDir: string;
   private gitService: GitService | null;
+  private cache: CacheService;
 
   constructor(dataDir: string = DATA_DIR, gitService: GitService | null = null) {
     this.dataDir = dataDir;
     this.gitService = gitService;
+
+    // Allow cache TTL to be configured via environment variable (default 30 seconds)
+    const cacheTTL = process.env.CACHE_TTL_MS ? parseInt(process.env.CACHE_TTL_MS) : 30000;
+    this.cache = new CacheService(cacheTTL);
   }
 
   async initialize(): Promise<void> {
@@ -35,6 +41,13 @@ export class FileSystemService {
   }
 
   async getFolderTree(relativePath: string = ''): Promise<FolderNode> {
+    // Check cache first
+    const cacheKey = `folder-tree:${relativePath}`;
+    const cached = this.cache.get<FolderNode>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const fullPath = path.join(this.dataDir, relativePath);
     const stats = await fs.stat(fullPath);
 
@@ -45,26 +58,34 @@ export class FileSystemService {
     const entries = await fs.readdir(fullPath, { withFileTypes: true });
     const children: FolderNode[] = [];
 
-    for (const entry of entries) {
-      // Skip hidden folders like .git
-      if (entry.isDirectory() && !entry.name.startsWith('.')) {
+    // Parallelize subdirectory scanning for better performance
+    const childPromises = entries
+      .filter(entry => entry.isDirectory() && !entry.name.startsWith('.'))
+      .map(async (entry) => {
         const childPath = path.join(relativePath, entry.name);
-        const child = await this.getFolderTree(childPath);
-        children.push(child);
-      }
-    }
+        return this.getFolderTree(childPath);
+      });
 
-    return {
+    children.push(...await Promise.all(childPromises));
+
+    const result = {
       name: relativePath === '' ? 'root' : path.basename(relativePath),
       path: relativePath || '/',
-      type: 'folder',
+      type: 'folder' as const,
       children: children.sort((a, b) => a.name.localeCompare(b.name))
     };
+
+    // Cache the result
+    this.cache.set(cacheKey, result);
+    return result;
   }
 
   async createFolder(relativePath: string): Promise<void> {
     const fullPath = path.join(this.dataDir, relativePath);
     await fs.mkdir(fullPath, { recursive: true });
+
+    // Invalidate folder tree cache
+    this.cache.invalidate('folder-tree:');
   }
 
   async deleteFolder(relativePath: string): Promise<void> {
@@ -73,15 +94,32 @@ export class FileSystemService {
     }
     const fullPath = path.join(this.dataDir, relativePath);
     await fs.rm(fullPath, { recursive: true, force: true });
+
+    // Invalidate folder tree and any pages in this folder
+    this.cache.invalidate('folder-tree:');
+    this.cache.invalidate(`pages:${relativePath}`);
+    this.cache.invalidate(`page:${relativePath}`);
   }
 
   async renameFolder(oldPath: string, newPath: string): Promise<void> {
     const oldFullPath = path.join(this.dataDir, oldPath);
     const newFullPath = path.join(this.dataDir, newPath);
     await fs.rename(oldFullPath, newFullPath);
+
+    // Invalidate folder tree and pages caches
+    this.cache.invalidate('folder-tree:');
+    this.cache.invalidate(`pages:${oldPath}`);
+    this.cache.invalidate(`page:${oldPath}`);
   }
 
   async getPages(folderPath: string = ''): Promise<FileNode[]> {
+    // Check cache first
+    const cacheKey = `pages:${folderPath}`;
+    const cached = this.cache.get<FileNode[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const fullPath = path.join(this.dataDir, folderPath);
     const entries = await fs.readdir(fullPath, { withFileTypes: true });
 
@@ -96,7 +134,11 @@ export class FileSystemService {
       }
     }
 
-    return pages.sort((a, b) => a.name.localeCompare(b.name));
+    const result = pages.sort((a, b) => a.name.localeCompare(b.name));
+
+    // Cache the result
+    this.cache.set(cacheKey, result);
+    return result;
   }
 
   async createPage(relativePath: string, content: string = ''): Promise<void> {
@@ -107,6 +149,11 @@ export class FileSystemService {
     await fs.mkdir(dir, { recursive: true });
 
     await fs.writeFile(fullPath, content, 'utf-8');
+
+    // Invalidate caches
+    const folderPath = path.dirname(relativePath);
+    this.cache.invalidate(`pages:${folderPath}`);
+    this.cache.invalidateKey(`page:${relativePath}`);
 
     // Commit the new page (non-blocking in production, blocking in tests)
     if (this.gitService) {
@@ -123,13 +170,27 @@ export class FileSystemService {
   }
 
   async getPageContent(relativePath: string): Promise<string> {
+    // Check cache first
+    const cacheKey = `page:${relativePath}`;
+    const cached = this.cache.get<string>(cacheKey);
+    if (cached !== null) {
+      return cached;
+    }
+
     const fullPath = path.join(this.dataDir, relativePath);
-    return await fs.readFile(fullPath, 'utf-8');
+    const content = await fs.readFile(fullPath, 'utf-8');
+
+    // Cache the content
+    this.cache.set(cacheKey, content);
+    return content;
   }
 
   async updatePage(relativePath: string, content: string): Promise<void> {
     const fullPath = path.join(this.dataDir, relativePath);
     await fs.writeFile(fullPath, content, 'utf-8');
+
+    // Invalidate page cache
+    this.cache.invalidateKey(`page:${relativePath}`);
 
     // Commit the update (non-blocking in production, blocking in tests)
     if (this.gitService) {
@@ -148,6 +209,11 @@ export class FileSystemService {
   async deletePage(relativePath: string): Promise<void> {
     const fullPath = path.join(this.dataDir, relativePath);
     await fs.unlink(fullPath);
+
+    // Invalidate caches
+    const folderPath = path.dirname(relativePath);
+    this.cache.invalidate(`pages:${folderPath}`);
+    this.cache.invalidateKey(`page:${relativePath}`);
 
     // Commit the deletion (non-blocking in production, blocking in tests)
     if (this.gitService) {
@@ -172,6 +238,14 @@ export class FileSystemService {
     await fs.mkdir(newDir, { recursive: true });
 
     await fs.rename(oldFullPath, newFullPath);
+
+    // Invalidate caches for both old and new paths
+    const oldFolderPath = path.dirname(oldPath);
+    const newFolderPath = path.dirname(newPath);
+    this.cache.invalidate(`pages:${oldFolderPath}`);
+    this.cache.invalidate(`pages:${newFolderPath}`);
+    this.cache.invalidateKey(`page:${oldPath}`);
+    this.cache.invalidateKey(`page:${newPath}`);
 
     // Commit the rename (non-blocking in production, blocking in tests)
     if (this.gitService) {
@@ -211,6 +285,13 @@ export class FileSystemService {
     }
 
     await fs.rename(oldFullPath, newFullPath);
+
+    // Invalidate caches for both old and new locations
+    const oldFolderPath = path.dirname(oldPath);
+    this.cache.invalidate(`pages:${oldFolderPath}`);
+    this.cache.invalidate(`pages:${newFolderPath}`);
+    this.cache.invalidateKey(`page:${oldPath}`);
+    this.cache.invalidateKey(`page:${newPath}`);
 
     // Commit the move (non-blocking in production, blocking in tests)
     if (this.gitService) {

@@ -33,6 +33,120 @@
   color: var(--text-primary);
 }
 
+.preview-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.export-dropdown {
+  position: relative;
+}
+
+.export-dropdown-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+
+.export-dropdown-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.export-dropdown-btn svg:first-child {
+  display: block;
+}
+
+.export-dropdown-btn span {
+  font-size: 10px;
+  line-height: 1;
+}
+
+.export-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.export-menu-item {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+
+.export-menu-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.export-menu-item svg {
+  flex-shrink: 0;
+}
+
+.open-window-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.open-window-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.open-window-btn svg {
+  display: block;
+}
+
+.sync-scroll-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.sync-scroll-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
 .loading-indicator {
   color: #007bff;
   animation: pulse 1s infinite;
@@ -137,4 +251,16 @@
 .preview-content img {
   max-width: 100%;
   height: auto;
+}
+
+.preview-content figure {
+  margin: 16px 0;
+  text-align: center;
+}
+
+.preview-content figcaption {
+  margin-top: 8px;
+  font-size: 0.9em;
+  color: var(--text-secondary);
+  font-style: italic;
 }

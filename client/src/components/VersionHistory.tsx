@@ -148,6 +148,7 @@ export default function VersionHistory({ pagePath, onClose, onRestore }: Version
                   <div
                     key={commit.hash}
                     className={`commit-item ${selectedVersion?.hash === commit.hash ? 'selected' : ''}`}
+                    onClick={() => handleViewVersion(commit.hash)}
                   >
                     <div className="commit-header">
                       <span className="commit-badge">{index === 0 ? 'Latest' : `v${history.length - index}`}</span>
@@ -156,16 +157,19 @@ export default function VersionHistory({ pagePath, onClose, onRestore }: Version
                     <div className="commit-message">{commit.message}</div>
                     <div className="commit-author">by {commit.author}</div>
                     <div className="commit-actions">
-                      <button onClick={() => handleViewVersion(commit.hash)} className="btn-small">
-                        View
-                      </button>
                       {selectedVersion && selectedVersion.hash !== commit.hash && (
-                        <button onClick={() => handleCompare(commit.hash)} className="btn-small">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleCompare(commit.hash); }}
+                          className="btn-small"
+                        >
                           Compare
                         </button>
                       )}
                       {index > 0 && (
-                        <button onClick={() => handleRestore(commit.hash)} className="btn-small btn-restore">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleRestore(commit.hash); }}
+                          className="btn-small btn-restore"
+                        >
                           Restore
                         </button>
                       )}

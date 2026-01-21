@@ -30,3 +30,10 @@ export interface VersionContent {
   message: string;
   author: string;
 }
+
+export interface SearchResult {
+  path: string;
+  title: string;
+  snippet: string;
+  matches: number;
+}

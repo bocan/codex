@@ -4,6 +4,8 @@ import { PageList } from './components/PageList';
 import { Editor } from './components/Editor';
 import { Preview } from './components/Preview';
 import { Login } from './components/Login';
+import { Search } from './components/Search';
+import ErrorBoundary from './components/ErrorBoundary';
 import { api } from './services/api';
 import { FolderNode } from './types';
 import './App.css';
@@ -24,13 +26,16 @@ function App() {
   const [folderTree, setFolderTree] = useState<FolderNode | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [selectedPage, setSelectedPage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [leftPaneCollapsed, setLeftPaneCollapsed] = useState(false);
   const [rightPaneCollapsed, setRightPaneCollapsed] = useState(false);
+  const [editorContent, setEditorContent] = useState<string>(''); // Track live editor content for preview
+  const [scrollPercent, setScrollPercent] = useState<number>(0); // Synchronized scroll position (editor -> preview)
 
-  // Dark mode state
-  const [theme, setTheme] = useState<'light' | 'dark' | 'auto'>(() => {
+  // Theme state
+  const [theme, setTheme] = useState<'light' | 'dark' | 'high-contrast' | 'auto'>(() => {
     const saved = localStorage.getItem('disnotion-theme');
-    return (saved as 'light' | 'dark' | 'auto') || 'auto';
+    return (saved as 'light' | 'dark' | 'high-contrast' | 'auto') || 'auto';
   });
 
   // Resizable pane widths
@@ -192,6 +197,7 @@ function App() {
 
   const loadFolderTree = async () => {
     try {
+      setError(null);
       const tree = await api.getFolderTree();
       setFolderTree(tree);
 
@@ -199,18 +205,54 @@ function App() {
       if (!selectedFolder) {
         setSelectedFolder(tree.path);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to load folder tree:', error);
+      const message = error.response?.status === 401
+        ? 'Session expired. Please log in again.'
+        : 'Failed to load folders. Please try refreshing the page.';
+      setError(message);
     }
   };
 
-  const handleSelectFolder = (path: string) => {
+  const handleSelectFolder = async (path: string) => {
+    const isSameFolder = selectedFolder === path;
     setSelectedFolder(path);
-    setSelectedPage(null);
+
+    // Only clear selected page if switching to a different folder
+    if (!isSameFolder) {
+      setSelectedPage(null);
+    }
+
+    // Auto-select README.md if it exists in the folder (or keep current page if same folder)
+    if (!isSameFolder || !selectedPage) {
+      try {
+        setError(null);
+        const folderPath = path === '/' ? '' : path;
+        const pages = await api.getPages(folderPath);
+        const readme = pages.find(page => page.name.toLowerCase() === 'readme.md');
+        if (readme) {
+          setSelectedPage(readme.path);
+        }
+      } catch (error: any) {
+        console.error('Failed to check for README.md:', error);
+        const message = error.response?.status === 401
+          ? 'Session expired. Please log in again.'
+          : `Failed to load pages from folder: ${path}`;
+        setError(message);
+        // Don't prevent folder selection on error, just show the error
+      }
+    }
   };
 
   const handleSelectPage = (path: string) => {
     setSelectedPage(path);
+    // Reset scroll position when changing pages
+    setScrollPercent(0);
+  };
+
+  // Handle scroll from editor - syncs to preview
+  const handleEditorScroll = (percent: number) => {
+    setScrollPercent(percent);
   };
 
   const handleCloseEditor = () => {
@@ -221,6 +263,7 @@ function App() {
     setTheme((current) => {
       if (current === 'auto') return 'light';
       if (current === 'light') return 'dark';
+      if (current === 'dark') return 'high-contrast';
       return 'auto';
     });
   };
@@ -228,7 +271,8 @@ function App() {
   const getThemeIcon = () => {
     if (theme === 'auto') return '🌓';
     if (theme === 'light') return '☀️';
-    return '🌙';
+    if (theme === 'dark') return '🌙';
+    return '◐';
   };
 
   const getBreadcrumbs = () => {
@@ -268,14 +312,14 @@ function App() {
   }
 
   return (
-    <div className="app">
-      <header className="app-header">
+    <div className="app" role="application" aria-label="Disnotion Document Editor">
+      <header className="app-header" role="banner">
         <div className="header-content">
           <div className="header-left">
             <h1>📝 Disnotion</h1>
             <p className="tagline">Your Personal Wiki & Document Store</p>
           </div>
-          <div className="breadcrumbs">
+          <nav className="breadcrumbs" aria-label="Breadcrumb navigation">
             {getBreadcrumbs().map((crumb, index, arr) => (
               <span key={crumb.path} className="breadcrumb-item">
                 <button
@@ -285,44 +329,69 @@ function App() {
                 >
                   {crumb.name}
                 </button>
-                {index < arr.length - 1 && <span className="breadcrumb-separator">/</span>}
+                {index < arr.length - 1 && <span className="breadcrumb-separator" aria-hidden="true">/</span>}
               </span>
             ))}
-          </div>
-          <div className="header-actions">
+          </nav>
+          <div className="header-actions" role="toolbar" aria-label="Application controls">
+            <Search onSelectPage={handleSelectPage} />
             <button
               className="theme-toggle"
               onClick={cycleTheme}
               title={`Theme: ${theme} (click to cycle)`}
+              aria-label={`Current theme: ${theme}. Click to cycle themes.`}
             >
-              {getThemeIcon()}
+              <span aria-hidden="true">{getThemeIcon()}</span>
             </button>
             {authEnabled && (
               <button
                 className="logout-button"
                 onClick={handleLogout}
                 title="Logout"
+                aria-label="Logout of application"
               >
-                🚪 Logout
+                <span aria-hidden="true">🚪</span> Logout
               </button>
             )}
           </div>
         </div>
       </header>
 
-      <div className="app-container">
+      <main className="app-container">
+        {/* Error Message */}
+        {error && (
+          <div className="error-banner" role="alert" aria-live="assertive">
+            <span aria-hidden="true">⚠️</span> {error}
+            <button
+              className="error-dismiss"
+              onClick={() => setError(null)}
+              aria-label="Dismiss error message"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
+        <ErrorBoundary>
+        <div className="panes-container">
         {/* Left Pane: Folder Tree */}
-        <div
+        <aside
           ref={leftPaneRef}
           className={`left-pane ${leftPaneCollapsed ? 'collapsed' : ''}`}
-          style={{ width: leftPaneCollapsed ? '30px' : `${leftPaneWidth}px` }}
+          style={{ width: leftPaneCollapsed ? '0' : `${leftPaneWidth}px` }}
+          aria-label="Folder and page navigation"
+          aria-hidden={leftPaneCollapsed}
         >
-          <button
-            className="collapse-btn"
-            onClick={() => setLeftPaneCollapsed(!leftPaneCollapsed)}
-          >
-            {leftPaneCollapsed ? '▶' : '◀'}
-          </button>
+          {!leftPaneCollapsed && (
+            <button
+              className="collapse-btn"
+              onClick={() => setLeftPaneCollapsed(!leftPaneCollapsed)}
+              title="Hide sidebar"
+              aria-label="Hide sidebar"
+            >
+              <span aria-hidden="true">◀</span>
+            </button>
+          )}
           {!leftPaneCollapsed && folderTree && (
             <>
               <div className="pane-content">
@@ -340,6 +409,9 @@ function App() {
                 <div
                   className="resize-handle resize-handle-horizontal"
                   onMouseDown={handleFolderTreeResizeStart}
+                  role="separator"
+                  aria-label="Resize folder tree height"
+                  aria-orientation="horizontal"
                 />
                 <div className="page-list-section">
                   <PageList
@@ -354,43 +426,84 @@ function App() {
               <div
                 className="resize-handle resize-handle-right"
                 onMouseDown={handleLeftResizeStart}
+                role="separator"
+                aria-label="Resize sidebar width"
+                aria-orientation="vertical"
               />
             </>
           )}
-        </div>
+        </aside>
 
         {/* Center Pane: Editor */}
-        <div className="center-pane">
+        <section className="center-pane" aria-label="Markdown editor">
+          {leftPaneCollapsed && (
+            <button
+              className="expand-btn expand-btn-left"
+              onClick={() => setLeftPaneCollapsed(false)}
+              title="Show sidebar"
+              aria-label="Show sidebar"
+            >
+              <span aria-hidden="true">▶</span>
+            </button>
+          )}
+          {rightPaneCollapsed && (
+            <button
+              className="expand-btn expand-btn-right"
+              onClick={() => setRightPaneCollapsed(false)}
+              title="Show preview"
+              aria-label="Show preview"
+            >
+              <span aria-hidden="true">◀</span>
+            </button>
+          )}
           <Editor
             pagePath={selectedPage}
             onClose={handleCloseEditor}
+            onContentChange={setEditorContent}
+            onScroll={handleEditorScroll}
           />
-        </div>
+        </section>
 
         {/* Right Pane: Preview */}
-        <div
+        <aside
           className={`right-pane ${rightPaneCollapsed ? 'collapsed' : ''}`}
-          style={{ width: rightPaneCollapsed ? '30px' : `${rightPaneWidth}px` }}
+          style={{ width: rightPaneCollapsed ? '0' : `${rightPaneWidth}px` }}
+          aria-label="Markdown preview"
+          aria-hidden={rightPaneCollapsed}
         >
-          <button
-            className="collapse-btn"
-            onClick={() => setRightPaneCollapsed(!rightPaneCollapsed)}
-          >
-            {rightPaneCollapsed ? '◀' : '▶'}
-          </button>
+          {!rightPaneCollapsed && (
+            <button
+              className="collapse-btn"
+              onClick={() => setRightPaneCollapsed(!rightPaneCollapsed)}
+              title="Hide preview"
+              aria-label="Hide preview"
+            >
+              <span aria-hidden="true">▶</span>
+            </button>
+          )}
           {!rightPaneCollapsed && (
             <>
               <div
                 className="resize-handle resize-handle-left"
                 onMouseDown={handleRightResizeStart}
+                role="separator"
+                aria-label="Resize preview width"
+                aria-orientation="vertical"
               />
               <div className="pane-content">
-                <Preview pagePath={selectedPage} />
+                <Preview
+                  pagePath={selectedPage}
+                  liveContent={editorContent}
+                  onNavigate={handleSelectPage}
+                  scrollPercent={scrollPercent}
+                />
               </div>
             </>
           )}
+        </aside>
         </div>
-      </div>
+        </ErrorBoundary>
+      </main>
     </div>
   );
 }

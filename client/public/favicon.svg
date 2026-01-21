@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Page background -->
+  <rect x="6" y="4" width="16" height="22" fill="#ffffff" stroke="#333333" stroke-width="1.5" rx="1"/>
+
+  <!-- Page lines -->
+  <line x1="9" y1="9" x2="19" y2="9" stroke="#333333" stroke-width="1" opacity="0.3"/>
+  <line x1="9" y1="13" x2="19" y2="13" stroke="#333333" stroke-width="1" opacity="0.3"/>
+  <line x1="9" y1="17" x2="16" y2="17" stroke="#333333" stroke-width="1" opacity="0.3"/>
+
+  <!-- Pen -->
+  <g transform="translate(18, 18) rotate(-45)">
+    <rect x="0" y="0" width="8" height="2" fill="#4a7c9e"/>
+    <polygon points="0,2 4,6 8,2" fill="#2d5a7b"/>
+    <circle cx="4" cy="-1" r="1" fill="#cccccc"/>
+  </g>
+</svg>

@@ -114,6 +114,34 @@
   border-color: var(--accent-color);
 }
 
+.dictate-btn {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.dictate-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-color);
+}
+
+.dictate-btn.listening {
+  background: #e74c3c;
+  color: white;
+  border-color: #c0392b;
+  animation: pulse-mic 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-mic {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
 .save-error {
   font-size: 12px;
   color: #e74c3c;
