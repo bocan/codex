@@ -1,14 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
-import { FolderTree } from './components/FolderTree';
-import { PageList } from './components/PageList';
-import { Editor } from './components/Editor';
-import { Preview } from './components/Preview';
-import { Login } from './components/Login';
-import { Search } from './components/Search';
-import ErrorBoundary from './components/ErrorBoundary';
-import { api } from './services/api';
-import { FolderNode } from './types';
-import './App.css';
+import { useState, useEffect, useRef } from "react";
+import { FolderTree } from "./components/FolderTree";
+import { PageList } from "./components/PageList";
+import { Editor } from "./components/Editor";
+import { Preview } from "./components/Preview";
+import { Login } from "./components/Login";
+import { Search } from "./components/Search";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { api } from "./services/api";
+import { FolderNode } from "./types";
+import "./App.css";
 
 const DEFAULT_LEFT_WIDTH = 300;
 const DEFAULT_RIGHT_WIDTH = 400;
@@ -29,26 +29,28 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [leftPaneCollapsed, setLeftPaneCollapsed] = useState(false);
   const [rightPaneCollapsed, setRightPaneCollapsed] = useState(false);
-  const [editorContent, setEditorContent] = useState<string>(''); // Track live editor content for preview
+  const [editorContent, setEditorContent] = useState<string>(""); // Track live editor content for preview
   const [scrollPercent, setScrollPercent] = useState<number>(0); // Synchronized scroll position (editor -> preview)
 
   // Theme state
-  const [theme, setTheme] = useState<'light' | 'dark' | 'high-contrast' | 'auto'>(() => {
-    const saved = localStorage.getItem('disnotion-theme');
-    return (saved as 'light' | 'dark' | 'high-contrast' | 'auto') || 'auto';
+  const [theme, setTheme] = useState<
+    "light" | "dark" | "high-contrast" | "auto"
+  >(() => {
+    const saved = localStorage.getItem("disnotion-theme");
+    return (saved as "light" | "dark" | "high-contrast" | "auto") || "auto";
   });
 
   // Resizable pane widths
   const [leftPaneWidth, setLeftPaneWidth] = useState(() => {
-    const saved = localStorage.getItem('disnotion-left-pane-width');
+    const saved = localStorage.getItem("disnotion-left-pane-width");
     return saved ? parseInt(saved, 10) : DEFAULT_LEFT_WIDTH;
   });
   const [rightPaneWidth, setRightPaneWidth] = useState(() => {
-    const saved = localStorage.getItem('disnotion-right-pane-width');
+    const saved = localStorage.getItem("disnotion-right-pane-width");
     return saved ? parseInt(saved, 10) : DEFAULT_RIGHT_WIDTH;
   });
   const [folderTreeHeight, setFolderTreeHeight] = useState(() => {
-    const saved = localStorage.getItem('disnotion-folder-tree-height');
+    const saved = localStorage.getItem("disnotion-folder-tree-height");
     return saved ? parseInt(saved, 10) : DEFAULT_FOLDER_HEIGHT;
   });
 
@@ -68,7 +70,7 @@ function App() {
       setAuthEnabled(status.authEnabled);
       setIsAuthenticated(status.authenticated);
     } catch (err) {
-      console.error('Failed to check auth status:', err);
+      console.error("Failed to check auth status:", err);
       setIsAuthenticated(false);
     }
   };
@@ -84,7 +86,7 @@ function App() {
       setIsAuthenticated(false);
       setFolderTree(null);
     } catch (err) {
-      console.error('Logout failed:', err);
+      console.error("Logout failed:", err);
     }
   };
 
@@ -97,15 +99,21 @@ function App() {
 
   // Save pane widths to localStorage
   useEffect(() => {
-    localStorage.setItem('disnotion-left-pane-width', leftPaneWidth.toString());
+    localStorage.setItem("disnotion-left-pane-width", leftPaneWidth.toString());
   }, [leftPaneWidth]);
 
   useEffect(() => {
-    localStorage.setItem('disnotion-right-pane-width', rightPaneWidth.toString());
+    localStorage.setItem(
+      "disnotion-right-pane-width",
+      rightPaneWidth.toString(),
+    );
   }, [rightPaneWidth]);
 
   useEffect(() => {
-    localStorage.setItem('disnotion-folder-tree-height', folderTreeHeight.toString());
+    localStorage.setItem(
+      "disnotion-folder-tree-height",
+      folderTreeHeight.toString(),
+    );
   }, [folderTreeHeight]);
 
   // Apply theme to document
@@ -113,27 +121,29 @@ function App() {
     const applyTheme = () => {
       let effectiveTheme = theme;
 
-      if (theme === 'auto') {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        effectiveTheme = prefersDark ? 'dark' : 'light';
+      if (theme === "auto") {
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        effectiveTheme = prefersDark ? "dark" : "light";
       }
 
-      document.documentElement.setAttribute('data-theme', effectiveTheme);
+      document.documentElement.setAttribute("data-theme", effectiveTheme);
     };
 
     applyTheme();
-    localStorage.setItem('disnotion-theme', theme);
+    localStorage.setItem("disnotion-theme", theme);
 
     // Listen for system theme changes when in auto mode
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = () => {
-      if (theme === 'auto') {
+      if (theme === "auto") {
         applyTheme();
       }
     };
 
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, [theme]);
 
   // Handle mouse move for resizing
@@ -164,35 +174,35 @@ function App() {
       isResizingLeft.current = false;
       isResizingRight.current = false;
       isResizingFolderTree.current = false;
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, []);
 
   const handleLeftResizeStart = () => {
     isResizingLeft.current = true;
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
   };
 
   const handleRightResizeStart = () => {
     isResizingRight.current = true;
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
   };
 
   const handleFolderTreeResizeStart = () => {
     isResizingFolderTree.current = true;
-    document.body.style.cursor = 'row-resize';
-    document.body.style.userSelect = 'none';
+    document.body.style.cursor = "row-resize";
+    document.body.style.userSelect = "none";
   };
 
   const loadFolderTree = async () => {
@@ -206,10 +216,11 @@ function App() {
         setSelectedFolder(tree.path);
       }
     } catch (error: any) {
-      console.error('Failed to load folder tree:', error);
-      const message = error.response?.status === 401
-        ? 'Session expired. Please log in again.'
-        : 'Failed to load folders. Please try refreshing the page.';
+      console.error("Failed to load folder tree:", error);
+      const message =
+        error.response?.status === 401
+          ? "Session expired. Please log in again."
+          : "Failed to load folders. Please try refreshing the page.";
       setError(message);
     }
   };
@@ -227,17 +238,20 @@ function App() {
     if (!isSameFolder || !selectedPage) {
       try {
         setError(null);
-        const folderPath = path === '/' ? '' : path;
+        const folderPath = path === "/" ? "" : path;
         const pages = await api.getPages(folderPath);
-        const readme = pages.find(page => page.name.toLowerCase() === 'readme.md');
+        const readme = pages.find(
+          (page) => page.name.toLowerCase() === "readme.md",
+        );
         if (readme) {
           setSelectedPage(readme.path);
         }
       } catch (error: any) {
-        console.error('Failed to check for README.md:', error);
-        const message = error.response?.status === 401
-          ? 'Session expired. Please log in again.'
-          : `Failed to load pages from folder: ${path}`;
+        console.error("Failed to check for README.md:", error);
+        const message =
+          error.response?.status === 401
+            ? "Session expired. Please log in again."
+            : `Failed to load pages from folder: ${path}`;
         setError(message);
         // Don't prevent folder selection on error, just show the error
       }
@@ -261,33 +275,33 @@ function App() {
 
   const cycleTheme = () => {
     setTheme((current) => {
-      if (current === 'auto') return 'light';
-      if (current === 'light') return 'dark';
-      if (current === 'dark') return 'high-contrast';
-      return 'auto';
+      if (current === "auto") return "light";
+      if (current === "light") return "dark";
+      if (current === "dark") return "high-contrast";
+      return "auto";
     });
   };
 
   const getThemeIcon = () => {
-    if (theme === 'auto') return '🌓';
-    if (theme === 'light') return '☀️';
-    if (theme === 'dark') return '🌙';
-    return '◐';
+    if (theme === "auto") return "🌓";
+    if (theme === "light") return "☀️";
+    if (theme === "dark") return "🌙";
+    return "◐";
   };
 
   const getBreadcrumbs = () => {
     if (!selectedFolder) return [];
 
-    if (selectedFolder === '/') {
-      return [{ name: 'Root', path: '/' }];
+    if (selectedFolder === "/") {
+      return [{ name: "Root", path: "/" }];
     }
 
-    const parts = selectedFolder.split('/').filter(Boolean);
-    const breadcrumbs = [{ name: 'Root', path: '/' }];
+    const parts = selectedFolder.split("/").filter(Boolean);
+    const breadcrumbs = [{ name: "Root", path: "/" }];
 
-    let currentPath = '';
+    let currentPath = "";
     for (const part of parts) {
-      currentPath += (currentPath ? '/' : '') + part;
+      currentPath += (currentPath ? "/" : "") + part;
       breadcrumbs.push({ name: part, path: currentPath });
     }
 
@@ -312,7 +326,11 @@ function App() {
   }
 
   return (
-    <div className="app" role="application" aria-label="Disnotion Document Editor">
+    <div
+      className="app"
+      role="application"
+      aria-label="Disnotion Document Editor"
+    >
       <header className="app-header" role="banner">
         <div className="header-content">
           <div className="header-left">
@@ -329,11 +347,19 @@ function App() {
                 >
                   {crumb.name}
                 </button>
-                {index < arr.length - 1 && <span className="breadcrumb-separator" aria-hidden="true">/</span>}
+                {index < arr.length - 1 && (
+                  <span className="breadcrumb-separator" aria-hidden="true">
+                    /
+                  </span>
+                )}
               </span>
             ))}
           </nav>
-          <div className="header-actions" role="toolbar" aria-label="Application controls">
+          <div
+            className="header-actions"
+            role="toolbar"
+            aria-label="Application controls"
+          >
             <Search onSelectPage={handleSelectPage} />
             <button
               className="theme-toggle"
@@ -373,135 +399,137 @@ function App() {
         )}
 
         <ErrorBoundary>
-        <div className="panes-container">
-        {/* Left Pane: Folder Tree */}
-        <aside
-          ref={leftPaneRef}
-          className={`left-pane ${leftPaneCollapsed ? 'collapsed' : ''}`}
-          style={{ width: leftPaneCollapsed ? '0' : `${leftPaneWidth}px` }}
-          aria-label="Folder and page navigation"
-          aria-hidden={leftPaneCollapsed}
-        >
-          {!leftPaneCollapsed && (
-            <button
-              className="collapse-btn"
-              onClick={() => setLeftPaneCollapsed(!leftPaneCollapsed)}
-              title="Hide sidebar"
-              aria-label="Hide sidebar"
+          <div className="panes-container">
+            {/* Left Pane: Folder Tree */}
+            <aside
+              ref={leftPaneRef}
+              className={`left-pane ${leftPaneCollapsed ? "collapsed" : ""}`}
+              style={{ width: leftPaneCollapsed ? "0" : `${leftPaneWidth}px` }}
+              aria-label="Folder and page navigation"
+              aria-hidden={leftPaneCollapsed}
             >
-              <span aria-hidden="true">◀</span>
-            </button>
-          )}
-          {!leftPaneCollapsed && folderTree && (
-            <>
-              <div className="pane-content">
-                <div
-                  className="folder-tree-section"
-                  style={{ height: `${folderTreeHeight}px` }}
+              {!leftPaneCollapsed && (
+                <button
+                  className="collapse-btn"
+                  onClick={() => setLeftPaneCollapsed(!leftPaneCollapsed)}
+                  title="Hide sidebar"
+                  aria-label="Hide sidebar"
                 >
-                  <FolderTree
-                    root={folderTree}
-                    onSelectFolder={handleSelectFolder}
-                    selectedFolder={selectedFolder}
-                    onRefresh={loadFolderTree}
+                  <span aria-hidden="true">◀</span>
+                </button>
+              )}
+              {!leftPaneCollapsed && folderTree && (
+                <>
+                  <div className="pane-content">
+                    <div
+                      className="folder-tree-section"
+                      style={{ height: `${folderTreeHeight}px` }}
+                    >
+                      <FolderTree
+                        root={folderTree}
+                        onSelectFolder={handleSelectFolder}
+                        selectedFolder={selectedFolder}
+                        onRefresh={loadFolderTree}
+                      />
+                    </div>
+                    <div
+                      className="resize-handle resize-handle-horizontal"
+                      onMouseDown={handleFolderTreeResizeStart}
+                      role="separator"
+                      aria-label="Resize folder tree height"
+                      aria-orientation="horizontal"
+                    />
+                    <div className="page-list-section">
+                      <PageList
+                        selectedFolder={selectedFolder}
+                        onSelectPage={handleSelectPage}
+                        selectedPage={selectedPage}
+                        onRefresh={loadFolderTree}
+                        folderTree={folderTree}
+                      />
+                    </div>
+                  </div>
+                  <div
+                    className="resize-handle resize-handle-right"
+                    onMouseDown={handleLeftResizeStart}
+                    role="separator"
+                    aria-label="Resize sidebar width"
+                    aria-orientation="vertical"
                   />
-                </div>
-                <div
-                  className="resize-handle resize-handle-horizontal"
-                  onMouseDown={handleFolderTreeResizeStart}
-                  role="separator"
-                  aria-label="Resize folder tree height"
-                  aria-orientation="horizontal"
-                />
-                <div className="page-list-section">
-                  <PageList
-                    selectedFolder={selectedFolder}
-                    onSelectPage={handleSelectPage}
-                    selectedPage={selectedPage}
-                    onRefresh={loadFolderTree}
-                    folderTree={folderTree}
+                </>
+              )}
+            </aside>
+
+            {/* Center Pane: Editor */}
+            <section className="center-pane" aria-label="Markdown editor">
+              {leftPaneCollapsed && (
+                <button
+                  className="expand-btn expand-btn-left"
+                  onClick={() => setLeftPaneCollapsed(false)}
+                  title="Show sidebar"
+                  aria-label="Show sidebar"
+                >
+                  <span aria-hidden="true">▶</span>
+                </button>
+              )}
+              {rightPaneCollapsed && (
+                <button
+                  className="expand-btn expand-btn-right"
+                  onClick={() => setRightPaneCollapsed(false)}
+                  title="Show preview"
+                  aria-label="Show preview"
+                >
+                  <span aria-hidden="true">◀</span>
+                </button>
+              )}
+              <Editor
+                pagePath={selectedPage}
+                onClose={handleCloseEditor}
+                onContentChange={setEditorContent}
+                onScroll={handleEditorScroll}
+              />
+            </section>
+
+            {/* Right Pane: Preview */}
+            <aside
+              className={`right-pane ${rightPaneCollapsed ? "collapsed" : ""}`}
+              style={{
+                width: rightPaneCollapsed ? "0" : `${rightPaneWidth}px`,
+              }}
+              aria-label="Markdown preview"
+              aria-hidden={rightPaneCollapsed}
+            >
+              {!rightPaneCollapsed && (
+                <button
+                  className="collapse-btn"
+                  onClick={() => setRightPaneCollapsed(!rightPaneCollapsed)}
+                  title="Hide preview"
+                  aria-label="Hide preview"
+                >
+                  <span aria-hidden="true">▶</span>
+                </button>
+              )}
+              {!rightPaneCollapsed && (
+                <>
+                  <div
+                    className="resize-handle resize-handle-left"
+                    onMouseDown={handleRightResizeStart}
+                    role="separator"
+                    aria-label="Resize preview width"
+                    aria-orientation="vertical"
                   />
-                </div>
-              </div>
-              <div
-                className="resize-handle resize-handle-right"
-                onMouseDown={handleLeftResizeStart}
-                role="separator"
-                aria-label="Resize sidebar width"
-                aria-orientation="vertical"
-              />
-            </>
-          )}
-        </aside>
-
-        {/* Center Pane: Editor */}
-        <section className="center-pane" aria-label="Markdown editor">
-          {leftPaneCollapsed && (
-            <button
-              className="expand-btn expand-btn-left"
-              onClick={() => setLeftPaneCollapsed(false)}
-              title="Show sidebar"
-              aria-label="Show sidebar"
-            >
-              <span aria-hidden="true">▶</span>
-            </button>
-          )}
-          {rightPaneCollapsed && (
-            <button
-              className="expand-btn expand-btn-right"
-              onClick={() => setRightPaneCollapsed(false)}
-              title="Show preview"
-              aria-label="Show preview"
-            >
-              <span aria-hidden="true">◀</span>
-            </button>
-          )}
-          <Editor
-            pagePath={selectedPage}
-            onClose={handleCloseEditor}
-            onContentChange={setEditorContent}
-            onScroll={handleEditorScroll}
-          />
-        </section>
-
-        {/* Right Pane: Preview */}
-        <aside
-          className={`right-pane ${rightPaneCollapsed ? 'collapsed' : ''}`}
-          style={{ width: rightPaneCollapsed ? '0' : `${rightPaneWidth}px` }}
-          aria-label="Markdown preview"
-          aria-hidden={rightPaneCollapsed}
-        >
-          {!rightPaneCollapsed && (
-            <button
-              className="collapse-btn"
-              onClick={() => setRightPaneCollapsed(!rightPaneCollapsed)}
-              title="Hide preview"
-              aria-label="Hide preview"
-            >
-              <span aria-hidden="true">▶</span>
-            </button>
-          )}
-          {!rightPaneCollapsed && (
-            <>
-              <div
-                className="resize-handle resize-handle-left"
-                onMouseDown={handleRightResizeStart}
-                role="separator"
-                aria-label="Resize preview width"
-                aria-orientation="vertical"
-              />
-              <div className="pane-content">
-                <Preview
-                  pagePath={selectedPage}
-                  liveContent={editorContent}
-                  onNavigate={handleSelectPage}
-                  scrollPercent={scrollPercent}
-                />
-              </div>
-            </>
-          )}
-        </aside>
-        </div>
+                  <div className="pane-content">
+                    <Preview
+                      pagePath={selectedPage}
+                      liveContent={editorContent}
+                      onNavigate={handleSelectPage}
+                      scrollPercent={scrollPercent}
+                    />
+                  </div>
+                </>
+              )}
+            </aside>
+          </div>
         </ErrorBoundary>
       </main>
     </div>

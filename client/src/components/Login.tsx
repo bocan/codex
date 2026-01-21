@@ -1,33 +1,33 @@
-import { useState } from 'react';
-import { api } from '../services/api';
-import './Login.css';
+import { useState } from "react";
+import { api } from "../services/api";
+import "./Login.css";
 
 interface LoginProps {
   onLoginSuccess: () => void;
 }
 
 export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!password) {
-      setError('Please enter a password');
+      setError("Please enter a password");
       return;
     }
 
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
       await api.login(password);
       onLoginSuccess();
     } catch (err: any) {
-      console.error('Login failed:', err);
-      setError(err.response?.data?.error || 'Invalid password');
+      console.error("Login failed:", err);
+      setError(err.response?.data?.error || "Invalid password");
     } finally {
       setIsLoading(false);
     }
@@ -47,7 +47,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             name="username"
             autoComplete="username"
             value="disnotion"
-            style={{ display: 'none' }}
+            style={{ display: "none" }}
             readOnly
             aria-hidden="true"
           />
@@ -61,7 +61,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
               disabled={isLoading}
               autoFocus
               autoComplete="current-password"
-              className={error ? 'error' : ''}
+              className={error ? "error" : ""}
             />
           </div>
 
@@ -77,7 +77,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             disabled={isLoading || !password}
             className="login-button"
           >
-            {isLoading ? 'Logging in...' : 'Login'}
+            {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>

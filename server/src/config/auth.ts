@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;
 
@@ -13,14 +13,16 @@ export class AuthConfig {
     const password = process.env.AUTH_PASSWORD;
 
     if (!password) {
-      console.warn('⚠️  AUTH_PASSWORD not set - authentication disabled');
-      console.warn('   Set AUTH_PASSWORD in .env file to enable authentication');
+      console.warn("⚠️  AUTH_PASSWORD not set - authentication disabled");
+      console.warn(
+        "   Set AUTH_PASSWORD in .env file to enable authentication",
+      );
       return;
     }
 
     // Hash password synchronously on startup
     this.passwordHash = bcrypt.hashSync(password, SALT_ROUNDS);
-    console.log('✓ Authentication enabled');
+    console.log("✓ Authentication enabled");
   }
 
   isAuthEnabled(): boolean {

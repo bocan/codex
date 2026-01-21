@@ -5,7 +5,8 @@ export class CacheService {
   private cache = new Map<string, { data: any; timestamp: number }>();
   private ttl: number;
 
-  constructor(ttlMs: number = 30000) { // 30 seconds default
+  constructor(ttlMs: number = 30000) {
+    // 30 seconds default
     this.ttl = ttlMs;
   }
 
@@ -33,7 +34,7 @@ export class CacheService {
   set(key: string, data: any): void {
     this.cache.set(key, {
       data,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -68,7 +69,7 @@ export class CacheService {
   getStats(): { size: number; keys: string[] } {
     return {
       size: this.cache.size,
-      keys: Array.from(this.cache.keys())
+      keys: Array.from(this.cache.keys()),
     };
   }
 }

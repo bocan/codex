@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { api } from '../services/api';
-import VersionHistory from './VersionHistory';
-import { Attachments } from './Attachments';
-import './Editor.css';
+import React, { useState, useEffect, useRef } from "react";
+import { api } from "../services/api";
+import VersionHistory from "./VersionHistory";
+import { Attachments } from "./Attachments";
+import "./Editor.css";
 
 interface EditorProps {
   pagePath: string | null;
@@ -11,8 +11,13 @@ interface EditorProps {
   onScroll?: (percent: number) => void;
 }
 
-export const Editor: React.FC<EditorProps> = ({ pagePath, onClose, onContentChange, onScroll }) => {
-  const [content, setContent] = useState('');
+export const Editor: React.FC<EditorProps> = ({
+  pagePath,
+  onClose,
+  onContentChange,
+  onScroll,
+}) => {
+  const [content, setContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +41,7 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose, onContentChan
     if (pagePath) {
       loadPage();
     } else {
-      setContent('');
+      setContent("");
       setError(null);
     }
   }, [pagePath]);
@@ -54,8 +59,8 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose, onContentChan
         onContentChange(page.content);
       }
     } catch (err) {
-      console.error('Failed to load page:', err);
-      setError('Failed to load page. Click to retry.');
+      console.error("Failed to load page:", err);
+      setError("Failed to load page. Click to retry.");
     } finally {
       setIsLoading(false);
     }
@@ -72,8 +77,8 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose, onContentChan
       setLastSaved(new Date());
       setLastSaveTime(now);
     } catch (err) {
-      console.error('Failed to save page:', err);
-      setError('Failed to save. Click to retry.');
+      console.error("Failed to save page:", err);
+      setError("Failed to save. Click to retry.");
     } finally {
       setIsSaving(false);
     }
@@ -90,9 +95,10 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose, onContentChan
 
     // If enough time has passed since last save, use typing pause delay
     // Otherwise, wait until the minimum interval has passed
-    const delay = timeSinceLastSave >= minSaveInterval
-      ? typingPauseDelay
-      : Math.max(typingPauseDelay, minSaveInterval - timeSinceLastSave);
+    const delay =
+      timeSinceLastSave >= minSaveInterval
+        ? typingPauseDelay
+        : Math.max(typingPauseDelay, minSaveInterval - timeSinceLastSave);
 
     const timer = setTimeout(() => {
       handleSave();
@@ -122,24 +128,28 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose, onContentChan
 
   // Speech recognition functions
   const startListening = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert('Speech recognition is not supported in this browser. Try Chrome or Edge.');
+      alert(
+        "Speech recognition is not supported in this browser. Try Chrome or Edge.",
+      );
       return;
     }
 
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = 'en-GB';
+    recognition.lang = "en-GB";
 
-    let finalTranscript = '';
+    let finalTranscript = "";
 
     recognition.onresult = (event: any) => {
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
-          finalTranscript += transcript + ' ';
+          finalTranscript += transcript + " ";
         }
       }
 
@@ -150,7 +160,10 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose, onContentChan
         const end = textarea.selectionEnd;
         // Use contentRef.current to get the latest content value
         const currentContent = contentRef.current;
-        const newContent = currentContent.slice(0, start) + finalTranscript + currentContent.slice(end);
+        const newContent =
+          currentContent.slice(0, start) +
+          finalTranscript +
+          currentContent.slice(end);
 
         setContent(newContent);
         if (onContentChange) {
@@ -164,14 +177,16 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose, onContentChan
           textarea.selectionEnd = newCursorPos;
         }, 0);
 
-        finalTranscript = '';
+        finalTranscript = "";
       }
     };
 
     recognition.onerror = (event: any) => {
-      console.error('Speech recognition error:', event.error);
-      if (event.error === 'not-allowed') {
-        alert('Microphone access denied. Please allow microphone access and try again.');
+      console.error("Speech recognition error:", event.error);
+      if (event.error === "not-allowed") {
+        alert(
+          "Microphone access denied. Please allow microphone access and try again.",
+        );
       }
       setIsListening(false);
     };
@@ -221,7 +236,9 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose, onContentChan
     return (
       <div className="editor empty" role="status">
         <div className="empty-state">
-          <span className="empty-icon" aria-hidden="true">✏️</span>
+          <span className="empty-icon" aria-hidden="true">
+            ✏️
+          </span>
           <p>Select a page to start editing</p>
         </div>
       </div>
@@ -230,7 +247,12 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose, onContentChan
 
   if (isLoading) {
     return (
-      <div className="editor loading" role="status" aria-live="polite" aria-label="Loading page">
+      <div
+        className="editor loading"
+        role="status"
+        aria-live="polite"
+        aria-label="Loading page"
+      >
         <div className="loading-state">
           <div className="loading-spinner" aria-hidden="true"></div>
           <p>Loading page...</p>
@@ -243,7 +265,9 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose, onContentChan
     return (
       <div className="editor error" role="alert">
         <div className="error-state" onClick={loadPage}>
-          <span className="error-icon" aria-hidden="true">⚠️</span>
+          <span className="error-icon" aria-hidden="true">
+            ⚠️
+          </span>
           <p>{error}</p>
         </div>
       </div>
@@ -262,14 +286,17 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose, onContentChan
     const end = textarea.selectionEnd;
 
     // Determine if it's an image
-    const ext = filename.split('.').pop()?.toLowerCase();
-    const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext || '');
+    const ext = filename.split(".").pop()?.toLowerCase();
+    const isImage = ["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(
+      ext || "",
+    );
 
     const link = isImage
       ? `![${filename}](.attachments/${filename})`
       : `[${filename}](.attachments/${filename})`;
 
-    const newContent = content.substring(0, start) + link + content.substring(end);
+    const newContent =
+      content.substring(0, start) + link + content.substring(end);
     setContent(newContent);
     if (onContentChange) {
       onContentChange(newContent);
@@ -287,25 +314,43 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose, onContentChan
   return (
     <div className="editor" data-1p-ignore>
       <div className="editor-header">
-        <h3>{pagePath.split('/').pop()}</h3>
+        <h3>{pagePath.split("/").pop()}</h3>
         <div className="editor-actions">
           {error && (
-            <span className="save-error" onClick={handleSave} role="alert" aria-live="assertive"><span aria-hidden="true">⚠️</span> {error}</span>
+            <span
+              className="save-error"
+              onClick={handleSave}
+              role="alert"
+              aria-live="assertive"
+            >
+              <span aria-hidden="true">⚠️</span> {error}
+            </span>
           )}
           {lastSaved && !error && (
             <span className="save-status" role="status" aria-live="polite">
               Saved at {lastSaved.toLocaleTimeString()}
             </span>
           )}
-          {isSaving && <span className="save-status saving" role="status" aria-live="polite">Saving...</span>}
+          {isSaving && (
+            <span
+              className="save-status saving"
+              role="status"
+              aria-live="polite"
+            >
+              Saving...
+            </span>
+          )}
           <button
             onClick={toggleListening}
-            className={`dictate-btn ${isListening ? 'listening' : ''}`}
-            title={isListening ? 'Stop dictation' : 'Start dictation'}
-            aria-label={isListening ? 'Stop voice dictation' : 'Start voice dictation'}
+            className={`dictate-btn ${isListening ? "listening" : ""}`}
+            title={isListening ? "Stop dictation" : "Start dictation"}
+            aria-label={
+              isListening ? "Stop voice dictation" : "Start voice dictation"
+            }
             aria-pressed={isListening}
           >
-            <span aria-hidden="true">🎤</span> {isListening ? 'Stop' : 'Dictate'}
+            <span aria-hidden="true">🎤</span>{" "}
+            {isListening ? "Stop" : "Dictate"}
           </button>
           <button
             onClick={() => setShowAttachments(true)}
@@ -315,13 +360,23 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose, onContentChan
           >
             <span aria-hidden="true">📎</span> Attachments
           </button>
-          <button onClick={() => setShowHistory(true)} className="history-btn" aria-label="View version history">
+          <button
+            onClick={() => setShowHistory(true)}
+            className="history-btn"
+            aria-label="View version history"
+          >
             <span aria-hidden="true">📜</span> History
           </button>
-          <button onClick={handleSave} disabled={isSaving} aria-label="Save page">
-            {isSaving ? 'Saving...' : 'Save'}
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            aria-label="Save page"
+          >
+            {isSaving ? "Saving..." : "Save"}
           </button>
-          <button onClick={onClose} aria-label="Close editor">Close</button>
+          <button onClick={onClose} aria-label="Close editor">
+            Close
+          </button>
         </div>
       </div>
       <textarea
@@ -341,7 +396,6 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose, onContentChan
         disabled={isSaving}
         aria-label="Markdown editor"
       />
-
       {showHistory && (
         <VersionHistory
           pagePath={pagePath}
@@ -351,10 +405,15 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose, onContentChan
       )}
       {showAttachments && (
         <Attachments
-          folderPath={pagePath ? pagePath.substring(0, pagePath.lastIndexOf('/')) || '' : ''}
+          folderPath={
+            pagePath
+              ? pagePath.substring(0, pagePath.lastIndexOf("/")) || ""
+              : ""
+          }
           onClose={() => setShowAttachments(false)}
           onInsert={handleInsertAttachment}
         />
-      )}    </div>
+      )}{" "}
+    </div>
   );
 };

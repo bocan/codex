@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { api } from '../services/api';
-import './Attachments.css';
+import React, { useState, useEffect, useRef } from "react";
+import { api } from "../services/api";
+import "./Attachments.css";
 
 interface Attachment {
   name: string;
@@ -14,7 +14,11 @@ interface AttachmentsProps {
   onInsert?: (filename: string) => void;
 }
 
-export const Attachments: React.FC<AttachmentsProps> = ({ folderPath, onClose, onInsert }) => {
+export const Attachments: React.FC<AttachmentsProps> = ({
+  folderPath,
+  onClose,
+  onInsert,
+}) => {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -33,8 +37,8 @@ export const Attachments: React.FC<AttachmentsProps> = ({ folderPath, onClose, o
       const data = await api.getAttachments(folderPath);
       setAttachments(data);
     } catch (err) {
-      console.error('Failed to load attachments:', err);
-      setError('Failed to load attachments');
+      console.error("Failed to load attachments:", err);
+      setError("Failed to load attachments");
     } finally {
       setLoading(false);
     }
@@ -52,8 +56,8 @@ export const Attachments: React.FC<AttachmentsProps> = ({ folderPath, onClose, o
       }
       await loadAttachments();
     } catch (err) {
-      console.error('Upload failed:', err);
-      setError('Failed to upload files');
+      console.error("Upload failed:", err);
+      setError("Failed to upload files");
     } finally {
       setUploading(false);
     }
@@ -66,17 +70,17 @@ export const Attachments: React.FC<AttachmentsProps> = ({ folderPath, onClose, o
       await api.deleteAttachment(folderPath, filename);
       await loadAttachments();
     } catch (err) {
-      console.error('Delete failed:', err);
-      setError('Failed to delete file');
+      console.error("Delete failed:", err);
+      setError("Failed to delete file");
     }
   };
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
+    if (e.type === "dragenter" || e.type === "dragover") {
       setDragActive(true);
-    } else if (e.type === 'dragleave') {
+    } else if (e.type === "dragleave") {
       setDragActive(false);
     }
   };
@@ -92,21 +96,22 @@ export const Attachments: React.FC<AttachmentsProps> = ({ folderPath, onClose, o
   };
 
   const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
   };
 
   const getFileIcon = (filename: string): string => {
-    const ext = filename.split('.').pop()?.toLowerCase();
-    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext || '')) return '🖼️';
-    if (['pdf'].includes(ext || '')) return '📄';
-    if (['doc', 'docx'].includes(ext || '')) return '📝';
-    if (['xls', 'xlsx'].includes(ext || '')) return '📊';
-    if (['zip', 'rar', '7z'].includes(ext || '')) return '📦';
-    return '📎';
+    const ext = filename.split(".").pop()?.toLowerCase();
+    if (["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(ext || ""))
+      return "🖼️";
+    if (["pdf"].includes(ext || "")) return "📄";
+    if (["doc", "docx"].includes(ext || "")) return "📝";
+    if (["xls", "xlsx"].includes(ext || "")) return "📊";
+    if (["zip", "rar", "7z"].includes(ext || "")) return "📦";
+    return "📎";
   };
 
   const handleInsertLink = (filename: string) => {
@@ -116,24 +121,41 @@ export const Attachments: React.FC<AttachmentsProps> = ({ folderPath, onClose, o
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="attachments-title">
-      <div className="modal attachments-modal" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="modal-overlay"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="attachments-title"
+    >
+      <div
+        className="modal attachments-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <h3 id="attachments-title">📎 Attachments</h3>
-          <button className="modal-close" onClick={onClose} aria-label="Close attachments modal">✕</button>
+          <button
+            className="modal-close"
+            onClick={onClose}
+            aria-label="Close attachments modal"
+          >
+            ✕
+          </button>
         </div>
 
         {error && (
           <div className="error-banner" role="alert">
             <span>⚠️</span> {error}
-            <button onClick={() => setError(null)} aria-label="Dismiss error">✕</button>
+            <button onClick={() => setError(null)} aria-label="Dismiss error">
+              ✕
+            </button>
           </div>
         )}
 
         <div className="modal-body">
           {/* Upload Area */}
           <div
-            className={`upload-area ${dragActive ? 'drag-active' : ''}`}
+            className={`upload-area ${dragActive ? "drag-active" : ""}`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
@@ -148,7 +170,7 @@ export const Attachments: React.FC<AttachmentsProps> = ({ folderPath, onClose, o
               type="file"
               multiple
               onChange={(e) => handleUpload(e.target.files)}
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
               aria-label="File input"
             />
             {uploading ? (
@@ -158,8 +180,12 @@ export const Attachments: React.FC<AttachmentsProps> = ({ folderPath, onClose, o
               </div>
             ) : (
               <>
-                <div className="upload-icon" aria-hidden="true">📤</div>
-                <p><strong>Drop files here</strong> or click to browse</p>
+                <div className="upload-icon" aria-hidden="true">
+                  📤
+                </div>
+                <p>
+                  <strong>Drop files here</strong> or click to browse
+                </p>
                 <p className="upload-hint">Up to 50MB per file</p>
               </>
             )}
@@ -180,10 +206,14 @@ export const Attachments: React.FC<AttachmentsProps> = ({ folderPath, onClose, o
               <ul role="list">
                 {attachments.map((file) => (
                   <li key={file.name} className="attachment-item">
-                    <span className="file-icon" aria-hidden="true">{getFileIcon(file.name)}</span>
+                    <span className="file-icon" aria-hidden="true">
+                      {getFileIcon(file.name)}
+                    </span>
                     <div className="file-info">
                       <div className="file-name">{file.name}</div>
-                      <div className="file-meta">{formatFileSize(file.size)}</div>
+                      <div className="file-meta">
+                        {formatFileSize(file.size)}
+                      </div>
                     </div>
                     <div className="file-actions">
                       <button

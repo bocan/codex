@@ -16,7 +16,8 @@
 - 📝 **Markdown Pages**: Create and edit markdown documents with GitHub Flavored Markdown support
 - 🎨 **Three-Pane Layout**: Folder tree (left), markdown editor (center), live preview (right)
 - 📐 **Fully Resizable**: Drag to resize both horizontal panes (left/right) and vertical sections (folder tree/page list)
-- 🌓 **Dark Mode**: Auto-detects system theme preference with manual override - cycles through auto/light/dark modes
+- 🌓 **Theme Options**: Auto-detects system theme preference with manual override - cycles through auto/light/dark/high-contrast modes
+- ♿ **Accessibility**: Full ARIA labels, semantic HTML, high-contrast theme, and improved color contrast for WCAG compliance
 - 📤 **Move Pages**: Elegant folder picker to move pages between folders via right-click menu
 - 💾 **Smart Auto-save**: 10-second throttled saves with 5-second typing debounce - prevents excessive saves while keeping your work safe
 - 🔄 **Live Preview**: Real-time markdown preview that updates instantly as you type (no waiting for saves)
@@ -26,6 +27,9 @@
 - 📖 **Reading Mode**: Open any page in a new window for distraction-free reading
 - 🔃 **Synchronized Scrolling**: Editor scroll position syncs to preview pane
 - 📄 **Auto-select README**: Navigating to a folder automatically opens its README.md if present
+- 🔎 **Full-Text Search**: Quick search across all pages with keyboard shortcut (⌘K/Ctrl+K) and relevance-ranked results
+- 📑 **Table of Contents**: Auto-generated, collapsible TOC for easy document navigation with active section highlighting
+- 🎤 **Speech-to-Text**: Dictate content using Web Speech API (Chrome/Edge/Safari)
 - ⚡ **Performance Caching**: Server-side caching layer with 30-second TTL for fast folder/page loading
 - 🌐 **RESTful API**: Programmatic access to all folder and page operations
 - ✅ **Tested**: Comprehensive test suite for both backend and frontend
@@ -73,6 +77,41 @@ Helmet middleware provides:
 - Enable HTTPS in production (`NODE_ENV=production`)
 - Monitor logs for suspicious login patterns
 - Consider deploying behind a reverse proxy (nginx, Caddy) for additional security
+
+## ♿ Accessibility Features
+
+Disnotion is designed to be accessible to all users, including those using assistive technologies:
+
+### Screen Reader Support
+- **Comprehensive ARIA labels** on all interactive elements
+- **Semantic HTML** structure using `<header>`, `<nav>`, `<main>`, `<section>`, `<aside>`, and `<article>` elements
+- **Live regions** (`aria-live`) announce dynamic content updates
+- **Proper roles** (`role="tree"`, `role="button"`, `role="dialog"`) for enhanced navigation
+- **Keyboard navigation** support with proper focus management and `tabIndex` attributes
+- **Descriptive labels** explain the state and purpose of all controls
+
+### Visual Accessibility
+- **Four theme options**: Auto (follows system), Light, Dark, and High-Contrast
+- **High-contrast mode** provides maximum visual clarity:
+  - Pure black (#000) background with white (#fff) text
+  - Yellow (#ffff00) secondary text for clear distinction
+  - Cyan (#00ffff) accent colors for links and interactive elements
+  - White borders for clear element separation
+- **Improved contrast ratios** in all themes for WCAG compliance
+- **Larger interactive elements**: Buttons sized at 32px for easier clicking
+- **Consistent theming**: All features including reading mode support all themes
+
+### Keyboard Accessibility
+- **Tab navigation** through all interactive elements
+- **Arrow key navigation** in folder tree and search results
+- **Enter/Space** to activate buttons and links
+- **Escape** to close modals and dialogs
+- **⌘K/Ctrl+K** global search shortcut
+
+The accessibility features ensure Disnotion can be used effectively by people with:
+- Visual impairments (screen readers, high-contrast mode)
+- Motor disabilities (keyboard-only navigation, larger click targets)
+- Color blindness (semantic colors with sufficient contrast)
 
 ## 🚀 Quick Start
 
@@ -321,7 +360,7 @@ The application will be available at:
     - Drag the edge of left/right panes to resize horizontally
     - Drag the divider between folder tree and page list to resize vertically
 11. **Collapse Panes**: Use the arrow buttons to hide left/right panes
-12. **Theme Toggle**: Click the theme button (🌓/☀️/🌙) in the header to cycle through auto/light/dark modes
+12. **Theme Toggle**: Click the theme button (🌓/☀️/🌙/◐) in the header to cycle through auto/light/dark/high-contrast modes
 
 ### Production Build
 
@@ -655,6 +694,49 @@ chmod 755 data/
 - Review the API documentation above
 - Ensure all prerequisites are installed
 - Try a clean install: `make clean && make install`
+
+## ⌨️ Keyboard Shortcuts
+
+| Shortcut | Description |
+|----------|-------------|
+| `⌘K` / `Ctrl+K` | Open search modal |
+| `↑` `↓` | Navigate search results |
+| `Enter` | Select highlighted search result |
+| `Esc` | Close search modal |
+
+## 🔍 Search Features
+
+Disnotion includes a powerful full-text search that:
+- **Searches across all pages** in all folders recursively
+- **Ranks results by relevance** (number of matches)
+- **Highlights matching text** in context snippets
+- **Shows search context** (50 characters before and after match)
+- **Keyboard-driven** with quick access via `⌘K` / `Ctrl+K`
+- **Instant results** with 300ms debounce for smooth typing
+- **Arrow key navigation** to browse results
+- **Click or Enter** to jump to matching pages
+
+### Using Search
+
+1. Click the search button in the header or press `⌘K` / `Ctrl+K`
+2. Type your query (case-insensitive)
+3. Navigate results with `↑` `↓` arrow keys
+4. Press `Enter` or click to open the page
+5. Press `Esc` to close the search modal
+
+## 📑 Table of Contents
+
+The Table of Contents automatically:
+- **Extracts all headings** from the current document
+- **Creates hierarchical structure** based on heading levels (H1-H6)
+- **Highlights the current section** as you scroll
+- **Provides quick navigation** - click any heading to jump to it
+- **Collapsible sidebar** - click the toggle to show/hide
+- **Remembers your preference** - state persists across sessions
+- **Smooth scrolling** to target sections
+- **Auto-hides on small screens** (responsive design)
+
+The TOC appears as a floating widget on the right side of the preview pane when viewing pages with multiple headings.
 
 ## 💻 Tech Stack
 

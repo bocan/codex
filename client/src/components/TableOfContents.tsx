@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import GithubSlugger from 'github-slugger';
-import './TableOfContents.css';
+import React, { useState, useEffect, useRef } from "react";
+import GithubSlugger from "github-slugger";
+import "./TableOfContents.css";
 
 interface Heading {
   id: string;
@@ -12,15 +12,17 @@ interface TableOfContentsProps {
   content: string;
 }
 
-export const TableOfContents: React.FC<TableOfContentsProps> = ({ content }) => {
+export const TableOfContents: React.FC<TableOfContentsProps> = ({
+  content,
+}) => {
   const [headings, setHeadings] = useState<Heading[]>([]);
-  const [activeId, setActiveId] = useState<string>('');
+  const [activeId, setActiveId] = useState<string>("");
   const [isCollapsed, setIsCollapsed] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Extract headings from markdown content
   useEffect(() => {
-    const lines = content.split('\n');
+    const lines = content.split("\n");
     const extractedHeadings: Heading[] = [];
     const slugger = new GithubSlugger();
 
@@ -51,8 +53,8 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({ content }) => 
         });
       },
       {
-        rootMargin: '-100px 0px -80% 0px',
-      }
+        rootMargin: "-100px 0px -80% 0px",
+      },
     );
 
     // Observe all heading elements in the preview
@@ -69,29 +71,32 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({ content }) => 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsCollapsed(true);
       }
     };
 
     if (!isCollapsed) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isCollapsed]);
 
   // Save collapsed state
   useEffect(() => {
-    localStorage.setItem('disnotion-toc-collapsed', String(isCollapsed));
+    localStorage.setItem("disnotion-toc-collapsed", String(isCollapsed));
   }, [isCollapsed]);
 
   const handleClick = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
@@ -120,7 +125,7 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({ content }) => 
                 <li
                   key={heading.id}
                   className={`toc-item toc-level-${heading.level} ${
-                    activeId === heading.id ? 'active' : ''
+                    activeId === heading.id ? "active" : ""
                   }`}
                 >
                   <button

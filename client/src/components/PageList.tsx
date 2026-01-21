@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { FileNode, FolderNode } from '../types';
-import { api } from '../services/api';
-import './PageList.css';
+import React, { useState, useEffect } from "react";
+import { FileNode, FolderNode } from "../types";
+import { api } from "../services/api";
+import "./PageList.css";
 
 interface PageListProps {
   selectedFolder: string | null;
@@ -23,7 +23,7 @@ export const PageList: React.FC<PageListProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [contextMenuPage, setContextMenuPage] = useState<string | null>(null);
   const [renamingPage, setRenamingPage] = useState<string | null>(null);
-  const [newPageName, setNewPageName] = useState('');
+  const [newPageName, setNewPageName] = useState("");
   const [movingPage, setMovingPage] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
@@ -43,12 +43,12 @@ export const PageList: React.FC<PageListProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const folderPath = selectedFolder === '/' ? '' : selectedFolder;
+      const folderPath = selectedFolder === "/" ? "" : selectedFolder;
       const data = await api.getPages(folderPath);
       setPages(data);
     } catch (err) {
-      console.error('Failed to load pages:', err);
-      setError('Failed to load pages. Click to retry.');
+      console.error("Failed to load pages:", err);
+      setError("Failed to load pages. Click to retry.");
     } finally {
       setLoading(false);
     }
@@ -57,18 +57,19 @@ export const PageList: React.FC<PageListProps> = ({
   const handleCreatePage = async () => {
     if (!selectedFolder) return;
 
-    const pageName = prompt('Enter page name (without .md extension):');
+    const pageName = prompt("Enter page name (without .md extension):");
     if (pageName) {
       setIsCreating(true);
       try {
-        const fileName = pageName.endsWith('.md') ? pageName : `${pageName}.md`;
-        const pagePath = selectedFolder === '/' ? fileName : `${selectedFolder}/${fileName}`;
+        const fileName = pageName.endsWith(".md") ? pageName : `${pageName}.md`;
+        const pagePath =
+          selectedFolder === "/" ? fileName : `${selectedFolder}/${fileName}`;
         await api.createPage(pagePath, `# ${pageName}\n\nStart writing...`);
         loadPages();
         onRefresh();
       } catch (err) {
-        console.error('Failed to create page:', err);
-        setError('Failed to create page. Please try again.');
+        console.error("Failed to create page:", err);
+        setError("Failed to create page. Please try again.");
       } finally {
         setIsCreating(false);
       }
@@ -85,11 +86,11 @@ export const PageList: React.FC<PageListProps> = ({
         loadPages();
         onRefresh();
         if (selectedPage === path) {
-          onSelectPage('');
+          onSelectPage("");
         }
       } catch (err) {
-        console.error('Failed to delete page:', err);
-        setError('Failed to delete page. Please try again.');
+        console.error("Failed to delete page:", err);
+        setError("Failed to delete page. Please try again.");
       } finally {
         setIsDeleting(null);
       }
@@ -100,7 +101,7 @@ export const PageList: React.FC<PageListProps> = ({
 
   const handleRenamePage = (path: string, name: string) => {
     setRenamingPage(path);
-    setNewPageName(name.replace('.md', ''));
+    setNewPageName(name.replace(".md", ""));
     setContextMenuPage(null);
   };
 
@@ -110,8 +111,10 @@ export const PageList: React.FC<PageListProps> = ({
       return;
     }
 
-    const fileName = newPageName.endsWith('.md') ? newPageName : `${newPageName}.md`;
-    const folderPath = oldPath.substring(0, oldPath.lastIndexOf('/'));
+    const fileName = newPageName.endsWith(".md")
+      ? newPageName
+      : `${newPageName}.md`;
+    const folderPath = oldPath.substring(0, oldPath.lastIndexOf("/"));
     const newPath = folderPath ? `${folderPath}/${fileName}` : fileName;
 
     if (newPath !== oldPath) {
@@ -123,8 +126,8 @@ export const PageList: React.FC<PageListProps> = ({
           onSelectPage(newPath);
         }
       } catch (err) {
-        console.error('Failed to rename page:', err);
-        setError('Failed to rename page. Please try again.');
+        console.error("Failed to rename page:", err);
+        setError("Failed to rename page. Please try again.");
       }
     }
     setRenamingPage(null);
@@ -154,20 +157,28 @@ export const PageList: React.FC<PageListProps> = ({
       }
       setMovingPage(null);
     } catch (err: any) {
-      console.error('Failed to move page:', err);
-      setError(err.response?.data?.error || 'Failed to move page. Please try again.');
+      console.error("Failed to move page:", err);
+      setError(
+        err.response?.data?.error || "Failed to move page. Please try again.",
+      );
       setMovingPage(null);
     } finally {
       setIsMoving(false);
     }
   };
 
-  const getAllFolders = (node: FolderNode, prefix: string = ''): Array<{ path: string; display: string }> => {
+  const getAllFolders = (
+    node: FolderNode,
+    prefix: string = "",
+  ): Array<{ path: string; display: string }> => {
     const folders: Array<{ path: string; display: string }> = [];
     const currentPath = prefix ? `${prefix}/${node.name}` : node.name;
-    const displayPath = currentPath === '' ? '/' : currentPath;
+    const displayPath = currentPath === "" ? "/" : currentPath;
 
-    folders.push({ path: node.path === '/' ? '' : node.path, display: displayPath });
+    folders.push({
+      path: node.path === "/" ? "" : node.path,
+      display: displayPath,
+    });
 
     for (const child of node.children) {
       folders.push(...getAllFolders(child, currentPath));
@@ -183,37 +194,60 @@ export const PageList: React.FC<PageListProps> = ({
         <button
           onClick={handleCreatePage}
           disabled={!selectedFolder || isCreating}
-          className={isCreating ? 'loading' : ''}
+          className={isCreating ? "loading" : ""}
           aria-label="Create new page"
         >
-          {isCreating ? 'Creating...' : '+ New Page'}
+          {isCreating ? "Creating..." : "+ New Page"}
         </button>
       </div>
 
       {/* Error State */}
       {error && (
-        <div className="error-state" onClick={() => { setError(null); loadPages(); }} role="alert" aria-live="polite">
-          <span className="error-icon" aria-hidden="true">⚠️</span>
+        <div
+          className="error-state"
+          onClick={() => {
+            setError(null);
+            loadPages();
+          }}
+          role="alert"
+          aria-live="polite"
+        >
+          <span className="error-icon" aria-hidden="true">
+            ⚠️
+          </span>
           <span>{error}</span>
         </div>
       )}
 
       {/* Loading State - only when no data */}
       {loading && !pages.length && !error ? (
-        <div className="loading-state" role="status" aria-live="polite" aria-label="Loading pages">
+        <div
+          className="loading-state"
+          role="status"
+          aria-live="polite"
+          aria-label="Loading pages"
+        >
           <div className="loading-spinner" aria-hidden="true"></div>
           <span>Loading pages...</span>
         </div>
       ) : !selectedFolder ? (
         <div className="empty-state" role="status">
-          <span className="empty-icon" aria-hidden="true">📂</span>
+          <span className="empty-icon" aria-hidden="true">
+            📂
+          </span>
           <span>Select a folder to view pages</span>
         </div>
       ) : !loading && pages.length === 0 && !error ? (
         <div className="empty-state" role="status">
-          <span className="empty-icon" aria-hidden="true">📄</span>
+          <span className="empty-icon" aria-hidden="true">
+            📄
+          </span>
           <span>No pages yet</span>
-          <button onClick={handleCreatePage} disabled={isCreating} aria-label="Create your first page">
+          <button
+            onClick={handleCreatePage}
+            disabled={isCreating}
+            aria-label="Create your first page"
+          >
             Create your first page
           </button>
         </div>
@@ -222,15 +256,19 @@ export const PageList: React.FC<PageListProps> = ({
           {pages.map((page) => (
             <li
               key={page.path}
-              className={`page-item ${selectedPage === page.path ? 'selected' : ''} ${isDeleting === page.path ? 'deleting' : ''}`}
+              className={`page-item ${selectedPage === page.path ? "selected" : ""} ${isDeleting === page.path ? "deleting" : ""}`}
               onClick={() => !isDeleting && onSelectPage(page.path)}
-              onContextMenu={(e) => !isDeleting && handleContextMenu(e, page.path)}
+              onContextMenu={(e) =>
+                !isDeleting && handleContextMenu(e, page.path)
+              }
               role="button"
               tabIndex={0}
-              aria-label={`Page: ${page.name}${selectedPage === page.path ? ' (selected)' : ''}`}
+              aria-label={`Page: ${page.name}${selectedPage === page.path ? " (selected)" : ""}`}
               aria-busy={isDeleting === page.path}
             >
-              <span className="page-icon" aria-hidden="true">{isDeleting === page.path ? '⏳' : '📄'}</span>
+              <span className="page-icon" aria-hidden="true">
+                {isDeleting === page.path ? "⏳" : "📄"}
+              </span>
               {renamingPage === page.path ? (
                 <input
                   type="text"
@@ -239,8 +277,8 @@ export const PageList: React.FC<PageListProps> = ({
                   onChange={(e) => setNewPageName(e.target.value)}
                   onBlur={() => handleRenameSubmit(page.path)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleRenameSubmit(page.path);
-                    if (e.key === 'Escape') setRenamingPage(null);
+                    if (e.key === "Enter") handleRenameSubmit(page.path);
+                    if (e.key === "Escape") setRenamingPage(null);
                   }}
                   onClick={(e) => e.stopPropagation()}
                   autoFocus
@@ -250,10 +288,33 @@ export const PageList: React.FC<PageListProps> = ({
                 <span className="page-name">{page.name}</span>
               )}
               {contextMenuPage === page.path && (
-                <div className="page-context-menu" onClick={(e) => e.stopPropagation()} role="menu" aria-label="Page actions">
-                  <button onClick={() => handleRenamePage(page.path, page.name)} role="menuitem" aria-label={`Rename ${page.name}`}>Rename</button>
-                  <button onClick={() => handleMovePage(page.path)} role="menuitem" aria-label={`Move ${page.name} to another folder`}>Move to...</button>
-                  <button onClick={(e) => handleDeletePage(page.path, e)} role="menuitem" aria-label={`Delete ${page.name}`}>Delete</button>
+                <div
+                  className="page-context-menu"
+                  onClick={(e) => e.stopPropagation()}
+                  role="menu"
+                  aria-label="Page actions"
+                >
+                  <button
+                    onClick={() => handleRenamePage(page.path, page.name)}
+                    role="menuitem"
+                    aria-label={`Rename ${page.name}`}
+                  >
+                    Rename
+                  </button>
+                  <button
+                    onClick={() => handleMovePage(page.path)}
+                    role="menuitem"
+                    aria-label={`Move ${page.name} to another folder`}
+                  >
+                    Move to...
+                  </button>
+                  <button
+                    onClick={(e) => handleDeletePage(page.path, e)}
+                    role="menuitem"
+                    aria-label={`Delete ${page.name}`}
+                  >
+                    Delete
+                  </button>
                 </div>
               )}
             </li>
@@ -263,10 +324,19 @@ export const PageList: React.FC<PageListProps> = ({
 
       {/* Move Page Modal */}
       {movingPage && folderTree && (
-        <div className="modal-overlay" onClick={() => !isMoving && setMovingPage(null)} role="dialog" aria-modal="true" aria-labelledby="move-modal-title">
+        <div
+          className="modal-overlay"
+          onClick={() => !isMoving && setMovingPage(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="move-modal-title"
+        >
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <h3 id="move-modal-title">Move Page</h3>
-            <p>Select destination folder for <strong>{movingPage.split('/').pop()}</strong>:</p>
+            <p>
+              Select destination folder for{" "}
+              <strong>{movingPage.split("/").pop()}</strong>:
+            </p>
             {isMoving ? (
               <div className="modal-loading" role="status" aria-live="polite">
                 <div className="loading-spinner" aria-hidden="true"></div>
@@ -288,7 +358,12 @@ export const PageList: React.FC<PageListProps> = ({
                 ))}
               </div>
             )}
-            <button className="cancel-btn" onClick={() => setMovingPage(null)} disabled={isMoving} aria-label="Cancel moving page">
+            <button
+              className="cancel-btn"
+              onClick={() => setMovingPage(null)}
+              disabled={isMoving}
+              aria-label="Cancel moving page"
+            >
               Cancel
             </button>
           </div>

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { api } from '../services/api';
-import { SearchResult } from '../types';
-import './Search.css';
+import React, { useState, useEffect, useRef } from "react";
+import { api } from "../services/api";
+import { SearchResult } from "../types";
+import "./Search.css";
 
 interface SearchProps {
   onSelectPage: (path: string) => void;
@@ -9,7 +9,7 @@ interface SearchProps {
 
 export const Search: React.FC<SearchProps> = ({ onSelectPage }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -19,20 +19,20 @@ export const Search: React.FC<SearchProps> = ({ onSelectPage }) => {
   // Keyboard shortcut: Cmd+K (Mac) or Ctrl+K (Windows/Linux)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setIsOpen(true);
       }
 
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === "Escape" && isOpen) {
         setIsOpen(false);
-        setQuery('');
+        setQuery("");
         setResults([]);
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen]);
 
   // Focus input when modal opens
@@ -47,16 +47,16 @@ export const Search: React.FC<SearchProps> = ({ onSelectPage }) => {
     const handleClickOutside = (e: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
         setIsOpen(false);
-        setQuery('');
+        setQuery("");
         setResults([]);
       }
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
   // Search with debounce
@@ -74,7 +74,7 @@ export const Search: React.FC<SearchProps> = ({ onSelectPage }) => {
         setResults(searchResults);
         setSelectedIndex(0);
       } catch (error) {
-        console.error('Search failed:', error);
+        console.error("Search failed:", error);
         setResults([]);
       } finally {
         setIsSearching(false);
@@ -86,13 +86,13 @@ export const Search: React.FC<SearchProps> = ({ onSelectPage }) => {
 
   // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowDown') {
+    if (e.key === "ArrowDown") {
       e.preventDefault();
-      setSelectedIndex(prev => Math.min(prev + 1, results.length - 1));
-    } else if (e.key === 'ArrowUp') {
+      setSelectedIndex((prev) => Math.min(prev + 1, results.length - 1));
+    } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setSelectedIndex(prev => Math.max(prev - 1, 0));
-    } else if (e.key === 'Enter' && results[selectedIndex]) {
+      setSelectedIndex((prev) => Math.max(prev - 1, 0));
+    } else if (e.key === "Enter" && results[selectedIndex]) {
       e.preventDefault();
       handleSelectResult(results[selectedIndex]);
     }
@@ -101,7 +101,7 @@ export const Search: React.FC<SearchProps> = ({ onSelectPage }) => {
   const handleSelectResult = (result: SearchResult) => {
     onSelectPage(result.path);
     setIsOpen(false);
-    setQuery('');
+    setQuery("");
     setResults([]);
   };
 
@@ -113,44 +113,73 @@ export const Search: React.FC<SearchProps> = ({ onSelectPage }) => {
         title="Search (⌘K)"
         aria-label="Search pages (keyboard shortcut: Command K)"
       >
-        <span className="search-icon" aria-hidden="true">🔍</span>
+        <span className="search-icon" aria-hidden="true">
+          🔍
+        </span>
         <span className="search-hint">Search...</span>
-        <span className="search-shortcut" aria-hidden="true">⌘K</span>
+        <span className="search-shortcut" aria-hidden="true">
+          ⌘K
+        </span>
       </button>
 
       {isOpen && (
-        <div className="search-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="search-label">
+        <div
+          className="search-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="search-label"
+        >
           <div className="search-modal" ref={modalRef}>
             <div className="search-input-container">
-              <span className="search-input-icon" aria-hidden="true">🔍</span>
+              <span className="search-input-icon" aria-hidden="true">
+                🔍
+              </span>
               <input
                 ref={inputRef}
                 type="text"
                 className="search-input"
                 placeholder="Search pages..."
                 value={query}
-                onChange={e => setQuery(e.target.value)}
+                onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 aria-label="Search input"
                 id="search-label"
               />
-              {isSearching && <span className="search-spinner" aria-label="Searching" role="status" aria-live="polite" aria-hidden="true">⏳</span>}
+              {isSearching && (
+                <span
+                  className="search-spinner"
+                  aria-label="Searching"
+                  role="status"
+                  aria-live="polite"
+                  aria-hidden="true"
+                >
+                  ⏳
+                </span>
+              )}
             </div>
 
             {results.length > 0 && (
-              <div className="search-results" role="listbox" aria-label="Search results">
+              <div
+                className="search-results"
+                role="listbox"
+                aria-label="Search results"
+              >
                 {results.map((result, index) => (
                   <div
                     key={result.path}
-                    className={`search-result ${index === selectedIndex ? 'selected' : ''}`}
+                    className={`search-result ${index === selectedIndex ? "selected" : ""}`}
                     onClick={() => handleSelectResult(result)}
                     onMouseEnter={() => setSelectedIndex(index)}
                     role="option"
                     aria-selected={index === selectedIndex}
                   >
                     <div className="search-result-header">
-                      <span className="search-result-title">{result.title}</span>
-                      <span className="search-result-matches">{result.matches} match{result.matches > 1 ? 'es' : ''}</span>
+                      <span className="search-result-title">
+                        {result.title}
+                      </span>
+                      <span className="search-result-matches">
+                        {result.matches} match{result.matches > 1 ? "es" : ""}
+                      </span>
                     </div>
                     <div className="search-result-path">{result.path}</div>
                     <div

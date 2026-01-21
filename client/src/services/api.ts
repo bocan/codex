@@ -1,7 +1,14 @@
-import axios from 'axios';
-import { FolderNode, FileNode, Page, CommitInfo, VersionContent, SearchResult } from '../types';
+import axios from "axios";
+import {
+  FolderNode,
+  FileNode,
+  Page,
+  CommitInfo,
+  VersionContent,
+  SearchResult,
+} from "../types";
 
-const API_BASE = '/api';
+const API_BASE = "/api";
 
 // Enable cookies for session authentication
 axios.defaults.withCredentials = true;
@@ -16,12 +23,15 @@ axios.interceptors.response.use(
       window.location.reload();
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export const api = {
   // Auth operations
-  checkAuthStatus: async (): Promise<{ authEnabled: boolean; authenticated: boolean }> => {
+  checkAuthStatus: async (): Promise<{
+    authEnabled: boolean;
+    authenticated: boolean;
+  }> => {
     const response = await axios.get(`${API_BASE}/auth/status`);
     return response.data;
   },
@@ -65,7 +75,7 @@ export const api = {
     return response.data;
   },
 
-  createPage: async (path: string, content: string = ''): Promise<void> => {
+  createPage: async (path: string, content: string = ""): Promise<void> => {
     await axios.post(`${API_BASE}/pages`, { path, content });
   },
 
@@ -81,8 +91,14 @@ export const api = {
     await axios.put(`${API_BASE}/pages/rename/file`, { oldPath, newPath });
   },
 
-  movePage: async (oldPath: string, newFolderPath: string): Promise<{ newPath: string }> => {
-    const response = await axios.put(`${API_BASE}/pages/move`, { oldPath, newFolderPath });
+  movePage: async (
+    oldPath: string,
+    newFolderPath: string,
+  ): Promise<{ newPath: string }> => {
+    const response = await axios.put(`${API_BASE}/pages/move`, {
+      oldPath,
+      newFolderPath,
+    });
     return response.data;
   },
 
@@ -92,8 +108,13 @@ export const api = {
     return response.data;
   },
 
-  getPageVersion: async (path: string, hash: string): Promise<VersionContent> => {
-    const response = await axios.get(`${API_BASE}/pages/${path}/versions/${hash}`);
+  getPageVersion: async (
+    path: string,
+    hash: string,
+  ): Promise<VersionContent> => {
+    const response = await axios.get(
+      `${API_BASE}/pages/${path}/versions/${hash}`,
+    );
     return response.data;
   },
 
@@ -112,11 +133,11 @@ export const api = {
   // Attachment operations
   uploadAttachment: async (folderPath: string, file: File): Promise<void> => {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
     await axios.post(`${API_BASE}/attachments`, formData, {
       params: { folder: folderPath },
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
   },
@@ -128,7 +149,10 @@ export const api = {
     return response.data;
   },
 
-  deleteAttachment: async (folderPath: string, filename: string): Promise<void> => {
+  deleteAttachment: async (
+    folderPath: string,
+    filename: string,
+  ): Promise<void> => {
     await axios.delete(`${API_BASE}/attachments/${filename}`, {
       params: { folder: folderPath },
     });
