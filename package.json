@@ -15,14 +15,19 @@
     "build": "cd server && npm run build && cd ../client && npm run build",
     "test": "npm run test:server && npm run test:client",
     "test:server": "cd server && npm test",
-    "test:client": "cd client && npm test"
+    "test:client": "cd client && npm test",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/express-session": "^1.18.2",
     "@types/morgan": "^1.9.10",
+    "@typescript-eslint/eslint-plugin": "^8.53.1",
+    "@typescript-eslint/parser": "^8.53.1",
     "bcrypt": "^6.0.0",
     "concurrently": "^8.2.2",
+    "eslint": "^9.39.2",
     "express-rate-limit": "^8.2.1",
     "express-session": "^1.18.2",
     "helmet": "^8.1.0",

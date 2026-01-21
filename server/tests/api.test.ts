@@ -264,4 +264,74 @@ describe('API Tests', () => {
       expect(content).toBe('# Version 1');
     });
   });
+
+  describe('Search Operations', () => {
+    beforeEach(async () => {
+      // Create test pages with various content
+      await testFileSystemService.createPage('test1.md', '# Test Page 1\n\nThis page contains the word typescript and javascript.');
+      await testFileSystemService.createPage('test2.md', '# Test Page 2\n\nThis is about TypeScript programming.');
+      await testFileSystemService.createFolder('subfolder');
+      await testFileSystemService.createPage('subfolder/test3.md', '# Nested Page\n\nDiscussing Python and TypeScript.');
+    });
+
+    it('should search across all pages', async () => {
+      const response = await request(app).get('/api/search?q=typescript');
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body.length).toBe(3); // All 3 pages contain "typescript"
+    });
+
+    it('should return results with correct structure', async () => {
+      const response = await request(app).get('/api/search?q=typescript');
+
+      expect(response.status).toBe(200);
+      expect(response.body[0]).toHaveProperty('path');
+      expect(response.body[0]).toHaveProperty('title');
+      expect(response.body[0]).toHaveProperty('snippet');
+      expect(response.body[0]).toHaveProperty('matches');
+    });
+
+    it('should highlight matches in snippets', async () => {
+      const response = await request(app).get('/api/search?q=typescript');
+
+      expect(response.status).toBe(200);
+      const firstResult = response.body[0];
+      expect(firstResult.snippet).toContain('<strong>');
+      expect(firstResult.snippet).toContain('</strong>');
+    });
+
+    it('should sort results by number of matches', async () => {
+      const response = await request(app).get('/api/search?q=typescript');
+
+      expect(response.status).toBe(200);
+      expect(response.body.length).toBeGreaterThan(1);
+
+      // Verify descending order by matches
+      for (let i = 0; i < response.body.length - 1; i++) {
+        expect(response.body[i].matches).toBeGreaterThanOrEqual(response.body[i + 1].matches);
+      }
+    });
+
+    it('should return empty array for no matches', async () => {
+      const response = await request(app).get('/api/search?q=nonexistent');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual([]);
+    });
+
+    it('should return empty array for empty query', async () => {
+      const response = await request(app).get('/api/search?q=');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual([]);
+    });
+
+    it('should be case-insensitive', async () => {
+      const response = await request(app).get('/api/search?q=TYPESCRIPT');
+
+      expect(response.status).toBe(200);
+      expect(response.body.length).toBe(3);
+    });
+  });
 });

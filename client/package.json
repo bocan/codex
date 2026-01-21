@@ -14,9 +14,13 @@
   "dependencies": {
     "axios": "^1.6.5",
     "diff": "^8.0.3",
+    "github-slugger": "^2.0.0",
+    "html-docx-js-typescript": "^0.1.5",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-markdown": "^10.1.0",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.0"
   },
   "devDependencies": {

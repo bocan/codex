@@ -1,10 +1,23 @@
 import axios from 'axios';
-import { FolderNode, FileNode, Page, CommitInfo, VersionContent } from '../types';
+import { FolderNode, FileNode, Page, CommitInfo, VersionContent, SearchResult } from '../types';
 
 const API_BASE = '/api';
 
 // Enable cookies for session authentication
 axios.defaults.withCredentials = true;
+
+// Add response interceptor to handle 401 unauthorized
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // If we get a 401 (unauthorized), the session has expired
+    if (error.response?.status === 401) {
+      // Reload the page to trigger login flow
+      window.location.reload();
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const api = {
   // Auth operations
@@ -86,5 +99,43 @@ export const api = {
 
   restorePageVersion: async (path: string, hash: string): Promise<void> => {
     await axios.post(`${API_BASE}/pages/${path}/restore/${hash}`);
+  },
+
+  // Search operations
+  search: async (query: string): Promise<SearchResult[]> => {
+    const response = await axios.get(`${API_BASE}/search`, {
+      params: { q: query },
+    });
+    return response.data;
+  },
+
+  // Attachment operations
+  uploadAttachment: async (folderPath: string, file: File): Promise<void> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    await axios.post(`${API_BASE}/attachments`, formData, {
+      params: { folder: folderPath },
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+
+  getAttachments: async (folderPath: string): Promise<any[]> => {
+    const response = await axios.get(`${API_BASE}/attachments`, {
+      params: { folder: folderPath },
+    });
+    return response.data;
+  },
+
+  deleteAttachment: async (folderPath: string, filename: string): Promise<void> => {
+    await axios.delete(`${API_BASE}/attachments/${filename}`, {
+      params: { folder: folderPath },
+    });
+  },
+
+  getAttachmentUrl: (folderPath: string, filename: string): string => {
+    const params = new URLSearchParams({ folder: folderPath });
+    return `${API_BASE}/attachments/${encodeURIComponent(filename)}?${params}`;
   },
 };

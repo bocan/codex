@@ -66,7 +66,7 @@ export class GitService {
     try {
       await this.git.addConfig('user.name', 'Disnotion', false, 'local');
       await this.git.addConfig('user.email', 'disnotion@local', false, 'local');
-    } catch (error) {
+    } catch (_error) {
       // Config might already exist, that's fine
     }
   }

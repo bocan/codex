@@ -13,7 +13,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!password) {
       setError('Please enter a password');
       return;
@@ -40,16 +40,27 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           <h1>📝 Disnotion</h1>
           <p>Enter your password to continue</p>
         </div>
-        
-        <form onSubmit={handleSubmit} className="login-form">
+
+        <form onSubmit={handleSubmit} className="login-form" name="login">
+          <input
+            type="text"
+            name="username"
+            autoComplete="username"
+            value="disnotion"
+            style={{ display: 'none' }}
+            readOnly
+            aria-hidden="true"
+          />
           <div className="form-group">
             <input
               type="password"
+              name="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
               autoFocus
+              autoComplete="current-password"
               className={error ? 'error' : ''}
             />
           </div>
@@ -61,8 +72,8 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             </div>
           )}
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={isLoading || !password}
             className="login-button"
           >

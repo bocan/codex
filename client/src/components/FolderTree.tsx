@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FolderNode } from '../types';
 import { api } from '../services/api';
 import './FolderTree.css';
@@ -17,10 +17,36 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({ node, onSelectFolder, selec
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
 
   const isSelected = selectedFolder === node.path;
   const hasChildren = node.children.length > 0;
   const isBusy = isCreating || isDeleting;
+
+  // Close context menu when clicking outside or pressing Escape
+  useEffect(() => {
+    if (!showContextMenu) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (contextMenuRef.current && !contextMenuRef.current.contains(event.target as Node)) {
+        setShowContextMenu(false);
+      }
+    };
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowContextMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscapeKey);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [showContextMenu]);
 
   const handleToggle = () => {
     setIsExpanded(!isExpanded);
@@ -94,16 +120,28 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({ node, onSelectFolder, selec
   };
 
   return (
-    <div className="folder-tree-item">
+    <div className="folder-tree-item" role="treeitem" aria-expanded={hasChildren ? isExpanded : undefined}>
       <div
         className={`folder-item ${isSelected ? 'selected' : ''} ${isBusy ? 'busy' : ''}`}
         onClick={handleSelect}
         onContextMenu={(e) => !isBusy && handleContextMenu(e)}
+        role="button"
+        tabIndex={0}
+        aria-label={`Folder: ${node.name}${isSelected ? ' (selected)' : ''}`}
+        aria-busy={isBusy}
       >
-        <span className="folder-toggle" onClick={(e) => { e.stopPropagation(); handleToggle(); }}>
-          {hasChildren && (isExpanded ? '▼' : '▶')}
-          {!hasChildren && <span style={{ width: '12px', display: 'inline-block' }}></span>}
-        </span>
+        <button
+          className="folder-toggle"
+          onClick={(e) => { e.stopPropagation(); handleToggle(); }}
+          aria-label={hasChildren ? (isExpanded ? 'Collapse folder' : 'Expand folder') : undefined}
+          aria-hidden={!hasChildren}
+          tabIndex={hasChildren ? 0 : -1}
+        >
+          <span aria-hidden="true">
+            {hasChildren && (isExpanded ? '▼' : '▶')}
+            {!hasChildren && <span style={{ width: '12px', display: 'inline-block' }}></span>}
+          </span>
+        </button>
         {isRenaming ? (
           <input
             type="text"
@@ -116,22 +154,23 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({ node, onSelectFolder, selec
             }}
             onClick={(e) => e.stopPropagation()}
             autoFocus
+            aria-label="Rename folder"
           />
         ) : (
           <span className="folder-name">
-            {isDeleting ? '⏳' : '📁'} {node.name}
-            {isCreating && <span className="folder-creating"> (creating...)</span>}
+            <span aria-hidden="true">{isDeleting ? '⏳' : '📁'}</span> {node.name}
+            {isCreating && <span className="folder-creating" role="status" aria-live="polite"> (creating...)</span>}
           </span>
         )}
         {showContextMenu && !isBusy && (
-          <div className="context-menu" onClick={(e) => e.stopPropagation()}>
-            <button onClick={handleCreateFolder} disabled={isCreating}>
+          <div className="context-menu" ref={contextMenuRef} onClick={(e) => e.stopPropagation()} role="menu" aria-label="Folder actions">
+            <button onClick={handleCreateFolder} disabled={isCreating} role="menuitem" aria-label="Create new folder">
               {isCreating ? 'Creating...' : 'New Folder'}
             </button>
             {node.path !== '/' && (
               <>
-                <button onClick={handleRename}>Rename</button>
-                <button onClick={handleDelete} disabled={isDeleting}>
+                <button onClick={handleRename} role="menuitem" aria-label={`Rename ${node.name}`}>Rename</button>
+                <button onClick={handleDelete} disabled={isDeleting} role="menuitem" aria-label={`Delete ${node.name}`}>
                   {isDeleting ? 'Deleting...' : 'Delete'}
                 </button>
               </>
@@ -140,7 +179,7 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({ node, onSelectFolder, selec
         )}
       </div>
       {isExpanded && hasChildren && (
-        <div className="folder-children">
+        <div className="folder-children" role="group">
           {node.children.map((child) => (
             <FolderTreeItem
               key={child.path}
@@ -163,10 +202,10 @@ export const FolderTree: React.FC<Omit<FolderTreeProps, 'node'> & { root: Folder
   onRefresh,
 }) => {
   return (
-    <div className="folder-tree">
+    <nav className="folder-tree" aria-label="Folder navigation tree" role="tree">
       <div className="folder-tree-header">
         <h3>Folders</h3>
-        <button onClick={onRefresh} className="refresh-btn">↻</button>
+        <button onClick={onRefresh} className="refresh-btn" aria-label="Refresh folder tree"><span aria-hidden="true">↻</span></button>
       </div>
       <FolderTreeItem
         node={root}
@@ -174,6 +213,6 @@ export const FolderTree: React.FC<Omit<FolderTreeProps, 'node'> & { root: Folder
         selectedFolder={selectedFolder}
         onRefresh={onRefresh}
       />
-    </div>
+    </nav>
   );
 };

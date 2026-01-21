@@ -23,7 +23,7 @@ updates:
           - "minor"
           - "patch"
 
-  # GitHub Actions - ensure workflows are up to date
+  # GitHub Actions - ensure workflows are up to date.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

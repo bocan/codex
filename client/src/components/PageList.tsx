@@ -177,13 +177,14 @@ export const PageList: React.FC<PageListProps> = ({
   };
 
   return (
-    <div className="page-list">
+    <nav className="page-list" aria-label="Page list">
       <div className="page-list-header">
         <h4>Pages</h4>
         <button
           onClick={handleCreatePage}
           disabled={!selectedFolder || isCreating}
           className={isCreating ? 'loading' : ''}
+          aria-label="Create new page"
         >
           {isCreating ? 'Creating...' : '+ New Page'}
         </button>
@@ -191,41 +192,45 @@ export const PageList: React.FC<PageListProps> = ({
 
       {/* Error State */}
       {error && (
-        <div className="error-state" onClick={() => { setError(null); loadPages(); }}>
-          <span className="error-icon">⚠️</span>
+        <div className="error-state" onClick={() => { setError(null); loadPages(); }} role="alert" aria-live="polite">
+          <span className="error-icon" aria-hidden="true">⚠️</span>
           <span>{error}</span>
         </div>
       )}
 
       {/* Loading State - only when no data */}
       {loading && !pages.length && !error ? (
-        <div className="loading-state">
-          <div className="loading-spinner"></div>
+        <div className="loading-state" role="status" aria-live="polite" aria-label="Loading pages">
+          <div className="loading-spinner" aria-hidden="true"></div>
           <span>Loading pages...</span>
         </div>
       ) : !selectedFolder ? (
-        <div className="empty-state">
-          <span className="empty-icon">📂</span>
+        <div className="empty-state" role="status">
+          <span className="empty-icon" aria-hidden="true">📂</span>
           <span>Select a folder to view pages</span>
         </div>
       ) : !loading && pages.length === 0 && !error ? (
-        <div className="empty-state">
-          <span className="empty-icon">📄</span>
+        <div className="empty-state" role="status">
+          <span className="empty-icon" aria-hidden="true">📄</span>
           <span>No pages yet</span>
-          <button onClick={handleCreatePage} disabled={isCreating}>
+          <button onClick={handleCreatePage} disabled={isCreating} aria-label="Create your first page">
             Create your first page
           </button>
         </div>
       ) : (
-        <div className="page-items">
+        <ul className="page-items" role="list">
           {pages.map((page) => (
-            <div
+            <li
               key={page.path}
               className={`page-item ${selectedPage === page.path ? 'selected' : ''} ${isDeleting === page.path ? 'deleting' : ''}`}
               onClick={() => !isDeleting && onSelectPage(page.path)}
               onContextMenu={(e) => !isDeleting && handleContextMenu(e, page.path)}
+              role="button"
+              tabIndex={0}
+              aria-label={`Page: ${page.name}${selectedPage === page.path ? ' (selected)' : ''}`}
+              aria-busy={isDeleting === page.path}
             >
-              <span className="page-icon">{isDeleting === page.path ? '⏳' : '📄'}</span>
+              <span className="page-icon" aria-hidden="true">{isDeleting === page.path ? '⏳' : '📄'}</span>
               {renamingPage === page.path ? (
                 <input
                   type="text"
@@ -239,53 +244,56 @@ export const PageList: React.FC<PageListProps> = ({
                   }}
                   onClick={(e) => e.stopPropagation()}
                   autoFocus
+                  aria-label="Rename page"
                 />
               ) : (
                 <span className="page-name">{page.name}</span>
               )}
               {contextMenuPage === page.path && (
-                <div className="page-context-menu" onClick={(e) => e.stopPropagation()}>
-                  <button onClick={() => handleRenamePage(page.path, page.name)}>Rename</button>
-                  <button onClick={() => handleMovePage(page.path)}>Move to...</button>
-                  <button onClick={(e) => handleDeletePage(page.path, e)}>Delete</button>
+                <div className="page-context-menu" onClick={(e) => e.stopPropagation()} role="menu" aria-label="Page actions">
+                  <button onClick={() => handleRenamePage(page.path, page.name)} role="menuitem" aria-label={`Rename ${page.name}`}>Rename</button>
+                  <button onClick={() => handleMovePage(page.path)} role="menuitem" aria-label={`Move ${page.name} to another folder`}>Move to...</button>
+                  <button onClick={(e) => handleDeletePage(page.path, e)} role="menuitem" aria-label={`Delete ${page.name}`}>Delete</button>
                 </div>
               )}
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
 
       {/* Move Page Modal */}
       {movingPage && folderTree && (
-        <div className="modal-overlay" onClick={() => !isMoving && setMovingPage(null)}>
+        <div className="modal-overlay" onClick={() => !isMoving && setMovingPage(null)} role="dialog" aria-modal="true" aria-labelledby="move-modal-title">
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Move Page</h3>
+            <h3 id="move-modal-title">Move Page</h3>
             <p>Select destination folder for <strong>{movingPage.split('/').pop()}</strong>:</p>
             {isMoving ? (
-              <div className="modal-loading">
-                <div className="loading-spinner"></div>
+              <div className="modal-loading" role="status" aria-live="polite">
+                <div className="loading-spinner" aria-hidden="true"></div>
                 <span>Moving page...</span>
               </div>
             ) : (
-              <div className="folder-list">
+              <div className="folder-list" role="list">
                 {getAllFolders(folderTree).map((folder) => (
                   <button
                     key={folder.path}
                     className="folder-option"
                     onClick={() => handleMoveSubmit(folder.path)}
                     disabled={isMoving}
+                    role="listitem"
+                    aria-label={`Move to ${folder.display}`}
                   >
-                    📁 {folder.display}
+                    <span aria-hidden="true">📁</span> {folder.display}
                   </button>
                 ))}
               </div>
             )}
-            <button className="cancel-btn" onClick={() => setMovingPage(null)} disabled={isMoving}>
+            <button className="cancel-btn" onClick={() => setMovingPage(null)} disabled={isMoving} aria-label="Cancel moving page">
               Cancel
             </button>
           </div>
         </div>
       )}
-    </div>
+    </nav>
   );
 };

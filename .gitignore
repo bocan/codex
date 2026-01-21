@@ -6,3 +6,4 @@ build/
 .env
 .env.local
 test-data/
+**/.attachments/

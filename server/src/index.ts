@@ -7,6 +7,8 @@ import path from 'path';
 import folderRoutes from './routes/folders';
 import pageRoutes from './routes/pages';
 import authRoutes from './routes/auth';
+import searchRoutes from './routes/search';
+import attachmentRoutes from './routes/attachments';
 import { requireAuth } from './middleware/auth';
 import { GitService } from './services/gitService';
 import { FileSystemService } from './services/fileSystem';
@@ -142,6 +144,30 @@ app.get('/api', (req: Request, res: Response) => {
           example: `curl ${baseUrl}/api/auth/status -b cookies.txt`
         }
       },
+      attachments: {
+        'POST /api/attachments': {
+          description: 'Upload an attachment file to a folder',
+          body: 'multipart/form-data with "file" field and "folder" field',
+          note: 'Files are stored in .attachments subdirectory within the folder',
+          example: `curl -X POST ${baseUrl}/api/attachments -F "file=@image.jpg" -F "folder=My Folder" -b cookies.txt`
+        },
+        'GET /api/attachments': {
+          description: 'List all attachments in a folder',
+          query: { folder: 'folder path' },
+          returns: 'Array of file objects with name, size, and modified date',
+          example: `curl "${baseUrl}/api/attachments?folder=My%20Folder" -b cookies.txt`
+        },
+        'GET /api/attachments/:filename': {
+          description: 'Download or view an attachment',
+          query: { folder: 'folder path' },
+          example: `curl "${baseUrl}/api/attachments/image.jpg?folder=My%20Folder" -b cookies.txt -o image.jpg`
+        },
+        'DELETE /api/attachments/:filename': {
+          description: 'Delete an attachment',
+          query: { folder: 'folder path' },
+          example: `curl -X DELETE "${baseUrl}/api/attachments/image.jpg?folder=My%20Folder" -b cookies.txt`
+        }
+      },
       system: {
         'GET /api/health': {
           description: 'Health check endpoint',
@@ -158,7 +184,10 @@ app.get('/api', (req: Request, res: Response) => {
       'Folders are created automatically when creating pages',
       'Use URL encoding for paths with spaces (e.g., "My Folder" → "My%20Folder")',
       'Content is stored as markdown files on the file system',
-      'The API returns JSON for all endpoints except GET /api/pages/:path which returns the page object'
+      'The API returns JSON for all endpoints except GET /api/pages/:path which returns the page object',
+      'Attachments are stored in .attachments subdirectories and excluded from git',
+      'Maximum attachment file size is 50MB',
+      'Reference attachments in markdown with relative paths: ![alt](.attachments/filename.jpg)'
     ]
   });
 });
@@ -167,6 +196,8 @@ app.get('/api', (req: Request, res: Response) => {
 app.use('/api/auth', authRoutes); // Auth routes (public)
 app.use('/api/folders', requireAuth, folderRoutes); // Protected
 app.use('/api/pages', requireAuth, pageRoutes); // Protected
+app.use('/api/search', requireAuth, searchRoutes); // Protected
+app.use('/api/attachments', requireAuth, attachmentRoutes); // Protected
 
 // Health check
 app.get('/api/health', (req: Request, res: Response) => {
