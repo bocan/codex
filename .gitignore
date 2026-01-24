@@ -7,3 +7,7 @@ build/
 .env.local
 test-data/
 **/.attachments/
+
+# Data folder - only track Disnotion Documentation
+data/*
+!data/Disnotion Documentation/

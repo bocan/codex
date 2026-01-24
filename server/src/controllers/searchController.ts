@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
-import { FileSystemService } from "../services/fileSystem";
-
-const fileSystemService = new FileSystemService();
+import { fileSystemService } from "../index";
 
 export const searchPages = async (req: Request, res: Response) => {
   try {
