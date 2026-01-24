@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { FolderTree } from "./components/FolderTree";
 import { PageList } from "./components/PageList";
 import { Editor } from "./components/Editor";
@@ -10,6 +10,9 @@ import { api } from "./services/api";
 import { FolderNode } from "./types";
 import "./App.css";
 
+// Set document title dynamically from package.json
+document.title = `${__APP_NAME__} - ${__APP_DESCRIPTION__}`;
+
 const DEFAULT_LEFT_WIDTH = 300;
 const DEFAULT_RIGHT_WIDTH = 400;
 const DEFAULT_FOLDER_HEIGHT = 400;
@@ -17,6 +20,10 @@ const MIN_PANE_WIDTH = 200;
 const MAX_PANE_WIDTH = 800;
 const MIN_FOLDER_HEIGHT = 150;
 const MAX_FOLDER_HEIGHT = 800;
+
+// Responsive breakpoints
+const TABLET_BREAKPOINT = 768;
+const MOBILE_BREAKPOINT = 600;
 
 function App() {
   // Auth state
@@ -31,6 +38,8 @@ function App() {
   const [rightPaneCollapsed, setRightPaneCollapsed] = useState(false);
   const [editorContent, setEditorContent] = useState<string>(""); // Track live editor content for preview
   const [scrollPercent, setScrollPercent] = useState<number>(0); // Synchronized scroll position (editor -> preview)
+  const [isMobile, setIsMobile] = useState(false); // Track if we're on mobile for overlay behavior
+  const [showAbout, setShowAbout] = useState(false); // About modal visibility
 
   // Theme state
   const [theme, setTheme] = useState<
@@ -58,6 +67,55 @@ function App() {
   const isResizingRight = useRef(false);
   const isResizingFolderTree = useRef(false);
   const leftPaneRef = useRef<HTMLDivElement>(null);
+  const hasAutoCollapsed = useRef(false); // Track if we've auto-collapsed to avoid repeated triggers
+
+  // Responsive: auto-collapse panes based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width <= MOBILE_BREAKPOINT);
+
+      // Only auto-collapse once on initial load or when crossing breakpoints
+      if (!hasAutoCollapsed.current) {
+        if (width <= MOBILE_BREAKPOINT) {
+          setLeftPaneCollapsed(true);
+          setRightPaneCollapsed(true);
+        } else if (width <= TABLET_BREAKPOINT) {
+          setRightPaneCollapsed(true);
+        }
+        hasAutoCollapsed.current = true;
+      }
+    };
+
+    // Run on mount
+    handleResize();
+
+    // Listen for resize
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Close sidebar/preview when clicking overlay on mobile
+  const handleOverlayClick = useCallback(() => {
+    if (isMobile) {
+      setLeftPaneCollapsed(true);
+      setRightPaneCollapsed(true);
+    }
+  }, [isMobile]);
+
+  // Close About modal on Escape key
+  useEffect(() => {
+    if (!showAbout) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowAbout(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [showAbout]);
 
   // Check auth status on mount
   useEffect(() => {
@@ -329,13 +387,13 @@ function App() {
     <div
       className="app"
       role="application"
-      aria-label="Disnotion Document Editor"
+      aria-label={`${__APP_NAME__} Document Editor`}
     >
       <header className="app-header" role="banner">
         <div className="header-content">
           <div className="header-left">
-            <h1>📝 Disnotion</h1>
-            <p className="tagline">Your Personal Wiki & Document Store</p>
+            <h1>📝 {__APP_NAME__}</h1>
+            <p className="tagline">{__APP_DESCRIPTION__}</p>
           </div>
           <nav className="breadcrumbs" aria-label="Breadcrumb navigation">
             {getBreadcrumbs().map((crumb, index, arr) => (
@@ -379,9 +437,61 @@ function App() {
                 <span aria-hidden="true">🚪</span> Logout
               </button>
             )}
+            <button
+              className="about-button"
+              onClick={() => setShowAbout(true)}
+              title="About this app"
+              aria-label="About this app"
+            >
+              <span aria-hidden="true">?</span>
+            </button>
           </div>
         </div>
       </header>
+
+      {/* About Modal */}
+      {showAbout && (
+        <div
+          className="about-overlay"
+          onClick={() => setShowAbout(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="about-title"
+        >
+          <div
+            className="about-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="about-close"
+              onClick={() => setShowAbout(false)}
+              aria-label="Close about dialog"
+            >
+              ✕
+            </button>
+            <h2 id="about-title">📝 {__APP_NAME__}</h2>
+            <p className="about-version">Version {__APP_VERSION__}</p>
+            <p className="about-author">Developed by <a href="https://chris.funderburg.me" target="_blank" rel="noopener noreferrer">Chris Funderburg</a></p>
+            <p className="about-description">
+              {__APP_DESCRIPTION__} — with real-time markdown editing,
+              live preview, and Git-based version control.
+            </p>
+            <h3>Features</h3>
+            <ul className="about-features">
+              <li>📁 Hierarchical folder organization</li>
+              <li>✍️ Live markdown editor</li>
+              <li>👁️ Real-time synchronized preview</li>
+              <li>🎨 Syntax highlighting for code blocks (auto-detect or specify language)</li>
+              <li>🔍 Full-text search across all documents</li>
+              <li>📎 File attachments with drag-and-drop</li>
+              <li>📜 Git-powered version history</li>
+              <li>🌗 Light, dark, and high-contrast themes</li>
+              <li>📱 Responsive design for mobile devices</li>
+              <li>🔐 Optional password protection</li>
+            </ul>
+          </div>
+        </div>
+      )}
 
       <main className="app-container">
         {/* Error Message */}
@@ -399,12 +509,28 @@ function App() {
         )}
 
         <ErrorBoundary>
-          <div className="panes-container">
+          <div
+            className={`panes-container ${isMobile && (!leftPaneCollapsed || !rightPaneCollapsed) ? "overlay-active" : ""}`}
+            onClick={(e) => {
+              // Only handle overlay clicks (not clicks on panes themselves)
+              if (e.target === e.currentTarget || (e.target as HTMLElement).classList.contains('panes-container')) {
+                handleOverlayClick();
+              }
+            }}
+          >
+            {/* Mobile overlay */}
+            {isMobile && (!leftPaneCollapsed || !rightPaneCollapsed) && (
+              <div
+                className="mobile-overlay"
+                onClick={handleOverlayClick}
+                aria-hidden="true"
+              />
+            )}
             {/* Left Pane: Folder Tree */}
             <aside
               ref={leftPaneRef}
               className={`left-pane ${leftPaneCollapsed ? "collapsed" : ""}`}
-              style={{ width: leftPaneCollapsed ? "0" : `${leftPaneWidth}px` }}
+              style={{ width: leftPaneCollapsed ? "0" : (isMobile ? undefined : `${leftPaneWidth}px`) }}
               aria-label="Folder and page navigation"
               aria-hidden={leftPaneCollapsed}
             >
@@ -494,7 +620,7 @@ function App() {
             <aside
               className={`right-pane ${rightPaneCollapsed ? "collapsed" : ""}`}
               style={{
-                width: rightPaneCollapsed ? "0" : `${rightPaneWidth}px`,
+                width: rightPaneCollapsed ? "0" : (isMobile ? undefined : `${rightPaneWidth}px`),
               }}
               aria-label="Markdown preview"
               aria-hidden={rightPaneCollapsed}

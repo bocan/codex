@@ -26,11 +26,14 @@
   font-size: 18px;
   cursor: pointer;
   padding: 4px 8px;
+  color: var(--text-primary);
+  border-radius: 4px;
+  transition: background 0.2s, color 0.2s;
 }
 
 .refresh-btn:hover {
   background: var(--bg-secondary);
-  border-radius: 4px;
+  color: var(--accent-color);
 }
 
 .folder-tree-item {

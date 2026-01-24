@@ -9,6 +9,8 @@ export interface FileNode {
   name: string;
   path: string;
   type: "file";
+  createdAt: string;
+  modifiedAt: string;
 }
 
 export interface Page {

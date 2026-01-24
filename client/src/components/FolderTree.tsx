@@ -265,7 +265,8 @@ export const FolderTree: React.FC<
         <button
           onClick={onRefresh}
           className="refresh-btn"
-          aria-label="Refresh folder tree"
+          aria-label="Refresh folders"
+          title="Refresh folders"
         >
           <span aria-hidden="true">↻</span>
         </button>

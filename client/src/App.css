@@ -176,6 +176,155 @@ body {
   background: rgba(255, 255, 255, 0.3);
 }
 
+.about-button {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+/* About Modal */
+.about-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.about-modal {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px 32px;
+  max-width: 480px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 8px 32px var(--shadow);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.about-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.about-close:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.about-modal h2 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  color: var(--text-primary);
+}
+
+.about-version {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.about-author {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.about-author a {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.about-author a:hover {
+  text-decoration: underline;
+}
+
+.about-description {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.about-modal h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+.about-features {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-features li {
+  padding: 6px 0;
+  font-size: 13px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--bg-secondary);
+}
+
+.about-features li:last-child {
+  border-bottom: none;
+}
+
 .app.loading {
   display: flex;
   align-items: center;
@@ -444,4 +593,190 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+/* ===========================================
+   RESPONSIVE DESIGN
+   =========================================== */
+
+/* Tablet landscape and smaller desktops (≤1024px) */
+@media (max-width: 1024px) {
+  .header-left .tagline {
+    display: none;
+  }
+
+  .breadcrumbs {
+    padding: 0 10px;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .logout-button span:last-child {
+    display: none;
+  }
+
+  .logout-button {
+    padding: 8px 12px;
+  }
+}
+
+/* Tablet portrait (≤768px) - auto-collapse preview */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 10px 15px;
+  }
+
+  .header-left h1 {
+    font-size: 20px;
+  }
+
+  .header-content {
+    gap: 10px;
+  }
+
+  .breadcrumbs {
+    display: none;
+  }
+
+  .theme-toggle {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  /* Hide resize handles on touch devices */
+  .resize-handle {
+    display: none;
+  }
+
+  /* Make collapse/expand buttons larger for touch */
+  .collapse-btn,
+  .expand-btn {
+    width: 40px;
+    height: 48px;
+    font-size: 14px;
+  }
+}
+
+/* Large phones (≤600px) - auto-collapse sidebar */
+@media (max-width: 600px) {
+  .app-header {
+    padding: 8px 12px;
+  }
+
+  .header-left h1 {
+    font-size: 18px;
+  }
+
+  .header-actions {
+    gap: 4px;
+  }
+
+  .theme-toggle {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  .logout-button {
+    padding: 6px 10px;
+    font-size: 16px;
+  }
+
+  /* Make panes container relative for overlay positioning */
+  .panes-container {
+    position: relative;
+  }
+
+  /* Mobile overlay */
+  .mobile-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 50;
+  }
+
+  /* Full-width panes when expanded on mobile */
+  .left-pane:not(.collapsed),
+  .right-pane:not(.collapsed) {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 85vw !important;
+    max-width: 320px;
+    z-index: 100;
+    box-shadow: 2px 0 8px var(--shadow);
+  }
+
+  .left-pane:not(.collapsed) {
+    left: 0;
+  }
+
+  .right-pane:not(.collapsed) {
+    right: 0;
+    box-shadow: -2px 0 8px var(--shadow);
+  }
+}
+
+/* Small phones (≤480px) */
+@media (max-width: 480px) {
+  .header-left h1 {
+    font-size: 16px;
+  }
+
+  .theme-toggle {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .logout-button {
+    padding: 4px 8px;
+    font-size: 14px;
+  }
+}
+
+/* Touch device detection - larger tap targets */
+@media (hover: none) and (pointer: coarse) {
+  .collapse-btn,
+  .expand-btn {
+    width: 44px;
+    height: 52px;
+  }
+
+  .breadcrumb-link {
+    padding: 8px 12px;
+  }
+
+  /* Increase touch targets in page list */
+  .page-item {
+    padding: 10px 12px;
+    min-height: 44px;
+  }
+
+  .folder-item {
+    padding: 10px 12px;
+    min-height: 44px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .app-header,
+  .left-pane,
+  .right-pane,
+  .collapse-btn,
+  .expand-btn,
+  .resize-handle {
+    display: none !important;
+  }
+
+  .center-pane {
+    width: 100% !important;
+  }
 }
