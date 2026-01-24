@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.2.0](https://github.com/bocan/disnotion/compare/v1.1.5...v1.2.0) (2026-01-24)
+
+
+### Features
+
+* **about:** add link to changelog in version display ([0732990](https://github.com/bocan/disnotion/commit/0732990eb86b93c17af4aecfa26f567a13f5ed73))
+
+
+### Documentation
+
+* update README with Git workflow and release instructions ([2b800a0](https://github.com/bocan/disnotion/commit/2b800a0cc9e828e8e67bcabb87415abe753eccd8))
+
 ## [1.1.5](https://github.com/bocan/disnotion/compare/v1.1.4...v1.1.5) (2026-01-24)
 
 
