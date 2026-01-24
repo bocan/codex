@@ -209,7 +209,7 @@ refactor(api): simplify error handling
 
 ```bash
 # 1. Create and switch to feature branch
-git checkout -b feature/my-change
+git switch -c feature/my-change
 
 # 2. Make changes, commit (repeat as needed)
 git add .
@@ -222,7 +222,7 @@ git push -u origin feature/my-change
 gh pr create --title "feat: add new feature" --body "Description"
 
 # 5. After PR is merged, switch back to main
-git checkout main
+git switch main
 git pull
 ```
 
