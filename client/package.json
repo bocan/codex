@@ -19,6 +19,7 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-markdown": "^10.1.0",
+    "react-syntax-highlighter": "^16.1.0",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-slug": "^6.0.0",
     "remark-gfm": "^4.0.0"
@@ -29,6 +30,7 @@
     "@testing-library/user-event": "^14.5.2",
     "@types/react": "^19.2.9",
     "@types/react-dom": "^19.2.3",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "@vitejs/plugin-react": "^5.1.2",
     "jsdom": "^27.4.0",
     "typescript": "^5.3.3",

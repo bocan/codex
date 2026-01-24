@@ -16,6 +16,8 @@ export interface FileNode {
   name: string;
   path: string;
   type: "file";
+  createdAt: string;
+  modifiedAt: string;
 }
 
 export class FileSystemService {
@@ -131,10 +133,14 @@ export class FileSystemService {
     const pages: FileNode[] = [];
     for (const entry of entries) {
       if (entry.isFile() && entry.name.endsWith(".md")) {
+        const filePath = path.join(fullPath, entry.name);
+        const stats = await fs.stat(filePath);
         pages.push({
           name: entry.name,
           path: path.join(folderPath, entry.name),
           type: "file",
+          createdAt: stats.birthtime.toISOString(),
+          modifiedAt: stats.mtime.toISOString(),
         });
       }
     }

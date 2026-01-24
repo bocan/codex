@@ -37,7 +37,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>📝 Disnotion</h1>
+          <h1>📝 {__APP_NAME__}</h1>
           <p>Enter your password to continue</p>
         </div>
 

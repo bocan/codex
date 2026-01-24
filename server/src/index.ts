@@ -54,7 +54,7 @@ app.use(
     credentials: true, // Allow cookies
   }),
 );
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
 app.use(
   session({
     secret:

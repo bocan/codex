@@ -1,11 +1,91 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark, oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { asBlob } from "html-docx-js-typescript";
 import { api } from "../services/api";
 import { TableOfContents } from "./TableOfContents";
 import "./Preview.css";
+
+// CodeBlock component with copy functionality
+const CodeBlock: React.FC<{ language?: string; children: string }> = ({ language, children }) => {
+  const [copied, setCopied] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+
+  // Detect theme for syntax highlighter (including auto/system preference)
+  useEffect(() => {
+    const updateTheme = () => {
+      const theme = document.documentElement.getAttribute("data-theme");
+      if (theme === "dark" || theme === "high-contrast") {
+        setIsDark(true);
+      } else if (theme === "auto" || !theme) {
+        // Check system preference
+        setIsDark(window.matchMedia("(prefers-color-scheme: dark)").matches);
+      } else {
+        setIsDark(false);
+      }
+    };
+
+    updateTheme();
+
+    // Listen for theme changes
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+    // Listen for system preference changes
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    mediaQuery.addEventListener("change", updateTheme);
+
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeEventListener("change", updateTheme);
+    };
+  }, []);
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(children);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  }, [children]);
+
+  return (
+    <div className="code-block-wrapper">
+      <div className="code-block-header">
+        <span className="code-language-label">{language || "code"}</span>
+        <button
+          className={`code-copy-btn ${copied ? "copied" : ""}`}
+          onClick={handleCopy}
+          title={copied ? "Copied!" : "Copy code"}
+          aria-label={copied ? "Copied to clipboard" : "Copy code to clipboard"}
+        >
+          {copied ? "✓ Copied" : "📋 Copy"}
+        </button>
+      </div>
+      <SyntaxHighlighter
+        style={isDark ? oneDark : oneLight}
+        language={language}
+        PreTag="div"
+        showLineNumbers={children.split("\n").length > 3}
+        wrapLines={true}
+        customStyle={{
+          margin: 0,
+          borderRadius: 0,
+          fontSize: "14px",
+          border: "none",
+          background: isDark ? "#282c34" : "#fafafa",
+        }}
+      >
+        {children}
+      </SyntaxHighlighter>
+    </div>
+  );
+};
 
 interface PreviewProps {
   pagePath: string | null;
@@ -841,6 +921,30 @@ ${htmlContent}
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeSlug]}
           components={{
+            // Override pre to be a transparent wrapper - our CodeBlock handles all styling
+            pre: ({ children }) => <>{children}</>,
+            code: ({ node: _node, className, children, ...props }) => {
+              const match = /language-(\w+)/.exec(className || "");
+              const language = match ? match[1] : undefined;
+              const codeString = String(children).replace(/\n$/, "");
+
+              // Check if this is an inline code or a code block
+              // Code blocks have a parent <pre> element, which ReactMarkdown handles
+              // by wrapping the code component. We detect blocks by checking if
+              // className exists (language specified) or if content has newlines
+              const isCodeBlock = match || codeString.includes("\n");
+
+              if (isCodeBlock) {
+                return <CodeBlock language={language}>{codeString}</CodeBlock>;
+              }
+
+              // Inline code
+              return (
+                <code className={className} {...props}>
+                  {children}
+                </code>
+              );
+            },
             a: ({ node: _node, ...props }) => {
               const href = props.href || "";
               // Handle attachment links

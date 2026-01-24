@@ -7,9 +7,14 @@
 > ⚠️ **Note**: Disnotion is designed as a **single-user application**. It does not support concurrent multi-user editing or collaboration features. Perfect for personal wikis, note-taking, and documentation.
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-18.2-61dafb)](https://reactjs.org/)
+[![React](https://img.shields.io/badge/React-19-61dafb)](https://reactjs.org/)
 [![Express](https://img.shields.io/badge/Express-4.18-green)](https://expressjs.com/)
 
+```sh
+#!/bin/bash
+DOG=blah
+echo $DOG
+```
 ## ✨ Features
 
 - 📁 **Folder Management**: Create, delete, and rename folders in a collapsible tree view with right-click context menus

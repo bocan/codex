@@ -1,7 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { FileNode, FolderNode } from "../types";
 import { api } from "../services/api";
 import "./PageList.css";
+
+type SortField = "name" | "createdAt" | "modifiedAt";
+type SortDirection = "asc" | "desc";
+
+const formatDate = (isoDate: string): string => {
+  const date = new Date(isoDate);
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+const getPageTooltip = (page: FileNode): string => {
+  return `Created: ${formatDate(page.createdAt)}\nModified: ${formatDate(page.modifiedAt)}`;
+};
 
 interface PageListProps {
   selectedFolder: string | null;
@@ -28,6 +46,51 @@ export const PageList: React.FC<PageListProps> = ({
   const [isCreating, setIsCreating] = useState(false);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [isMoving, setIsMoving] = useState(false);
+  const [sortField, setSortField] = useState<SortField>("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const contextMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close context menu when clicking outside or pressing Escape
+  useEffect(() => {
+    if (!contextMenuPage) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        contextMenuRef.current &&
+        !contextMenuRef.current.contains(event.target as Node)
+      ) {
+        setContextMenuPage(null);
+      }
+    };
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setContextMenuPage(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscapeKey);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscapeKey);
+    };
+  }, [contextMenuPage]);
+
+  const sortedPages = useMemo(() => {
+    return [...pages].sort((a, b) => {
+      let comparison = 0;
+      if (sortField === "name") {
+        comparison = a.name.localeCompare(b.name);
+      } else if (sortField === "createdAt") {
+        comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      } else if (sortField === "modifiedAt") {
+        comparison = new Date(a.modifiedAt).getTime() - new Date(b.modifiedAt).getTime();
+      }
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [pages, sortField, sortDirection]);
 
   useEffect(() => {
     loadPages();
@@ -191,14 +254,37 @@ export const PageList: React.FC<PageListProps> = ({
     <nav className="page-list" aria-label="Page list">
       <div className="page-list-header">
         <h4>Pages</h4>
-        <button
-          onClick={handleCreatePage}
-          disabled={!selectedFolder || isCreating}
-          className={isCreating ? "loading" : ""}
-          aria-label="Create new page"
-        >
-          {isCreating ? "Creating..." : "+ New Page"}
-        </button>
+        <div className="page-list-controls">
+          <div className="sort-controls">
+            <select
+              value={sortField}
+              onChange={(e) => setSortField(e.target.value as SortField)}
+              aria-label="Sort by"
+              title="Sort by"
+            >
+              <option value="name">Name</option>
+              <option value="createdAt">Created</option>
+              <option value="modifiedAt">Modified</option>
+            </select>
+            <button
+              className="sort-direction-btn"
+              onClick={() => setSortDirection(d => d === "asc" ? "desc" : "asc")}
+              aria-label={`Sort ${sortDirection === "asc" ? "descending" : "ascending"}`}
+              title={sortDirection === "asc" ? "Oldest/A first" : "Newest/Z first"}
+            >
+              {sortDirection === "asc" ? "↑" : "↓"}
+            </button>
+          </div>
+          <button
+            onClick={handleCreatePage}
+            disabled={!selectedFolder || isCreating}
+            className={`new-page-btn ${isCreating ? "loading" : ""}`}
+            aria-label="Create new page"
+            title="Create new page"
+          >
+            {isCreating ? "..." : "+"}
+          </button>
+        </div>
       </div>
 
       {/* Error State */}
@@ -253,7 +339,7 @@ export const PageList: React.FC<PageListProps> = ({
         </div>
       ) : (
         <ul className="page-items" role="list">
-          {pages.map((page) => (
+          {sortedPages.map((page) => (
             <li
               key={page.path}
               className={`page-item ${selectedPage === page.path ? "selected" : ""} ${isDeleting === page.path ? "deleting" : ""}`}
@@ -265,6 +351,7 @@ export const PageList: React.FC<PageListProps> = ({
               tabIndex={0}
               aria-label={`Page: ${page.name}${selectedPage === page.path ? " (selected)" : ""}`}
               aria-busy={isDeleting === page.path}
+              title={getPageTooltip(page)}
             >
               <span className="page-icon" aria-hidden="true">
                 {isDeleting === page.path ? "⏳" : "📄"}
@@ -289,6 +376,7 @@ export const PageList: React.FC<PageListProps> = ({
               )}
               {contextMenuPage === page.path && (
                 <div
+                  ref={contextMenuRef}
                   className="page-context-menu"
                   onClick={(e) => e.stopPropagation()}
                   role="menu"

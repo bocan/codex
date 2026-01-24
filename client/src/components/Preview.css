@@ -209,6 +209,15 @@
   padding: 0;
 }
 
+/* Remove default pre/code styling inside code block wrapper - SyntaxHighlighter handles this */
+.code-block-wrapper pre,
+.code-block-wrapper code {
+  background: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
 .preview-content blockquote {
   border-left: 4px solid var(--border-color);
   padding-left: 16px;
@@ -263,4 +272,114 @@
   font-size: 0.9em;
   color: var(--text-secondary);
   font-style: italic;
+}
+
+/* Code block with copy button */
+.code-block-wrapper {
+  position: relative;
+  margin: 16px 0;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #d0d0d0;
+}
+
+/* Dark theme wrapper - explicit dark/high-contrast */
+[data-theme="dark"] .code-block-wrapper,
+[data-theme="high-contrast"] .code-block-wrapper {
+  border: 1px solid #3e4451;
+}
+
+/* Auto theme - use system preference */
+@media (prefers-color-scheme: dark) {
+  [data-theme="auto"] .code-block-wrapper {
+    border: 1px solid #3e4451;
+  }
+}
+
+.code-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  background: #e0e0e0;
+  border-bottom: 1px solid #d0d0d0;
+}
+
+/* Dark theme headers - explicit */
+[data-theme="dark"] .code-block-header,
+[data-theme="high-contrast"] .code-block-header {
+  background: #21252b;
+  border-bottom: 1px solid #3e4451;
+}
+
+/* Auto theme headers - use system preference */
+@media (prefers-color-scheme: dark) {
+  [data-theme="auto"] .code-block-header {
+    background: #21252b;
+    border-bottom: 1px solid #3e4451;
+  }
+}
+
+.code-language-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.code-copy-btn {
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s;
+  background: #ffffff;
+  border: 1px solid #c0c0c0;
+  color: #333333;
+}
+
+.code-copy-btn:hover {
+  background: #f0f0f0;
+  border-color: #a0a0a0;
+}
+
+/* Dark theme button - explicit */
+[data-theme="dark"] .code-copy-btn,
+[data-theme="high-contrast"] .code-copy-btn {
+  background: #3e4451;
+  border: 1px solid #4d5566;
+  color: #abb2bf;
+}
+
+[data-theme="dark"] .code-copy-btn:hover,
+[data-theme="high-contrast"] .code-copy-btn:hover {
+  background: #4d5566;
+  border-color: #5c6370;
+}
+
+/* Auto theme button - use system preference */
+@media (prefers-color-scheme: dark) {
+  [data-theme="auto"] .code-copy-btn {
+    background: #3e4451;
+    border: 1px solid #4d5566;
+    color: #abb2bf;
+  }
+
+  [data-theme="auto"] .code-copy-btn:hover {
+    background: #4d5566;
+    border-color: #5c6370;
+  }
+}
+
+.code-block-wrapper:hover .code-copy-btn {
+  opacity: 1;
+}
+
+.code-copy-btn.copied {
+  background: #28a745;
+  border-color: #28a745;
+  color: white;
+  opacity: 1;
 }
