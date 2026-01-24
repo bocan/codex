@@ -12,7 +12,7 @@ import "./Preview.css";
 // CodeBlock component with copy functionality
 const CodeBlock: React.FC<{ language?: string; children: string }> = ({ language, children }) => {
   const [copied, setCopied] = useState(false);
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true); // Default to dark to prevent white flash
 
   // Detect theme for syntax highlighter (including auto/system preference)
   useEffect(() => {
@@ -55,7 +55,7 @@ const CodeBlock: React.FC<{ language?: string; children: string }> = ({ language
   }, [children]);
 
   return (
-    <div className="code-block-wrapper">
+    <div className={`code-block-wrapper ${isDark ? "dark" : "light"}`}>
       <div className="code-block-header">
         <span className="code-language-label">{language || "code"}</span>
         <button
@@ -78,7 +78,6 @@ const CodeBlock: React.FC<{ language?: string; children: string }> = ({ language
           borderRadius: 0,
           fontSize: "14px",
           border: "none",
-          background: isDark ? "#282c34" : "#fafafa",
         }}
       >
         {children}

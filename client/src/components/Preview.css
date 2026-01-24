@@ -280,19 +280,40 @@
   margin: 16px 0;
   border-radius: 6px;
   overflow: hidden;
+  border: 1px solid #3e4451;
+  background: #282c34; /* Default dark to prevent white flash */
+}
+
+/* Code block background - controlled by component class */
+.code-block-wrapper.light {
   border: 1px solid #d0d0d0;
+  background: #fafafa;
+}
+
+.code-block-wrapper.light pre,
+.code-block-wrapper.light code,
+.code-block-wrapper.light > div:last-child {
+  background: #fafafa !important;
+}
+
+.code-block-wrapper.dark pre,
+.code-block-wrapper.dark code,
+.code-block-wrapper.dark > div:last-child {
+  background: #282c34 !important;
 }
 
 /* Dark theme wrapper - explicit dark/high-contrast */
-[data-theme="dark"] .code-block-wrapper,
-[data-theme="high-contrast"] .code-block-wrapper {
-  border: 1px solid #3e4451;
+/* (defaults are already dark, no override needed) */
+
+/* Light theme wrapper - must override dark default */
+[data-theme="light"] .code-block-wrapper {
+  border: 1px solid #d0d0d0;
 }
 
-/* Auto theme - use system preference */
-@media (prefers-color-scheme: dark) {
+/* Auto theme - use system preference for light */
+@media (prefers-color-scheme: light) {
   [data-theme="auto"] .code-block-wrapper {
-    border: 1px solid #3e4451;
+    border: 1px solid #d0d0d0;
   }
 }
 
@@ -301,22 +322,21 @@
   justify-content: space-between;
   align-items: center;
   padding: 6px 12px;
+  background: #21252b; /* Default dark to prevent white flash */
+  border-bottom: 1px solid #3e4451;
+}
+
+/* Light theme headers - must override dark default */
+[data-theme="light"] .code-block-header {
   background: #e0e0e0;
   border-bottom: 1px solid #d0d0d0;
 }
 
-/* Dark theme headers - explicit */
-[data-theme="dark"] .code-block-header,
-[data-theme="high-contrast"] .code-block-header {
-  background: #21252b;
-  border-bottom: 1px solid #3e4451;
-}
-
-/* Auto theme headers - use system preference */
-@media (prefers-color-scheme: dark) {
+/* Auto theme headers - use system preference for light */
+@media (prefers-color-scheme: light) {
   [data-theme="auto"] .code-block-header {
-    background: #21252b;
-    border-bottom: 1px solid #3e4451;
+    background: #e0e0e0;
+    border-bottom: 1px solid #d0d0d0;
   }
 }
 
@@ -335,41 +355,40 @@
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.2s, background 0.2s;
-  background: #ffffff;
-  border: 1px solid #c0c0c0;
-  color: #333333;
-}
-
-.code-copy-btn:hover {
-  background: #f0f0f0;
-  border-color: #a0a0a0;
-}
-
-/* Dark theme button - explicit */
-[data-theme="dark"] .code-copy-btn,
-[data-theme="high-contrast"] .code-copy-btn {
+  /* Default dark to prevent white flash */
   background: #3e4451;
   border: 1px solid #4d5566;
   color: #abb2bf;
 }
 
-[data-theme="dark"] .code-copy-btn:hover,
-[data-theme="high-contrast"] .code-copy-btn:hover {
+.code-copy-btn:hover {
   background: #4d5566;
   border-color: #5c6370;
 }
 
-/* Auto theme button - use system preference */
-@media (prefers-color-scheme: dark) {
+/* Light theme button - must override dark default */
+[data-theme="light"] .code-copy-btn {
+  background: #ffffff;
+  border: 1px solid #c0c0c0;
+  color: #333333;
+}
+
+[data-theme="light"] .code-copy-btn:hover {
+  background: #f0f0f0;
+  border-color: #a0a0a0;
+}
+
+/* Auto theme button - use system preference for light */
+@media (prefers-color-scheme: light) {
   [data-theme="auto"] .code-copy-btn {
-    background: #3e4451;
-    border: 1px solid #4d5566;
-    color: #abb2bf;
+    background: #ffffff;
+    border: 1px solid #c0c0c0;
+    color: #333333;
   }
 
   [data-theme="auto"] .code-copy-btn:hover {
-    background: #4d5566;
-    border-color: #5c6370;
+    background: #f0f0f0;
+    border-color: #a0a0a0;
   }
 }
 

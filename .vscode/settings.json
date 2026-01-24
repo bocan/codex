@@ -1,7 +1,7 @@
 {
   "github.copilot.chat.commitMessageGeneration.instructions": [
     {
-      "text": "Generate commit messages following Conventional Commits format (https://www.conventionalcommits.org/). Use these types: feat (new feature), fix (bug fix), docs (documentation), style (formatting), refactor (code restructuring), perf (performance), test (tests), chore (maintenance). Format: <type>(<optional scope>): <short summary>. Keep the first line under 72 characters. Use imperative mood ('add' not 'added'). For multiple unrelated changes, use the most significant type and summarize in the subject, then list individual changes as bullet points in the body. For breaking changes, add BREAKING CHANGE: in the body or ! after the type. Examples: 'feat(auth): add password reset functionality', 'fix: resolve null pointer in search', 'feat: add version management and UI improvements' with bullets in body."
+      "text": "Generate commit messages following Conventional Commits format (https://www.conventionalcommits.org/). Use these types: feat (new feature), fix (bug fix), docs (documentation), style (formatting), refactor (code restructuring), perf (performance), test (tests), chore (maintenance). Format: <type>(<optional scope>): <short summary>. Keep the first line under 72 characters. Use imperative mood ('add' not 'added'). For breaking changes, add BREAKING CHANGE: in the body or ! after the type. Examples: 'feat(auth): add password reset functionality', 'fix: resolve null pointer in search', 'feat: add version management and UI improvements' with bullets in body."
     }
   ]
 }
