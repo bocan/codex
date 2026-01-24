@@ -471,9 +471,9 @@ function App() {
             </button>
             <h2 id="about-title">📝 {__APP_NAME__}</h2>
             <p className="about-version">
-              <a 
-                href="https://github.com/bocan/disnotion/blob/main/CHANGELOG.md" 
-                target="_blank" 
+              <a
+                href="https://github.com/bocan/disnotion/blob/main/CHANGELOG.md"
+                target="_blank"
                 rel="noopener noreferrer"
                 title="View changelog"
               >

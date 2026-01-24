@@ -187,6 +187,68 @@ make help             # Show all available commands
 4. Client hot-reloads on file changes (via Vite HMR)
 5. Run `make test` before committing
 
+### Git Workflow & Releases
+
+This project uses [Conventional Commits](https://www.conventionalcommits.org/) and [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for automated changelog generation.
+
+#### Commit Message Format
+
+```
+type(scope): description
+
+Examples:
+feat: add search functionality
+fix: resolve dark mode flicker
+docs: update README
+refactor(api): simplify error handling
+```
+
+**Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`
+
+#### Pull Request Workflow
+
+```bash
+# 1. Create and switch to feature branch
+git checkout -b feature/my-change
+
+# 2. Make changes, commit (repeat as needed)
+git add .
+git commit -m "feat: add new feature"
+
+# 3. Push branch to GitHub
+git push -u origin feature/my-change
+
+# 4. Create PR (via GitHub CLI or web)
+gh pr create --title "feat: add new feature" --body "Description"
+
+# 5. After PR is merged, switch back to main
+git checkout main
+git pull
+```
+
+#### Creating a Release
+
+After merging PRs and when ready to release:
+
+```bash
+# Patch release (1.0.0 → 1.0.1) - bug fixes
+npm run release
+
+# Minor release (1.0.0 → 1.1.0) - new features
+npm run release:minor
+
+# Major release (1.0.0 → 2.0.0) - breaking changes
+npm run release:major
+
+# Push with tags
+git push --follow-tags
+```
+
+This will:
+1. Bump version in `package.json`
+2. Update `CHANGELOG.md` with commits since last release
+3. Create a git commit and tag (e.g., `v1.1.0`)
+
 ### Adding New Features
 
 #### Backend (Adding a new API endpoint)
