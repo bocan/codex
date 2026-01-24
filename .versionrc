@@ -14,27 +14,31 @@
     },
     {
       "type": "refactor",
-      "section": "Code Refactoring",
-      "hidden": true
+      "section": "Code Refactoring"
     },
     {
       "type": "docs",
-      "section": "Documentation",
-      "hidden": true
+      "section": "Documentation"
     },
     {
       "type": "style",
-      "section": "Styles",
-      "hidden": true
+      "section": "Styles"
     },
     {
       "type": "test",
-      "section": "Tests",
-      "hidden": true
+      "section": "Tests"
     },
     {
       "type": "chore",
-      "hidden": true
+      "section": "Chores"
+    },
+    {
+      "type": "build",
+      "section": "Build System"
+    },
+    {
+      "type": "ci",
+      "section": "CI/CD"
     }
   ],
   "commitUrlFormat": "https://github.com/bocan/disnotion/commit/{{hash}}",
