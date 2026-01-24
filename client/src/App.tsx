@@ -470,7 +470,16 @@ function App() {
               ✕
             </button>
             <h2 id="about-title">📝 {__APP_NAME__}</h2>
-            <p className="about-version">Version {__APP_VERSION__}</p>
+            <p className="about-version">
+              <a 
+                href="https://github.com/bocan/disnotion/blob/main/CHANGELOG.md" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                title="View changelog"
+              >
+                Version {__APP_VERSION__}
+              </a>
+            </p>
             <p className="about-author">Developed by <a href="https://chris.funderburg.me" target="_blank" rel="noopener noreferrer">Chris Funderburg</a></p>
             <p className="about-description">
               {__APP_DESCRIPTION__} — with real-time markdown editing,
