@@ -1,4 +1,4 @@
-# Disnotion Makefile
+# Codex Makefile
 # Convenient commands for building, testing, and running the application
 
 .PHONY: help install dev dev-server dev-client build build-server build-client test test-server test-client clean clean-server clean-client
@@ -13,7 +13,7 @@ NC := \033[0m # No Color
 ##@ General
 
 help: ## Display this help message
-	@echo "$(BLUE)Disnotion - Makefile Commands$(NC)"
+	@echo "$(BLUE)Codex - Makefile Commands$(NC)"
 	@echo ""
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make $(YELLOW)<target>$(NC)\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  $(BLUE)%-15s$(NC) %s\n", $$1, $$2 } /^##@/ { printf "\n$(GREEN)%s$(NC)\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 

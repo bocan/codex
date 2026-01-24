@@ -1,8 +1,8 @@
-# Disnotion - AI Coding Instructions
+# Codex - AI Coding Instructions
 
 ## Architecture Overview
 
-Disnotion is a **full-stack TypeScript** monorepo using npm workspaces with three packages:
+Codex is a **full-stack TypeScript** monorepo using npm workspaces with three packages:
 - **Root** (`/`) - Workspace orchestration, shared devDependencies
 - **Server** (`/server`) - Express REST API on port 3001
 - **Client** (`/client`) - React SPA on port 3000 (Vite dev server proxies `/api` to server)
@@ -98,6 +98,19 @@ Self-documenting API available at `GET /api` returns all endpoints with examples
 - **Never modify** the root `package-lock.json` directly (use `npm install` commands)
 - **Do not remove** existing tests unless they are explicitly broken by intended changes
 - **Do not change** the npm workspace structure without discussion
+
+## Git Commands
+
+Use modern Git commands instead of legacy `git checkout`:
+
+| Instead of | Use |
+|------------|-----|
+| `git checkout <branch>` | `git switch <branch>` |
+| `git checkout -b <branch>` | `git switch -c <branch>` |
+| `git checkout -- <file>` | `git restore <file>` |
+| `git checkout HEAD -- <file>` | `git restore --source=HEAD <file>` |
+
+**Never suggest or document `git checkout`** - always use `git switch` for branches and `git restore` for files.
 
 ## CI/CD Notes
 

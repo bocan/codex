@@ -8,6 +8,6 @@ build/
 test-data/
 **/.attachments/
 
-# Data folder - only track Disnotion Documentation
+# Data folder - only track Codex Documentation
 data/*
-!data/Disnotion Documentation/
+!data/Codex Documentation/

@@ -58,7 +58,7 @@ app.use(express.json({ limit: "10mb" }));
 app.use(
   session({
     secret:
-      process.env.SESSION_SECRET || "disnotion-dev-secret-change-in-production",
+      process.env.SESSION_SECRET || "codex-dev-secret-change-in-production",
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -74,7 +74,7 @@ app.get("/api", (req: Request, res: Response) => {
   const baseUrl = `${req.protocol}://${req.get("host")}`;
 
   res.json({
-    name: "Disnotion API",
+    name: "Codex API",
     version: "1.0.0",
     description: "A Notion-like wiki and document store API",
     baseUrl: baseUrl,

@@ -1,10 +1,10 @@
-# 📝 Disnotion
+# 📝 Codex
 
 > A Notion-like wiki and document store built with React and Express.
 
 **Single-user personal knowledge base** - A full-stack TypeScript application that provides a beautiful, intuitive interface for creating and managing markdown documents organized in a hierarchical folder structure.
 
-> ⚠️ **Note**: Disnotion is designed as a **single-user application**. It does not support concurrent multi-user editing or collaboration features. Perfect for personal wikis, note-taking, and documentation.
+> ⚠️ **Note**: Codex is designed as a **single-user application**. It does not support concurrent multi-user editing or collaboration features. Perfect for personal wikis, note-taking, and documentation.
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb)](https://reactjs.org/)
@@ -45,7 +45,7 @@ echo $DOG
 
 ## 🔐 Security & Logging
 
-Disnotion includes several security features to protect your data:
+Codex includes several security features to protect your data:
 
 ### Authentication
 - **Password-based login** with bcrypt hashing (10 salt rounds)
@@ -85,7 +85,7 @@ Helmet middleware provides:
 
 ## ♿ Accessibility Features
 
-Disnotion is designed to be accessible to all users, including those using assistive technologies:
+Codex is designed to be accessible to all users, including those using assistive technologies:
 
 ### Screen Reader Support
 - **Comprehensive ARIA labels** on all interactive elements
@@ -113,7 +113,7 @@ Disnotion is designed to be accessible to all users, including those using assis
 - **Escape** to close modals and dialogs
 - **⌘K/Ctrl+K** global search shortcut
 
-The accessibility features ensure Disnotion can be used effectively by people with:
+The accessibility features ensure Codex can be used effectively by people with:
 - Visual impairments (screen readers, high-contrast mode)
 - Motor disabilities (keyboard-only navigation, larger click targets)
 - Color blindness (semantic colors with sufficient contrast)
@@ -124,8 +124,8 @@ The accessibility features ensure Disnotion can be used effectively by people wi
 
 ```bash
 # Clone the repository
-git clone https://github.com/bocan/disnotion.git
-cd disnotion
+git clone https://github.com/bocan/codex.git
+cd codex
 
 # Install dependencies
 make install
@@ -209,7 +209,7 @@ refactor(api): simplify error handling
 
 ```bash
 # 1. Create and switch to feature branch
-git checkout -b feature/my-change
+git switch -c feature/my-change
 
 # 2. Make changes, commit (repeat as needed)
 git add .
@@ -222,7 +222,7 @@ git push -u origin feature/my-change
 gh pr create --title "feat: add new feature" --body "Description"
 
 # 5. After PR is merged, switch back to main
-git checkout main
+git switch main
 git pull
 ```
 
@@ -268,7 +268,7 @@ This will:
 ## 🏗️ Project Structure
 
 ```
-disnotion/
+codex/
 ├── 📄 Makefile                    # Build automation
 ├── 📄 package.json                # Root package config
 ├── 📄 README.md                   # This file
@@ -757,7 +757,7 @@ chmod 755 data/
 
 ### Getting Help
 
-- Check the [GitHub Issues](https://github.com/yourusername/disnotion/issues)
+- Check the [GitHub Issues](https://github.com/yourusername/codex/issues)
 - Review the API documentation above
 - Ensure all prerequisites are installed
 - Try a clean install: `make clean && make install`
@@ -773,7 +773,7 @@ chmod 755 data/
 
 ## 🔍 Search Features
 
-Disnotion includes a powerful full-text search that:
+Codex includes a powerful full-text search that:
 - **Searches across all pages** in all folders recursively
 - **Ranks results by relevance** (number of matches)
 - **Highlights matching text** in context snippets

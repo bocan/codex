@@ -42,6 +42,6 @@
       "section": "CI/CD"
     }
   ],
-  "commitUrlFormat": "https://github.com/bocan/disnotion/commit/{{hash}}",
-  "compareUrlFormat": "https://github.com/bocan/disnotion/compare/{{previousTag}}...{{currentTag}}"
+  "commitUrlFormat": "https://github.com/bocan/codex/commit/{{hash}}",
+  "compareUrlFormat": "https://github.com/bocan/codex/compare/{{previousTag}}...{{currentTag}}"
 }

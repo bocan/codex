@@ -1,7 +1,7 @@
 {
-  "name": "disnotion-client",
+  "name": "codex-client",
   "version": "1.0.0",
-  "description": "Frontend for Disnotion",
+  "description": "Frontend for Codex",
   "type": "module",
   "scripts": {
     "dev": "vite",
