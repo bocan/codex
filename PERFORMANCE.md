@@ -1,6 +1,6 @@
 # Performance Optimizations
 
-This document tracks performance improvements made to Disnotion.
+This document tracks performance improvements made to Codex.
 
 ## Caching Layer (Implemented)
 

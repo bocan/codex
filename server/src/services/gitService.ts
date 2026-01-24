@@ -68,8 +68,8 @@ export class GitService {
    */
   private async configureGit(): Promise<void> {
     try {
-      await this.git.addConfig("user.name", "Disnotion", false, "local");
-      await this.git.addConfig("user.email", "disnotion@local", false, "local");
+      await this.git.addConfig("user.name", "Codex", false, "local");
+      await this.git.addConfig("user.email", "codex@local", false, "local");
     } catch (_error) {
       // Config might already exist, that's fine
     }

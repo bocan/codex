@@ -1,4 +1,4 @@
- # Welcome to Disnotion!
+ # Welcome to Codex!
 
 This is your personal wiki and document store.
 

@@ -1,4 +1,4 @@
-# Disnotion Quick Reference
+# Codex Quick Reference
 
 ## Quick Start
 ```bash

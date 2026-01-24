@@ -90,7 +90,7 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
 
   // Save collapsed state
   useEffect(() => {
-    localStorage.setItem("disnotion-toc-collapsed", String(isCollapsed));
+    localStorage.setItem("codex-toc-collapsed", String(isCollapsed));
   }, [isCollapsed]);
 
   const handleClick = (id: string) => {

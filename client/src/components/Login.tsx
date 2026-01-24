@@ -46,7 +46,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             type="text"
             name="username"
             autoComplete="username"
-            value="disnotion"
+            value="codex"
             style={{ display: "none" }}
             readOnly
             aria-hidden="true"

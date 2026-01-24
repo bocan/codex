@@ -1,7 +1,7 @@
 # Search and Table of Contents Implementation
 
 ## Overview
-This document summarizes the implementation of full-text search and table of contents features in Disnotion.
+This document summarizes the implementation of full-text search and table of contents features in Codex.
 
 ## Search Feature
 

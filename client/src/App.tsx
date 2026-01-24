@@ -45,21 +45,21 @@ function App() {
   const [theme, setTheme] = useState<
     "light" | "dark" | "high-contrast" | "auto"
   >(() => {
-    const saved = localStorage.getItem("disnotion-theme");
+    const saved = localStorage.getItem("codex-theme");
     return (saved as "light" | "dark" | "high-contrast" | "auto") || "auto";
   });
 
   // Resizable pane widths
   const [leftPaneWidth, setLeftPaneWidth] = useState(() => {
-    const saved = localStorage.getItem("disnotion-left-pane-width");
+    const saved = localStorage.getItem("codex-left-pane-width");
     return saved ? parseInt(saved, 10) : DEFAULT_LEFT_WIDTH;
   });
   const [rightPaneWidth, setRightPaneWidth] = useState(() => {
-    const saved = localStorage.getItem("disnotion-right-pane-width");
+    const saved = localStorage.getItem("codex-right-pane-width");
     return saved ? parseInt(saved, 10) : DEFAULT_RIGHT_WIDTH;
   });
   const [folderTreeHeight, setFolderTreeHeight] = useState(() => {
-    const saved = localStorage.getItem("disnotion-folder-tree-height");
+    const saved = localStorage.getItem("codex-folder-tree-height");
     return saved ? parseInt(saved, 10) : DEFAULT_FOLDER_HEIGHT;
   });
 
@@ -157,19 +157,19 @@ function App() {
 
   // Save pane widths to localStorage
   useEffect(() => {
-    localStorage.setItem("disnotion-left-pane-width", leftPaneWidth.toString());
+    localStorage.setItem("codex-left-pane-width", leftPaneWidth.toString());
   }, [leftPaneWidth]);
 
   useEffect(() => {
     localStorage.setItem(
-      "disnotion-right-pane-width",
+      "codex-right-pane-width",
       rightPaneWidth.toString(),
     );
   }, [rightPaneWidth]);
 
   useEffect(() => {
     localStorage.setItem(
-      "disnotion-folder-tree-height",
+      "codex-folder-tree-height",
       folderTreeHeight.toString(),
     );
   }, [folderTreeHeight]);
@@ -190,7 +190,7 @@ function App() {
     };
 
     applyTheme();
-    localStorage.setItem("disnotion-theme", theme);
+    localStorage.setItem("codex-theme", theme);
 
     // Listen for system theme changes when in auto mode
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -472,7 +472,7 @@ function App() {
             <h2 id="about-title">📝 {__APP_NAME__}</h2>
             <p className="about-version">
               <a
-                href="https://github.com/bocan/disnotion/blob/main/CHANGELOG.md"
+                href="https://github.com/bocan/codex/blob/main/CHANGELOG.md"
                 target="_blank"
                 rel="noopener noreferrer"
                 title="View changelog"

@@ -277,6 +277,16 @@ body {
   color: var(--text-secondary);
 }
 
+.about-version a,
+.about-version a:visited {
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+.about-version a:hover {
+  text-decoration: underline;
+}
+
 .about-author {
   margin: 0 0 16px 0;
   font-size: 14px;

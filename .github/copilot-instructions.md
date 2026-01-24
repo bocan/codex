@@ -1,8 +1,8 @@
-# Disnotion - AI Coding Instructions
+# Codex - AI Coding Instructions
 
 ## Architecture Overview
 
-Disnotion is a **full-stack TypeScript** monorepo using npm workspaces with three packages:
+Codex is a **full-stack TypeScript** monorepo using npm workspaces with three packages:
 - **Root** (`/`) - Workspace orchestration, shared devDependencies
 - **Server** (`/server`) - Express REST API on port 3001
 - **Client** (`/client`) - React SPA on port 3000 (Vite dev server proxies `/api` to server)
