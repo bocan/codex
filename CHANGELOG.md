@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/bocan/disnotion/compare/v1.1.0...v1.1.1) (2026-01-24)
+
+
+### Code Refactoring
+
+* reveal hidden sections in version configuration ([a92536f](https://github.com/bocan/disnotion/commit/a92536f7d3b851db65b32dff9d65f05a9a3997ae))
+
 ## 1.1.0 (2026-01-24)
 
 
