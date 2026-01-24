@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.1.5](https://github.com/bocan/disnotion/compare/v1.1.4...v1.1.5) (2026-01-24)
+
+
+### Code Refactoring
+
+* **search:** move fileSystemService import to index ([7135424](https://github.com/bocan/disnotion/commit/71354240ee7ec1c773fdc0c14756fe0feb4ab1d2))
+
 ## [1.1.4](https://github.com/bocan/disnotion/compare/v1.1.3...v1.1.4) (2026-01-24)
 
 
