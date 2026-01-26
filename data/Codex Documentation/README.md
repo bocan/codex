@@ -7,9 +7,14 @@
 > ⚠️ **Note**: Codex is designed as a **single-user application**. It does not support concurrent multi-user editing or collaboration features. Perfect for personal wikis, note-taking, and documentation.
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-18.2-61dafb)](https://reactjs.org/)
+[![React](https://img.shields.io/badge/React-19-61dafb)](https://reactjs.org/)
 [![Express](https://img.shields.io/badge/Express-4.18-green)](https://expressjs.com/)
 
+```sh
+#!/bin/bash
+DOG=blah
+echo $DOG
+```
 ## ✨ Features
 
 - 📁 **Folder Management**: Create, delete, and rename folders in a collapsible tree view with right-click context menus
@@ -103,10 +108,12 @@ Codex is designed to be accessible to all users, including those using assistive
 
 ### Keyboard Accessibility
 - **Tab navigation** through all interactive elements
-- **Arrow key navigation** in folder tree and search results
-- **Enter/Space** to activate buttons and links
+- **Arrow key navigation** (↑↓) or vim-style (`j`/`k`) in folder tree, page list, and search results
+- **Enter** to activate buttons, open folders/pages, and select search results
 - **Escape** to close modals and dialogs
 - **⌘K/Ctrl+K** global search shortcut
+- **Focus indicators** show keyboard-selected items with blue outline
+- **Mouse hover sync** updates keyboard selection for seamless interaction
 
 The accessibility features ensure Codex can be used effectively by people with:
 - Visual impairments (screen readers, high-contrast mode)
@@ -181,6 +188,68 @@ make help             # Show all available commands
 3. Server auto-reloads on file changes (via ts-node-dev)
 4. Client hot-reloads on file changes (via Vite HMR)
 5. Run `make test` before committing
+
+### Git Workflow & Releases
+
+This project uses [Conventional Commits](https://www.conventionalcommits.org/) and [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for automated changelog generation.
+
+#### Commit Message Format
+
+```
+type(scope): description
+
+Examples:
+feat: add search functionality
+fix: resolve dark mode flicker
+docs: update README
+refactor(api): simplify error handling
+```
+
+**Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`
+
+#### Pull Request Workflow
+
+```bash
+# 1. Create and switch to feature branch
+git switch -c feature/my-change
+
+# 2. Make changes, commit (repeat as needed)
+git add .
+git commit -m "feat: add new feature"
+
+# 3. Push branch to GitHub
+git push -u origin feature/my-change
+
+# 4. Create PR (via GitHub CLI or web)
+gh pr create --title "feat: add new feature" --body "Description"
+
+# 5. After PR is merged, switch back to main
+git switch main
+git pull
+```
+
+#### Creating a Release
+
+After merging PRs and when ready to release:
+
+```bash
+# Patch release (1.0.0 → 1.0.1) - bug fixes
+npm run release
+
+# Minor release (1.0.0 → 1.1.0) - new features
+npm run release:minor
+
+# Major release (1.0.0 → 2.0.0) - breaking changes
+npm run release:major
+
+# Push with tags
+git push --follow-tags
+```
+
+This will:
+1. Bump version in `package.json`
+2. Update `CHANGELOG.md` with commits since last release
+3. Create a git commit and tag (e.g., `v1.1.0`)
 
 ### Adding New Features
 
@@ -697,12 +766,22 @@ chmod 755 data/
 
 ## ⌨️ Keyboard Shortcuts
 
+### Search Modal
 | Shortcut | Description |
 |----------|-------------|
 | `⌘K` / `Ctrl+K` | Open search modal |
 | `↑` `↓` | Navigate search results |
 | `Enter` | Select highlighted search result |
 | `Esc` | Close search modal |
+
+### Folder Tree & Page List Navigation
+| Shortcut | Description |
+|----------|-------------|
+| `↑` / `k` | Move selection up (vim-style) |
+| `↓` / `j` | Move selection down (vim-style) |
+| `Enter` | Open selected folder or page |
+
+**Note:** Click in the folder tree or page list to focus it, then use keyboard navigation. Mouse hover also updates the keyboard selection for seamless interaction.
 
 ## 🔍 Search Features
 

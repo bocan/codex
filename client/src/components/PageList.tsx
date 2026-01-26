@@ -48,7 +48,9 @@ export const PageList: React.FC<PageListProps> = ({
   const [isMoving, setIsMoving] = useState(false);
   const [sortField, setSortField] = useState<SortField>("name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const contextMenuRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   // Close context menu when clicking outside or pressing Escape
   useEffect(() => {
@@ -77,6 +79,33 @@ export const PageList: React.FC<PageListProps> = ({
       document.removeEventListener("keydown", handleEscapeKey);
     };
   }, [contextMenuPage]);
+
+  // Keyboard navigation (arrow keys and vim j/k)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle if list has focus and we're not renaming
+      if (!listRef.current?.contains(document.activeElement) || renamingPage) return;
+      
+      if (e.key === "ArrowDown" || e.key === "j") {
+        e.preventDefault();
+        setSelectedIndex((prev) => Math.min(prev + 1, sortedPages.length - 1));
+      } else if (e.key === "ArrowUp" || e.key === "k") {
+        e.preventDefault();
+        setSelectedIndex((prev) => Math.max(prev - 1, 0));
+      } else if (e.key === "Enter" && sortedPages[selectedIndex]) {
+        e.preventDefault();
+        onSelectPage(sortedPages[selectedIndex].path);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [sortedPages, selectedIndex, onSelectPage, renamingPage]);
+
+  // Reset selection when pages change
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [selectedFolder, sortedPages.length]);
 
   const sortedPages = useMemo(() => {
     return [...pages].sort((a, b) => {
@@ -338,17 +367,18 @@ export const PageList: React.FC<PageListProps> = ({
           </button>
         </div>
       ) : (
-        <ul className="page-items" role="list">
-          {sortedPages.map((page) => (
+        <ul className="page-items" role="list" ref={listRef} tabIndex={0}>
+          {sortedPages.map((page, index) => (
             <li
               key={page.path}
-              className={`page-item ${selectedPage === page.path ? "selected" : ""} ${isDeleting === page.path ? "deleting" : ""}`}
+              className={`page-item ${selectedPage === page.path ? "selected" : ""} ${index === selectedIndex ? "keyboard-selected" : ""} ${isDeleting === page.path ? "deleting" : ""}`}
               onClick={() => !isDeleting && onSelectPage(page.path)}
               onContextMenu={(e) =>
                 !isDeleting && handleContextMenu(e, page.path)
               }
+              onMouseEnter={() => setSelectedIndex(index)}
               role="button"
-              tabIndex={0}
+              tabIndex={-1}
               aria-label={`Page: ${page.name}${selectedPage === page.path ? " (selected)" : ""}`}
               aria-busy={isDeleting === page.path}
               title={getPageTooltip(page)}

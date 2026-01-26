@@ -108,10 +108,12 @@ Codex is designed to be accessible to all users, including those using assistive
 
 ### Keyboard Accessibility
 - **Tab navigation** through all interactive elements
-- **Arrow key navigation** in folder tree and search results
-- **Enter/Space** to activate buttons and links
+- **Arrow key navigation** (↑↓) or vim-style (`j`/`k`) in folder tree, page list, and search results
+- **Enter** to activate buttons, open folders/pages, and select search results
 - **Escape** to close modals and dialogs
 - **⌘K/Ctrl+K** global search shortcut
+- **Focus indicators** show keyboard-selected items with blue outline
+- **Mouse hover sync** updates keyboard selection for seamless interaction
 
 The accessibility features ensure Codex can be used effectively by people with:
 - Visual impairments (screen readers, high-contrast mode)
@@ -764,12 +766,22 @@ chmod 755 data/
 
 ## ⌨️ Keyboard Shortcuts
 
+### Search Modal
 | Shortcut | Description |
 |----------|-------------|
 | `⌘K` / `Ctrl+K` | Open search modal |
 | `↑` `↓` | Navigate search results |
 | `Enter` | Select highlighted search result |
 | `Esc` | Close search modal |
+
+### Folder Tree & Page List Navigation
+| Shortcut | Description |
+|----------|-------------|
+| `↑` / `k` | Move selection up (vim-style) |
+| `↓` / `j` | Move selection down (vim-style) |
+| `Enter` | Open selected folder or page |
+
+**Note:** Click in the folder tree or page list to focus it, then use keyboard navigation. Mouse hover also updates the keyboard selection for seamless interaction.
 
 ## 🔍 Search Features
 
