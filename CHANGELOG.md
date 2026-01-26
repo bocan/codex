@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.3.4](https://github.com/bocan/codex/compare/v2.3.3...v2.3.4) (2026-01-26)
+
+
+### Documentation
+
+* update copilot instructions with deployment and navigation details ([947dced](https://github.com/bocan/codex/commit/947dced750cfc41c6e4f5f6950e570e1ffb5348d))
+
 ## [2.3.3](https://github.com/bocan/codex/compare/v2.3.2...v2.3.3) (2026-01-26)
 
 ## [2.3.2](https://github.com/bocan/codex/compare/v2.3.1...v2.3.2) (2026-01-26)
