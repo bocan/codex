@@ -1,6 +1,6 @@
 # 📝 Codex
 
-> A Notion-like wiki and document store built with React and Express.
+> A wiki and document store built with React and Express.
 
 **Single-user personal knowledge base** - A full-stack TypeScript application that provides a beautiful, intuitive interface for creating and managing markdown documents organized in a hierarchical folder structure.
 
@@ -10,11 +10,6 @@
 [![React](https://img.shields.io/badge/React-19-61dafb)](https://reactjs.org/)
 [![Express](https://img.shields.io/badge/Express-4.18-green)](https://expressjs.com/)
 
-```sh
-#!/bin/bash
-DOG=blah
-echo $DOG
-```
 ## ✨ Features
 
 - 📁 **Folder Management**: Create, delete, and rename folders in a collapsible tree view with right-click context menus
@@ -445,7 +440,101 @@ This creates optimized production builds in:
 - `server/dist/` - Compiled backend
 - `client/dist/` - Optimized frontend bundle
 
-## 📡 API Documentation
+## � Docker Deployment
+
+Codex can be run in Docker for simplified deployment. In production mode, Express serves both the API and the React UI from a single port (3001).
+
+### Using Docker Compose (Recommended)
+
+```bash
+# Build and start the container
+docker compose up -d --build
+
+# View logs
+docker compose logs -f codex
+
+# Stop the container
+docker compose down
+```
+
+The application will be available at **http://localhost:3001** (both UI and API on the same port).
+
+### Using Raw Docker
+
+```bash
+# Build the image
+docker build -t codex .
+
+# Run the container
+docker run -d \
+  --name codex \
+  -p 3001:3001 \
+  -v $(pwd)/data:/app/data \
+  -e NODE_ENV=production \
+  codex
+
+# View logs
+docker logs -f codex
+
+# Stop and remove
+docker stop codex && docker rm codex
+```
+
+### Docker Configuration
+
+**Environment Variables** (in `docker-compose.yml`):
+- `NODE_ENV=production` - Runs in production mode
+- `PORT=3001` - Server port (default)
+- `AUTH_PASSWORD=your-password` - Set to enable authentication (optional)
+- `TRUST_PROXY=true` - Enable when behind a reverse proxy with HTTPS
+
+**Volume Mounting**:
+- `./data:/app/data` - Persists your wiki data outside the container
+
+### Authentication in Docker
+
+**Important**: Due to secure cookie requirements, there are two ways to run Codex with authentication:
+
+#### Option 1: Run Passwordless Locally (for testing)
+Remove or comment out the `AUTH_PASSWORD` environment variable in `docker-compose.yml`:
+
+```yaml
+environment:
+  - NODE_ENV=production
+  - PORT=3001
+  # - AUTH_PASSWORD=your-password  # Commented out
+```
+
+This allows direct HTTP access without authentication, suitable for local testing.
+
+#### Option 2: Deploy Behind a Reverse Proxy (for production)
+For production with authentication, deploy behind a reverse proxy (nginx, Caddy, Traefik) that:
+1. Terminates TLS/HTTPS
+2. Forwards requests to Codex with the `X-Forwarded-Proto: https` header
+3. Set `TRUST_PROXY=true` in the environment variables
+
+Example with nginx:
+```nginx
+server {
+    listen 443 ssl;
+    server_name wiki.example.com;
+
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
+
+    location / {
+        proxy_pass http://localhost:3001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+**Why?** In production mode, session cookies use `secure: auto`, which requires HTTPS. Direct HTTP access with a password set will fail because the browser won't send the secure cookie. The reverse proxy provides HTTPS termination while communicating with Codex via HTTP internally.
+
+## �📡 API Documentation
 
 The REST API is available at `http://localhost:3001/api`
 
