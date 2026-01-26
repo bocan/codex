@@ -24,6 +24,7 @@ export const Editor: React.FC<EditorProps> = ({
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
+  const [showFormatToolbar, setShowFormatToolbar] = useState(false);
   const [lastSaveTime, setLastSaveTime] = useState<number>(0);
   const [isListening, setIsListening] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -239,6 +240,88 @@ export const Editor: React.FC<EditorProps> = ({
     setIsListening(false);
   };
 
+  // Insert text at cursor position while preserving undo stack
+  // Uses execCommand which maintains native browser undo/redo
+  const insertTextPreservingUndo = (text: string) => {
+    if (!textareaRef.current) return;
+
+    const textarea = textareaRef.current;
+    textarea.focus();
+
+    // execCommand preserves native undo stack
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    const success = document.execCommand("insertText", false, text);
+
+    if (!success) {
+      // Fallback for browsers that don't support execCommand
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const newContent = content.substring(0, start) + text + content.substring(end);
+      setContent(newContent);
+      if (onContentChange) {
+        onContentChange(newContent);
+      }
+    }
+  };
+
+  // Formatting helper: wraps selection or inserts at cursor
+  const insertFormatting = (
+    prefix: string,
+    suffix: string = "",
+    placeholder: string = ""
+  ) => {
+    if (!textareaRef.current) return;
+
+    const textarea = textareaRef.current;
+    textarea.focus();
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    const textToWrap = selectedText || placeholder;
+    const insertText = prefix + textToWrap + suffix;
+
+    insertTextPreservingUndo(insertText);
+
+    // Position cursor appropriately after insertion
+    setTimeout(() => {
+      if (selectedText) {
+        // Select the wrapped text
+        textarea.setSelectionRange(
+          start + prefix.length,
+          start + prefix.length + textToWrap.length
+        );
+      } else {
+        // Position cursor at placeholder for typing
+        textarea.setSelectionRange(
+          start + prefix.length,
+          start + prefix.length + placeholder.length
+        );
+      }
+    }, 0);
+  };
+
+  // Insert block formatting (headings, lists) at line start
+  const insertLinePrefix = (prefix: string) => {
+    if (!textareaRef.current) return;
+
+    const textarea = textareaRef.current;
+    textarea.focus();
+
+    const start = textarea.selectionStart;
+
+    // Find the start of the current line
+    const lineStart = content.lastIndexOf("\n", start - 1) + 1;
+
+    // Select from line start to current position, then insert prefix + selected text
+    textarea.setSelectionRange(lineStart, lineStart);
+    insertTextPreservingUndo(prefix);
+
+    setTimeout(() => {
+      textarea.setSelectionRange(start + prefix.length, start + prefix.length);
+    }, 0);
+  };
+
   const toggleListening = () => {
     if (isListening) {
       stopListening();
@@ -306,8 +389,6 @@ export const Editor: React.FC<EditorProps> = ({
     if (!textareaRef.current) return;
 
     const textarea = textareaRef.current;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
 
     // Determine if it's an image
     const ext = filename.split(".").pop()?.toLowerCase();
@@ -319,26 +400,29 @@ export const Editor: React.FC<EditorProps> = ({
       ? `![${filename}](.attachments/${filename})`
       : `[${filename}](.attachments/${filename})`;
 
-    const newContent =
-      content.substring(0, start) + link + content.substring(end);
-    setContent(newContent);
-    if (onContentChange) {
-      onContentChange(newContent);
-    }
-
-    // Close modal and focus back on textarea
+    // Close modal and focus back on textarea, then insert
     setShowAttachments(false);
     setTimeout(() => {
       textarea.focus();
-      const newPos = start + link.length;
-      textarea.setSelectionRange(newPos, newPos);
+      insertTextPreservingUndo(link);
     }, 0);
   };
 
   return (
     <div className="editor" data-1p-ignore>
       <div className="editor-header">
-        <h3>{pagePath.split("/").pop()}</h3>
+        <div className="editor-title-row">
+          <h3>{pagePath.split("/").pop()}</h3>
+          <button
+            onClick={() => setShowFormatToolbar(!showFormatToolbar)}
+            className={`format-toggle-btn ${showFormatToolbar ? "active" : ""}`}
+            title={showFormatToolbar ? "Hide formatting toolbar" : "Show formatting toolbar"}
+            aria-label={showFormatToolbar ? "Hide formatting toolbar" : "Show formatting toolbar"}
+            aria-pressed={showFormatToolbar}
+          >
+            <span aria-hidden="true">¶</span>
+          </button>
+        </div>
         <div className="editor-actions">
           {error && (
             <span
@@ -403,6 +487,126 @@ export const Editor: React.FC<EditorProps> = ({
           </button>
         </div>
       </div>
+      {showFormatToolbar && (
+        <div className="format-toolbar" role="toolbar" aria-label="Text formatting">
+          <div className="format-group">
+            <button
+              onClick={() => insertLinePrefix("# ")}
+              title="Heading 1"
+              aria-label="Heading 1"
+            >
+              H1
+            </button>
+            <button
+              onClick={() => insertLinePrefix("## ")}
+              title="Heading 2"
+              aria-label="Heading 2"
+            >
+              H2
+            </button>
+            <button
+              onClick={() => insertLinePrefix("### ")}
+              title="Heading 3"
+              aria-label="Heading 3"
+            >
+              H3
+            </button>
+          </div>
+          <div className="format-separator" aria-hidden="true"></div>
+          <div className="format-group">
+            <button
+              onClick={() => insertFormatting("**", "**", "bold")}
+              title="Bold (wrap selection)"
+              aria-label="Bold"
+            >
+              <strong>B</strong>
+            </button>
+            <button
+              onClick={() => insertFormatting("*", "*", "italic")}
+              title="Italic (wrap selection)"
+              aria-label="Italic"
+            >
+              <em>I</em>
+            </button>
+            <button
+              onClick={() => insertFormatting("~~", "~~", "strikethrough")}
+              title="Strikethrough (wrap selection)"
+              aria-label="Strikethrough"
+            >
+              <s>S</s>
+            </button>
+            <button
+              onClick={() => insertFormatting("`", "`", "code")}
+              title="Inline code (wrap selection)"
+              aria-label="Inline code"
+            >
+              <code>&lt;/&gt;</code>
+            </button>
+          </div>
+          <div className="format-separator" aria-hidden="true"></div>
+          <div className="format-group">
+            <button
+              onClick={() => insertLinePrefix("- ")}
+              title="Bullet list"
+              aria-label="Bullet list"
+            >
+              •
+            </button>
+            <button
+              onClick={() => insertLinePrefix("1. ")}
+              title="Numbered list"
+              aria-label="Numbered list"
+            >
+              1.
+            </button>
+            <button
+              onClick={() => insertLinePrefix("> ")}
+              title="Blockquote"
+              aria-label="Blockquote"
+            >
+              &quot;
+            </button>
+            <button
+              onClick={() => insertLinePrefix("- [ ] ")}
+              title="Task list"
+              aria-label="Task list"
+            >
+              ☐
+            </button>
+          </div>
+          <div className="format-separator" aria-hidden="true"></div>
+          <div className="format-group">
+            <button
+              onClick={() => insertFormatting("[", "](url)", "link text")}
+              title="Link"
+              aria-label="Insert link"
+            >
+              🔗
+            </button>
+            <button
+              onClick={() => insertFormatting("![", "](image-url)", "alt text")}
+              title="Image"
+              aria-label="Insert image"
+            >
+              🖼️
+            </button>
+            <button
+              onClick={() => insertFormatting("\n```\n", "\n```\n", "code block")}
+              title="Code block"
+              aria-label="Insert code block"
+            >
+              { }
+            </button>
+            <button
+              onClick={() => insertFormatting("\n---\n", "", "")}
+              title="Horizontal rule"
+              aria-label="Insert horizontal rule"
+            >
+              ―
+            </button>
+          </div>
+        </div>
+      )}
       <textarea
         ref={textareaRef}
         className="editor-textarea"
