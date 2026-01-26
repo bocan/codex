@@ -303,7 +303,7 @@ export const FolderTree: React.FC<
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!treeRef.current?.contains(document.activeElement)) return;
-      
+
       if (e.key === "ArrowDown" || e.key === "j") {
         e.preventDefault();
         const newIndex = Math.min(selectedIndex + 1, visibleFolders.length - 1);

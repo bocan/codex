@@ -50,7 +50,7 @@ export const PageList: React.FC<PageListProps> = ({
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const contextMenuRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
 
   // Close context menu when clicking outside or pressing Escape
   useEffect(() => {
@@ -80,12 +80,26 @@ export const PageList: React.FC<PageListProps> = ({
     };
   }, [contextMenuPage]);
 
+  const sortedPages = useMemo(() => {
+    return [...pages].sort((a, b) => {
+      let comparison = 0;
+      if (sortField === "name") {
+        comparison = a.name.localeCompare(b.name);
+      } else if (sortField === "createdAt") {
+        comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      } else if (sortField === "modifiedAt") {
+        comparison = new Date(a.modifiedAt).getTime() - new Date(b.modifiedAt).getTime();
+      }
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [pages, sortField, sortDirection]);
+
   // Keyboard navigation (arrow keys and vim j/k)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Only handle if list has focus and we're not renaming
       if (!listRef.current?.contains(document.activeElement) || renamingPage) return;
-      
+
       if (e.key === "ArrowDown" || e.key === "j") {
         e.preventDefault();
         setSelectedIndex((prev) => Math.min(prev + 1, sortedPages.length - 1));
@@ -106,20 +120,6 @@ export const PageList: React.FC<PageListProps> = ({
   useEffect(() => {
     setSelectedIndex(0);
   }, [selectedFolder, sortedPages.length]);
-
-  const sortedPages = useMemo(() => {
-    return [...pages].sort((a, b) => {
-      let comparison = 0;
-      if (sortField === "name") {
-        comparison = a.name.localeCompare(b.name);
-      } else if (sortField === "createdAt") {
-        comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      } else if (sortField === "modifiedAt") {
-        comparison = new Date(a.modifiedAt).getTime() - new Date(b.modifiedAt).getTime();
-      }
-      return sortDirection === "asc" ? comparison : -comparison;
-    });
-  }, [pages, sortField, sortDirection]);
 
   useEffect(() => {
     loadPages();
