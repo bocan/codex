@@ -16,7 +16,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -53,21 +53,11 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Generate release notes from CHANGELOG
-        id: changelog
-        run: |
-          VERSION=${{ steps.extract_version.outputs.version }}
-          # Extract the section for this version from CHANGELOG.md
-          NOTES=$(awk "/^## \[${VERSION}\]/,/^## \[/" CHANGELOG.md | sed '1d;$d')
-          echo "notes<<EOF" >> $GITHUB_OUTPUT
-          echo "$NOTES" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.extract_version.outputs.version }}
           name: Release v${{ steps.extract_version.outputs.version }}
-          body: ${{ steps.changelog.outputs.notes }}
+          generate_release_notes: true
           draft: false
           prerelease: false
