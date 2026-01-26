@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.3.2](https://github.com/bocan/codex/compare/v2.3.1...v2.3.2) (2026-01-26)
+
+
+### Documentation
+
+* update README with Docker deployment instructions and remove example ([ac5038b](https://github.com/bocan/codex/commit/ac5038b2a4e35f995f7e82a1819c4df0772b8e9f))
+
 ## [2.3.1](https://github.com/bocan/codex/compare/v2.3.0...v2.3.1) (2026-01-26)
 
 
