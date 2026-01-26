@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.2.0](https://github.com/bocan/codex/compare/v2.0.1...v2.2.0) (2026-01-26)
+
+
+### Features
+
+* **docker:** add Dockerfile and docker-compose for containerization ([ae53258](https://github.com/bocan/codex/commit/ae532580af4e25e42ff05897c32b9191d06e83e8))
+
+
+### Bug Fixes
+
+* **PageList:** correct listRef type and optimize sorting logic ([2d0ecc9](https://github.com/bocan/codex/commit/2d0ecc97aaa893f226b36b7e63edadd12c75894d))
+
 ## [2.1.0](https://github.com/bocan/codex/compare/v2.0.1...v2.1.0) (2026-01-26)
 
 
