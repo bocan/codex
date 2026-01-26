@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.4.0](https://github.com/bocan/codex/compare/v2.3.4...v2.4.0) (2026-01-26)
+
+
+### Features
+
+* **editor:** add formatting toolbar with text formatting options ([37a5b12](https://github.com/bocan/codex/commit/37a5b12010ef6a8a199cc98114c9941b3bbc1b93))
+
 ## [2.3.4](https://github.com/bocan/codex/compare/v2.3.3...v2.3.4) (2026-01-26)
 
 
