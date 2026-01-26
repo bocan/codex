@@ -9,6 +9,8 @@ Codex is a **full-stack TypeScript** monorepo using npm workspaces with three pa
 
 **Data flow**: React components → `api.ts` service → Express routes → `FileSystemService` → `/data` directory (markdown files).
 
+**Production mode**: Express serves both API and static React build from port 3001 only (see `server/src/index.ts` static file serving section).
+
 ## Critical Commands
 
 ```bash
@@ -18,6 +20,15 @@ make install      # Fresh install all dependencies from root
 ```
 
 > **Important**: Dependencies install at the root level only. Run `npm ci` from root, not from subdirectories. The root `package-lock.json` manages all workspace dependencies.
+
+## Docker Deployment
+
+```bash
+docker compose up -d --build    # Build and run (port 3001 serves both UI and API)
+docker compose logs -f codex    # View logs
+```
+
+**Authentication caveat**: Session cookies use `secure: "auto"`. For local Docker testing without HTTPS, run passwordless (comment out `AUTH_PASSWORD`). For production, deploy behind a reverse proxy with `TRUST_PROXY=true` to respect `X-Forwarded-Proto` headers.
 
 ## Project Conventions
 
@@ -35,6 +46,7 @@ Self-documenting API available at `GET /api` returns all endpoints with examples
 - Types are defined once in `client/src/types/index.ts` and reused
 - Each component has a co-located `.css` file and `.test.tsx` file
 - CSS uses custom properties from `App.css` for theming: `var(--bg-primary)`, `var(--text-primary)`, etc.
+- Keyboard navigation uses arrow keys AND vim-style `j`/`k` (see `FolderTree.tsx`, `PageList.tsx`, `Search.tsx`)
 
 ### Testing
 - **Server tests**: Jest + supertest in `server/tests/api.test.ts`, uses isolated `test-data/` directory
@@ -56,6 +68,8 @@ Self-documenting API available at `GET /api` returns all endpoints with examples
 | Type definitions | `client/src/types/index.ts` |
 | Theme variables | `client/src/App.css` (`:root` and `[data-theme="dark"]`) |
 | Test setup | `server/tests/api.test.ts`, `client/src/test/setup.ts` |
+| Docker config | `Dockerfile`, `docker-compose.yml` |
+| CI/CD workflows | `.github/workflows/{ci.yml,release.yml}` |
 
 ## Adding Features
 
@@ -65,6 +79,7 @@ Self-documenting API available at `GET /api` returns all endpoints with examples
 3. Add route in `server/src/routes/` and import in `server/src/index.ts`
 4. Add client method in `client/src/services/api.ts`
 5. Add test in `server/tests/api.test.ts`
+6. Update API docs in `GET /api` handler (`server/src/index.ts`)
 
 **New UI component**:
 1. Create `Component.tsx` and `Component.css` in `client/src/components/`
@@ -81,10 +96,10 @@ Self-documenting API available at `GET /api` returns all endpoints with examples
 - Use proper typing for all function parameters and return values
 
 ### Security
-- **Never commit secrets** - Use environment variables for sensitive data (see `.env.example`)
-- Always validate and sanitize user input on both client and server
+- **Never commit secrets** - Use environment variables for sensitive data
 - Sanitize file paths and validate user input to prevent path traversal attacks
 - Keep dependencies up to date (monitored by Dependabot)
+- CSP directives configured in `server/src/index.ts` helmet middleware
 
 ### Testing
 - Write tests before pushing code
@@ -114,4 +129,6 @@ Use modern Git commands instead of legacy `git checkout`:
 
 ## CI/CD Notes
 
-GitHub Actions runs `npm ci` at root level (Node 24.x), then runs tests/builds in subdirectories. Dependabot monitors the root package.json weekly (npm workspaces means one lock file manages all deps).
+- **CI** (`ci.yml`): Runs on PRs - linting, tests, build verification
+- **Release** (`release.yml`): Auto-runs on merge to main - bumps version via `commit-and-tag-version`, creates GitHub Release with auto-generated notes
+- Uses Node 24.x, npm workspaces (single lock file at root)
