@@ -41,8 +41,28 @@ if (!process.env.TEST_DATA_DIR) {
   })();
 }
 
+// Trust proxy headers (X-Forwarded-Proto, X-Forwarded-For) when behind reverse proxy
+if (process.env.TRUST_PROXY === "true") {
+  app.set("trust proxy", 1);
+}
+
 // Security middleware
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "blob:", "https:"],
+        fontSrc: ["'self'"],
+        connectSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        frameAncestors: ["'none'"],
+      },
+    },
+  }),
+);
 
 // HTTP request logging
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
@@ -63,7 +83,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // HTTPS only in production
+      // 'auto' uses req.protocol which respects X-Forwarded-Proto when trust proxy is enabled
+      secure: "auto",
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
   }),
@@ -209,6 +230,17 @@ app.use("/api/attachments", requireAuth, attachmentRoutes); // Protected
 app.get("/api/health", (req: Request, res: Response) => {
   res.json({ status: "ok" });
 });
+
+// Serve static files in production
+if (process.env.NODE_ENV === "production") {
+  const clientDistPath = path.join(__dirname, "../../client/dist");
+  app.use(express.static(clientDistPath));
+
+  // Handle client-side routing - serve index.html for all non-API routes
+  app.get("*", (req: Request, res: Response) => {
+    res.sendFile(path.join(clientDistPath, "index.html"));
+  });
+}
 
 // Start server
 if (require.main === module) {

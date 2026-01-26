@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Build outputs
+dist/
+*/dist/
+*.tsbuildinfo
+
+# Development files
+.git/
+.github/
+*.md
+!README.md
+.env*
+.DS_Store
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test files
+coverage/
+*/coverage/
+test-data/
+*.test.ts
+*.test.tsx
+tests/
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore

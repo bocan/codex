@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { FolderNode } from "../types";
 import { api } from "../services/api";
 import "./FolderTree.css";
@@ -8,6 +8,9 @@ interface FolderTreeProps {
   onSelectFolder: (path: string) => void;
   selectedFolder: string | null;
   onRefresh: () => void;
+  expandedFolders?: Set<string>;
+  keyboardSelectedPath?: string | null;
+  onFolderHover?: (path: string) => void;
 }
 
 const FolderTreeItem: React.FC<FolderTreeProps> = ({
@@ -15,6 +18,9 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({
   onSelectFolder,
   selectedFolder,
   onRefresh,
+  expandedFolders,
+  keyboardSelectedPath,
+  onFolderHover,
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isRenaming, setIsRenaming] = useState(false);
@@ -25,8 +31,16 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({
   const contextMenuRef = useRef<HTMLDivElement>(null);
 
   const isSelected = selectedFolder === node.path;
+  const isKeyboardSelected = keyboardSelectedPath === node.path;
   const hasChildren = node.children.length > 0;
   const isBusy = isCreating || isDeleting;
+
+  // Sync with parent's expanded state if provided
+  useEffect(() => {
+    if (expandedFolders) {
+      setIsExpanded(expandedFolders.has(node.path));
+    }
+  }, [expandedFolders, node.path]);
 
   // Close context menu when clicking outside or pressing Escape
   useEffect(() => {
@@ -135,11 +149,12 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({
       aria-expanded={hasChildren ? isExpanded : undefined}
     >
       <div
-        className={`folder-item ${isSelected ? "selected" : ""} ${isBusy ? "busy" : ""}`}
+        className={`folder-item ${isSelected ? "selected" : ""} ${isKeyboardSelected ? "keyboard-selected" : ""} ${isBusy ? "busy" : ""}`}
         onClick={handleSelect}
         onContextMenu={(e) => !isBusy && handleContextMenu(e)}
+        onMouseEnter={() => onFolderHover?.(node.path)}
         role="button"
-        tabIndex={0}
+        tabIndex={-1}
         aria-label={`Folder: ${node.name}${isSelected ? " (selected)" : ""}`}
         aria-busy={isBusy}
       >
@@ -243,6 +258,9 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({
               onSelectFolder={onSelectFolder}
               selectedFolder={selectedFolder}
               onRefresh={onRefresh}
+              expandedFolders={expandedFolders}
+              keyboardSelectedPath={keyboardSelectedPath}
+              onFolderHover={onFolderHover}
             />
           ))}
         </div>
@@ -254,11 +272,73 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({
 export const FolderTree: React.FC<
   Omit<FolderTreeProps, "node"> & { root: FolderNode }
 > = ({ root, onSelectFolder, selectedFolder, onRefresh }) => {
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set([root.path]));
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [keyboardSelectedPath, setKeyboardSelectedPath] = useState<string | null>(root.path);
+  const treeRef = useRef<HTMLElement>(null);
+
+  // Flatten visible folders for keyboard navigation
+  const visibleFolders = useMemo(() => {
+    const folders: string[] = [];
+    const traverse = (node: FolderNode) => {
+      folders.push(node.path);
+      if (expandedFolders.has(node.path)) {
+        node.children.forEach(traverse);
+      }
+    };
+    traverse(root);
+    return folders;
+  }, [root, expandedFolders]);
+
+  // Track expanded folders
+  useEffect(() => {
+    const getAllFolderPaths = (node: FolderNode): string[] => {
+      return [node.path, ...node.children.flatMap(getAllFolderPaths)];
+    };
+    // Auto-expand all folders by default
+    setExpandedFolders(new Set(getAllFolderPaths(root)));
+  }, [root]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!treeRef.current?.contains(document.activeElement)) return;
+
+      if (e.key === "ArrowDown" || e.key === "j") {
+        e.preventDefault();
+        const newIndex = Math.min(selectedIndex + 1, visibleFolders.length - 1);
+        setSelectedIndex(newIndex);
+        setKeyboardSelectedPath(visibleFolders[newIndex]);
+      } else if (e.key === "ArrowUp" || e.key === "k") {
+        e.preventDefault();
+        const newIndex = Math.max(selectedIndex - 1, 0);
+        setSelectedIndex(newIndex);
+        setKeyboardSelectedPath(visibleFolders[newIndex]);
+      } else if (e.key === "Enter" && keyboardSelectedPath) {
+        e.preventDefault();
+        onSelectFolder(keyboardSelectedPath);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [selectedIndex, visibleFolders, keyboardSelectedPath, onSelectFolder]);
+
+  const handleFolderHover = (path: string) => {
+    const index = visibleFolders.indexOf(path);
+    if (index !== -1) {
+      setSelectedIndex(index);
+      setKeyboardSelectedPath(path);
+    }
+  };
+
   return (
     <nav
+      ref={treeRef}
       className="folder-tree"
       aria-label="Folder navigation tree"
       role="tree"
+      tabIndex={0}
     >
       <div className="folder-tree-header">
         <h3>Folders</h3>
@@ -276,6 +356,9 @@ export const FolderTree: React.FC<
         onSelectFolder={onSelectFolder}
         selectedFolder={selectedFolder}
         onRefresh={onRefresh}
+        expandedFolders={expandedFolders}
+        keyboardSelectedPath={keyboardSelectedPath}
+        onFolderHover={handleFolderHover}
       />
     </nav>
   );

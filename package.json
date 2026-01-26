@@ -22,20 +22,22 @@
     "release:minor": "commit-and-tag-version --release-as minor",
     "release:major": "commit-and-tag-version --release-as major"
   },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "express-rate-limit": "^8.2.1",
+    "express-session": "^1.19.0",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.1",
+    "simple-git": "^3.30.0"
+  },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/express-session": "^1.18.2",
     "@types/morgan": "^1.9.10",
     "@typescript-eslint/eslint-plugin": "^8.53.1",
     "@typescript-eslint/parser": "^8.53.1",
-    "bcrypt": "^6.0.0",
     "commit-and-tag-version": "^12.6.1",
     "concurrently": "^8.2.2",
-    "eslint": "^9.39.2",
-    "express-rate-limit": "^8.2.1",
-    "express-session": "^1.19.0",
-    "helmet": "^8.1.0",
-    "morgan": "^1.10.1",
-    "simple-git": "^3.30.0"
+    "eslint": "^9.39.2"
   }
 }

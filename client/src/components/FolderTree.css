@@ -56,6 +56,11 @@
   background: rgba(102, 126, 234, 0.2);
 }
 
+.folder-item.keyboard-selected {
+  outline: 2px solid var(--accent-color);
+  outline-offset: -2px;
+}
+
 .folder-toggle {
   width: 20px;
   display: inline-block;

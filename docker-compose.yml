@@ -1,0 +1,36 @@
+services:
+  codex:
+    container_name: codex
+    image: codex:latest
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    volumes:
+      # Persist wiki data outside the container
+      - ./data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      # Set AUTH_PASSWORD to enable authentication
+      # - AUTH_PASSWORD=m1dland
+      # Set TRUST_PROXY=true when behind a reverse proxy (nginx, traefik, etc.)
+      # This makes Express read X-Forwarded-Proto header for secure cookies
+      # - TRUST_PROXY=true
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+# Optional: Add a reverse proxy for production
+# services:
+#   nginx:
+#     image: nginx:alpine
+#     ports:
+#       - "80:80"
+#       - "443:443"
+#     volumes:
+#       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+#     depends_on:
+#       - codex
