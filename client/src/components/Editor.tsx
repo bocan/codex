@@ -70,10 +70,6 @@ export const Editor: React.FC<EditorProps> = ({
   const handleSave = async () => {
     if (!pagePath || isSaving) return;
 
-    // Preserve cursor/selection position across save
-    const selectionStart = textareaRef.current?.selectionStart;
-    const selectionEnd = textareaRef.current?.selectionEnd;
-
     setIsSaving(true);
     setError(null);
     try {
@@ -81,19 +77,6 @@ export const Editor: React.FC<EditorProps> = ({
       const now = Date.now();
       setLastSaved(new Date());
       setLastSaveTime(now);
-
-      // Restore cursor/selection after state update
-      setTimeout(() => {
-        if (
-          textareaRef.current &&
-          selectionStart !== undefined &&
-          selectionEnd !== undefined
-        ) {
-          textareaRef.current.selectionStart = selectionStart;
-          textareaRef.current.selectionEnd = selectionEnd;
-          textareaRef.current.focus();
-        }
-      }, 0);
     } catch (err) {
       console.error("Failed to save page:", err);
       setError("Failed to save. Click to retry.");
@@ -621,7 +604,6 @@ export const Editor: React.FC<EditorProps> = ({
         onScroll={handleScroll}
         placeholder="Start writing your markdown here..."
         spellCheck={false}
-        disabled={isSaving}
         aria-label="Markdown editor"
       />
       {showHistory && (
