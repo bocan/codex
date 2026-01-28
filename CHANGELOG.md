@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.5.0](https://github.com/bocan/codex/compare/v2.4.0...v2.5.0) (2026-01-28)
+
+
+### Features
+
+* **security:** implement path validation to prevent traversal attacks ([21693d8](https://github.com/bocan/codex/commit/21693d8257b191d158bbdd57f4ffa2cd44944ace))
+
+
+### Code Refactoring
+
+* **editor:** remove cursor position handling during save ([a7ede83](https://github.com/bocan/codex/commit/a7ede834edebb13df77f53b742bac14a4a108a7a))
+
 ## [2.4.0](https://github.com/bocan/codex/compare/v2.3.4...v2.4.0) (2026-01-26)
 
 
