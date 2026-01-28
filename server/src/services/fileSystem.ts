@@ -39,6 +39,31 @@ export class FileSystemService {
     this.cache = new CacheService(cacheTTL);
   }
 
+  /**
+   * Validates that a path is within the data directory to prevent path traversal attacks.
+   * @param relativePath - User-provided relative path
+   * @returns The validated absolute path
+   * @throws Error if path traversal is detected
+   */
+  private validatePath(relativePath: string): string {
+    // Normalize empty paths and root indicators
+    const normalizedPath = !relativePath || relativePath === "/" || relativePath === "."
+      ? ""
+      : relativePath;
+
+    // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+    // This IS the path validation function - it checks for traversal attacks
+    const fullPath = path.resolve(this.dataDir, normalizedPath);
+    const resolvedDataDir = path.resolve(this.dataDir);
+
+    // Ensure the resolved path is within the data directory
+    if (!fullPath.startsWith(resolvedDataDir + path.sep) && fullPath !== resolvedDataDir) {
+      throw new Error("Invalid path: path traversal detected");
+    }
+
+    return fullPath;
+  }
+
   async initialize(): Promise<void> {
     try {
       await fs.access(this.dataDir);
@@ -55,7 +80,7 @@ export class FileSystemService {
       return cached;
     }
 
-    const fullPath = path.join(this.dataDir, relativePath);
+    const fullPath = this.validatePath(relativePath);
     const stats = await fs.stat(fullPath);
 
     if (!stats.isDirectory()) {
@@ -69,6 +94,8 @@ export class FileSystemService {
     const childPromises = entries
       .filter((entry) => entry.isDirectory() && !entry.name.startsWith("."))
       .map(async (entry) => {
+        // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+        // Safe: entry.name comes from fs.readdir, not user input
         const childPath = path.join(relativePath, entry.name);
         return this.getFolderTree(childPath);
       });
@@ -77,7 +104,7 @@ export class FileSystemService {
 
     const result = {
       name: relativePath === "" ? "root" : path.basename(relativePath),
-      path: relativePath || "/",
+      path: relativePath || "",
       type: "folder" as const,
       children: children.sort((a, b) => a.name.localeCompare(b.name)),
     };
@@ -88,7 +115,7 @@ export class FileSystemService {
   }
 
   async createFolder(relativePath: string): Promise<void> {
-    const fullPath = path.join(this.dataDir, relativePath);
+    const fullPath = this.validatePath(relativePath);
     await fs.mkdir(fullPath, { recursive: true });
 
     // Invalidate folder tree cache
@@ -99,7 +126,7 @@ export class FileSystemService {
     if (!relativePath || relativePath === "/" || relativePath === ".") {
       throw new Error("Cannot delete root folder");
     }
-    const fullPath = path.join(this.dataDir, relativePath);
+    const fullPath = this.validatePath(relativePath);
     await fs.rm(fullPath, { recursive: true, force: true });
 
     // Invalidate folder tree and any pages in this folder
@@ -109,8 +136,8 @@ export class FileSystemService {
   }
 
   async renameFolder(oldPath: string, newPath: string): Promise<void> {
-    const oldFullPath = path.join(this.dataDir, oldPath);
-    const newFullPath = path.join(this.dataDir, newPath);
+    const oldFullPath = this.validatePath(oldPath);
+    const newFullPath = this.validatePath(newPath);
     await fs.rename(oldFullPath, newFullPath);
 
     // Invalidate folder tree and pages caches
@@ -127,16 +154,20 @@ export class FileSystemService {
       return cached;
     }
 
-    const fullPath = path.join(this.dataDir, folderPath);
+    const fullPath = this.validatePath(folderPath);
     const entries = await fs.readdir(fullPath, { withFileTypes: true });
 
     const pages: FileNode[] = [];
     for (const entry of entries) {
       if (entry.isFile() && entry.name.endsWith(".md")) {
+        // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+        // Safe: entry.name comes from fs.readdir, not user input; fullPath already validated
         const filePath = path.join(fullPath, entry.name);
         const stats = await fs.stat(filePath);
         pages.push({
           name: entry.name,
+          // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+          // Safe: entry.name comes from fs.readdir, not user input
           path: path.join(folderPath, entry.name),
           type: "file",
           createdAt: stats.birthtime.toISOString(),
@@ -153,7 +184,7 @@ export class FileSystemService {
   }
 
   async createPage(relativePath: string, content: string = ""): Promise<void> {
-    const fullPath = path.join(this.dataDir, relativePath);
+    const fullPath = this.validatePath(relativePath);
 
     // Ensure the directory exists
     const dir = path.dirname(fullPath);
@@ -191,7 +222,7 @@ export class FileSystemService {
       return cached;
     }
 
-    const fullPath = path.join(this.dataDir, relativePath);
+    const fullPath = this.validatePath(relativePath);
     const content = await fs.readFile(fullPath, "utf-8");
 
     // Cache the content
@@ -200,7 +231,7 @@ export class FileSystemService {
   }
 
   async updatePage(relativePath: string, content: string): Promise<void> {
-    const fullPath = path.join(this.dataDir, relativePath);
+    const fullPath = this.validatePath(relativePath);
     await fs.writeFile(fullPath, content, "utf-8");
 
     // Invalidate page cache
@@ -224,7 +255,7 @@ export class FileSystemService {
   }
 
   async deletePage(relativePath: string): Promise<void> {
-    const fullPath = path.join(this.dataDir, relativePath);
+    const fullPath = this.validatePath(relativePath);
     await fs.unlink(fullPath);
 
     // Invalidate caches
@@ -250,8 +281,8 @@ export class FileSystemService {
   }
 
   async renamePage(oldPath: string, newPath: string): Promise<void> {
-    const oldFullPath = path.join(this.dataDir, oldPath);
-    const newFullPath = path.join(this.dataDir, newPath);
+    const oldFullPath = this.validatePath(oldPath);
+    const newFullPath = this.validatePath(newPath);
 
     // Ensure the new directory exists
     const newDir = path.dirname(newFullPath);
@@ -288,12 +319,14 @@ export class FileSystemService {
   }
 
   async movePage(oldPath: string, newFolderPath: string): Promise<string> {
-    const oldFullPath = path.join(this.dataDir, oldPath);
+    const oldFullPath = this.validatePath(oldPath);
     const fileName = path.basename(oldPath);
+    // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+    // Safe: newPath is validated by validatePath() immediately after construction
     const newPath = newFolderPath
       ? path.join(newFolderPath, fileName)
       : fileName;
-    const newFullPath = path.join(this.dataDir, newPath);
+    const newFullPath = this.validatePath(newPath);
 
     // Check if source file exists
     await fs.access(oldFullPath);

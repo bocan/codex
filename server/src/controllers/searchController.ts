@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
 import { fileSystemService } from "../index";
 
+// Escape special regex characters to prevent ReDoS attacks
+const escapeRegExp = (str: string): string => {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
+
 export const searchPages = async (req: Request, res: Response) => {
   try {
     const query = req.query.q as string;
@@ -10,6 +15,10 @@ export const searchPages = async (req: Request, res: Response) => {
     }
 
     const searchTerm = query.toLowerCase().trim();
+
+    // Escape regex special characters to prevent ReDoS
+    const escapedSearchTerm = escapeRegExp(searchTerm);
+
     const results: Array<{
       path: string;
       title: string;
@@ -43,10 +52,9 @@ export const searchPages = async (req: Request, res: Response) => {
           const content = await fileSystemService.getPageContent(page.path);
           const lowerContent = content.toLowerCase();
 
-          // Count matches
-          const matches = (
-            lowerContent.match(new RegExp(searchTerm, "g")) || []
-          ).length;
+          // Count matches using simple string splitting (avoids regex complexity)
+          const parts = lowerContent.split(searchTerm);
+          const matches = parts.length - 1;
 
           if (matches > 0) {
             // Find snippet with context
@@ -63,7 +71,9 @@ export const searchPages = async (req: Request, res: Response) => {
             if (end < content.length) snippet = snippet + "...";
 
             // Highlight the match with HTML <strong> tags
-            const regex = new RegExp(`(${searchTerm})`, "gi");
+            // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp
+            // Safe: escapedSearchTerm has been sanitized with escapeRegExp to prevent ReDoS
+            const regex = new RegExp(`(${escapedSearchTerm})`, "gi");
             snippet = snippet.replace(regex, "<strong>$1</strong>");
 
             results.push({
@@ -74,7 +84,8 @@ export const searchPages = async (req: Request, res: Response) => {
             });
           }
         } catch (error) {
-          console.error(`Error searching page ${page.path}:`, error);
+          // Use structured logging to avoid format string issues
+          console.error("Error searching page:", { path: page.path, error });
         }
       }
     }
