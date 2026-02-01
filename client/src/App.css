@@ -3,33 +3,89 @@
 }
 
 :root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f5f5f5;
-  --bg-tertiary: #fafafa;
-  --bg-hover: #eeeeee;
-  --text-primary: #1a1a1a;
-  --text-secondary: #4a4a4a;
-  --border-color: #d0d0d0;
-  --border-hover: #999999;
-  --shadow: rgba(0, 0, 0, 0.1);
-  --header-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --accent-color: #5568d3;
-  --accent-bg: rgba(85, 104, 211, 0.1);
+  /* Typography */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Monaco', 'Menlo', monospace;
+
+  /* Type scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  /* Light theme - warm paper aesthetic */
+  --bg-primary: #fdfcfa;
+  --bg-secondary: #f7f5f2;
+  --bg-tertiary: #f0ede8;
+  --bg-hover: #e8e4dd;
+  --bg-canvas: #fffef9;
+  --text-primary: #1c1917;
+  --text-secondary: #57534e;
+  --text-muted: #a8a29e;
+  --border-color: #d6d3d1;
+  --border-hover: #a8a29e;
+  --shadow: rgba(28, 25, 23, 0.08);
+  --shadow-lg: rgba(28, 25, 23, 0.12);
+  --header-bg: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  --accent-color: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-bg: rgba(79, 70, 229, 0.08);
+  --accent-border: rgba(79, 70, 229, 0.2);
+  --success-color: #059669;
+  --error-color: #dc2626;
+
+  /* Editor specific */
+  --editor-bg: #fffef9;
+  --editor-line-number: #d6d3d1;
+
+  /* Transitions */
+  --transition-fast: 0.1s ease;
+  --transition-base: 0.2s ease;
+  --transition-slow: 0.3s ease;
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
 }
 
 [data-theme="dark"] {
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #2a2a2a;
-  --bg-tertiary: #222222;
-  --bg-hover: #363636;
-  --text-primary: #f0f0f0;
-  --text-secondary: #c0c0c0;
-  --border-color: #4a4a4a;
-  --border-hover: #6a6a6a;
-  --shadow: rgba(0, 0, 0, 0.4);
-  --header-bg: linear-gradient(135deg, #4a5f8f 0%, #5a3a72 100%);
-  --accent-color: #8a9ff0;
-  --accent-bg: rgba(138, 159, 240, 0.15);
+  --bg-primary: #18181b;
+  --bg-secondary: #27272a;
+  --bg-tertiary: #1f1f23;
+  --bg-hover: #3f3f46;
+  --bg-canvas: #0f0f12;
+  --text-primary: #fafaf9;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --border-color: #3f3f46;
+  --border-hover: #52525b;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --shadow-lg: rgba(0, 0, 0, 0.4);
+  --header-bg: linear-gradient(135deg, #3730a3 0%, #5b21b6 100%);
+  --accent-color: #818cf8;
+  --accent-hover: #a5b4fc;
+  --accent-bg: rgba(129, 140, 248, 0.12);
+  --accent-border: rgba(129, 140, 248, 0.25);
+  --success-color: #10b981;
+  --error-color: #f87171;
+
+  --editor-bg: #0f0f12;
+  --editor-line-number: #3f3f46;
 }
 
 [data-theme="high-contrast"] {
@@ -37,21 +93,31 @@
   --bg-secondary: #1a1a1a;
   --bg-tertiary: #0d0d0d;
   --bg-hover: #2a2a2a;
+  --bg-canvas: #000000;
   --text-primary: #ffffff;
   --text-secondary: #ffff00;
+  --text-muted: #cccccc;
   --border-color: #ffffff;
   --border-hover: #ffff00;
   --shadow: rgba(255, 255, 255, 0.3);
+  --shadow-lg: rgba(255, 255, 255, 0.4);
   --header-bg: #000000;
   --accent-color: #00ffff;
+  --accent-hover: #00cccc;
   --accent-bg: rgba(0, 255, 255, 0.2);
+  --accent-border: rgba(0, 255, 255, 0.4);
+  --success-color: #00ff00;
+  --error-color: #ff0000;
+
+  --editor-bg: #000000;
+  --editor-line-number: #666666;
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: var(--bg-primary);
@@ -68,8 +134,8 @@ body {
 .app-header {
   background: var(--header-bg);
   color: white;
-  padding: 15px 20px;
-  box-shadow: 0 2px 4px var(--shadow);
+  padding: 12px 20px;
+  box-shadow: 0 2px 8px var(--shadow-lg);
 }
 
 .header-content {
@@ -81,14 +147,17 @@ body {
 
 .header-left h1 {
   margin: 0;
-  font-size: 24px;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
   font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .header-left .tagline {
-  margin: 5px 0 0 0;
-  font-size: 13px;
-  opacity: 0.9;
+  margin: 2px 0 0 0;
+  font-size: var(--text-sm);
+  opacity: 0.85;
+  font-weight: 400;
 }
 
 .breadcrumbs {

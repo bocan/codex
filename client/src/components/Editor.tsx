@@ -305,6 +305,60 @@ export const Editor: React.FC<EditorProps> = ({
     }, 0);
   };
 
+  // Handle keyboard shortcuts in editor
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+    const cmdOrCtrl = isMac ? e.metaKey : e.ctrlKey;
+
+    if (cmdOrCtrl) {
+      switch (e.key.toLowerCase()) {
+        case "s":
+          // Save (Cmd/Ctrl + S)
+          e.preventDefault();
+          handleSave();
+          break;
+        case "b":
+          // Bold (Cmd/Ctrl + B)
+          e.preventDefault();
+          insertFormatting("**", "**", "bold");
+          break;
+        case "i":
+          // Italic (Cmd/Ctrl + I)
+          e.preventDefault();
+          insertFormatting("_", "_", "italic");
+          break;
+        case "k":
+          // Link (Cmd/Ctrl + K)
+          e.preventDefault();
+          insertFormatting("[", "](url)", "link text");
+          break;
+        case "`":
+          // Inline code (Cmd/Ctrl + `)
+          e.preventDefault();
+          insertFormatting("`", "`", "code");
+          break;
+      }
+    }
+
+    // Alt/Option + number for headings
+    if (e.altKey) {
+      switch (e.key) {
+        case "1":
+          e.preventDefault();
+          insertLinePrefix("# ");
+          break;
+        case "2":
+          e.preventDefault();
+          insertLinePrefix("## ");
+          break;
+        case "3":
+          e.preventDefault();
+          insertLinePrefix("### ");
+          break;
+      }
+    }
+  };
+
   const toggleListening = () => {
     if (isListening) {
       stopListening();
@@ -475,22 +529,25 @@ export const Editor: React.FC<EditorProps> = ({
           <div className="format-group">
             <button
               onClick={() => insertLinePrefix("# ")}
-              title="Heading 1"
+              title="Heading 1 (Alt+1)"
               aria-label="Heading 1"
+              data-shortcut="⌥1"
             >
               H1
             </button>
             <button
               onClick={() => insertLinePrefix("## ")}
-              title="Heading 2"
+              title="Heading 2 (Alt+2)"
               aria-label="Heading 2"
+              data-shortcut="⌥2"
             >
               H2
             </button>
             <button
               onClick={() => insertLinePrefix("### ")}
-              title="Heading 3"
+              title="Heading 3 (Alt+3)"
               aria-label="Heading 3"
+              data-shortcut="⌥3"
             >
               H3
             </button>
@@ -499,29 +556,32 @@ export const Editor: React.FC<EditorProps> = ({
           <div className="format-group">
             <button
               onClick={() => insertFormatting("**", "**", "bold")}
-              title="Bold (wrap selection)"
+              title="Bold (⌘B)"
               aria-label="Bold"
+              data-shortcut="⌘B"
             >
               <strong>B</strong>
             </button>
             <button
               onClick={() => insertFormatting("*", "*", "italic")}
-              title="Italic (wrap selection)"
+              title="Italic (⌘I)"
               aria-label="Italic"
+              data-shortcut="⌘I"
             >
               <em>I</em>
             </button>
             <button
               onClick={() => insertFormatting("~~", "~~", "strikethrough")}
-              title="Strikethrough (wrap selection)"
+              title="Strikethrough"
               aria-label="Strikethrough"
             >
               <s>S</s>
             </button>
             <button
               onClick={() => insertFormatting("`", "`", "code")}
-              title="Inline code (wrap selection)"
+              title="Inline code (⌘`)"
               aria-label="Inline code"
+              data-shortcut="⌘`"
             >
               <code>&lt;/&gt;</code>
             </button>
@@ -561,8 +621,9 @@ export const Editor: React.FC<EditorProps> = ({
           <div className="format-group">
             <button
               onClick={() => insertFormatting("[", "](url)", "link text")}
-              title="Link"
+              title="Link (⌘K)"
               aria-label="Insert link"
+              data-shortcut="⌘K"
             >
               🔗
             </button>
@@ -602,6 +663,7 @@ export const Editor: React.FC<EditorProps> = ({
           }
         }}
         onScroll={handleScroll}
+        onKeyDown={handleKeyDown}
         placeholder="Start writing your markdown here..."
         spellCheck={false}
         aria-label="Markdown editor"
