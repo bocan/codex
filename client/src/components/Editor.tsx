@@ -508,6 +508,7 @@ export const Editor: React.FC<EditorProps> = ({
           <button
             onClick={() => setShowHistory(true)}
             className="history-btn"
+            title="View version history"
             aria-label="View version history"
           >
             <span aria-hidden="true">📜</span> History
@@ -515,11 +516,12 @@ export const Editor: React.FC<EditorProps> = ({
           <button
             onClick={handleSave}
             disabled={isSaving}
+            title="Save page"
             aria-label="Save page"
           >
             {isSaving ? "Saving..." : "Save"}
           </button>
-          <button onClick={onClose} aria-label="Close editor">
+          <button onClick={onClose} title="Close editor" aria-label="Close editor">
             Close
           </button>
         </div>
@@ -639,7 +641,7 @@ export const Editor: React.FC<EditorProps> = ({
               title="Code block"
               aria-label="Insert code block"
             >
-              { }
+              ```
             </button>
             <button
               onClick={() => insertFormatting("\n---\n", "", "")}

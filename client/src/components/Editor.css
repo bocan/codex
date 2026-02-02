@@ -227,7 +227,13 @@
 }
 
 .editor-textarea::selection {
-  background: var(--accent-bg);
+  background: var(--selection-bg);
+  color: #ffffff;
+}
+
+/* High contrast needs black text on yellow selection */
+[data-theme="high-contrast"] .editor-textarea::selection {
+  color: #000000;
 }
 
 /* Format Toolbar - Floating panel style */

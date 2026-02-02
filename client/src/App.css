@@ -50,6 +50,7 @@
   /* Editor specific */
   --editor-bg: #fffef9;
   --editor-line-number: #d6d3d1;
+  --selection-bg: #3390ff;
 
   /* Transitions */
   --transition-fast: 0.1s ease;
@@ -86,6 +87,7 @@
 
   --editor-bg: #0f0f12;
   --editor-line-number: #3f3f46;
+  --selection-bg: #264f78;
 }
 
 [data-theme="high-contrast"] {
@@ -111,6 +113,7 @@
 
   --editor-bg: #000000;
   --editor-line-number: #666666;
+  --selection-bg: #ffff00;
 }
 
 body {
