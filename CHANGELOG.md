@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.6.0](https://github.com/bocan/codex/compare/v2.5.0...v2.6.0) (2026-02-02)
+
+
+### Features
+
+* **editor:** enhance selection styling and improve button accessibility ([8611c17](https://github.com/bocan/codex/commit/8611c1764585f94a16a72278db49083e39d44608))
+* **ui:** comprehensive UI refresh with typography and theme improvements ([2d4bc22](https://github.com/bocan/codex/commit/2d4bc222dfd6ac59310d6f90be4b8055e9e5f990))
+
 ## [2.5.0](https://github.com/bocan/codex/compare/v2.4.0...v2.5.0) (2026-01-28)
 
 
