@@ -324,6 +324,7 @@ codex/
 - [Installation](#-installation)
 - [Usage](#-usage)
 - [Project Structure](#-project-structure)
+- [MCP Server (AI Agent Access)](#-mcp-server-ai-agent-access)
 - [API Documentation](#-api-documentation)
 - [Testing](#-testing)
 - [Development](#-development)
@@ -534,7 +535,74 @@ server {
 
 **Why?** In production mode, session cookies use `secure: auto`, which requires HTTPS. Direct HTTP access with a password set will fail because the browser won't send the secure cookie. The reverse proxy provides HTTPS termination while communicating with Codex via HTTP internally.
 
-## �📡 API Documentation
+## 🤖 MCP Server (AI Agent Access)
+
+Codex includes a [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server that allows AI agents like Claude, GitHub Copilot, and other MCP-compatible clients to interact with your documentation.
+
+### Quick Setup
+
+1. **Enable the MCP server** by setting environment variables:
+   ```bash
+   export MCP_ENABLED=true
+   export MCP_API_KEY=your-secure-api-key
+   ```
+
+2. **Start the server** (runs alongside the main app):
+   ```bash
+   npm run dev:mcp -w server  # Development with hot reload
+   ```
+
+3. **Connect your MCP client** to `http://localhost:3002/mcp`
+
+### Available Tools
+
+The MCP server exposes 12 tools for AI agents:
+
+| Tool | Description |
+|------|-------------|
+| `search_pages` | Search documentation by query |
+| `get_page` | Read a page's content |
+| `create_page` | Create a new page |
+| `update_page` | Update an existing page |
+| `delete_page` | Delete a page |
+| `rename_page` | Rename a page |
+| `move_page` | Move a page to another folder |
+| `list_folders` | Get folder hierarchy |
+| `list_pages` | List pages in a folder |
+| `create_folder` | Create a new folder |
+| `delete_folder` | Delete an empty folder |
+| `rename_folder` | Rename a folder |
+
+### Client Configuration
+
+**Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+```json
+{
+  "mcpServers": {
+    "codex": {
+      "url": "http://localhost:3002/mcp",
+      "headers": { "Authorization": "Bearer your-api-key" }
+    }
+  }
+}
+```
+
+**VS Code / GitHub Copilot** (settings or `mcp.json`):
+```json
+{
+  "servers": {
+    "codex": {
+      "type": "http",
+      "url": "http://localhost:3002/mcp",
+      "headers": { "Authorization": "Bearer your-api-key" }
+    }
+  }
+}
+```
+
+For full documentation, see [server/src/mcp/README.md](server/src/mcp/README.md).
+
+## 📡 API Documentation
 
 The REST API is available at `http://localhost:3001/api`
 

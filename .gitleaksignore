@@ -1,0 +1,2 @@
+# Ignore example API keys in MCP documentation
+server/src/mcp/README.md:curl-auth-header:140

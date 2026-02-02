@@ -242,11 +242,26 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
+// Start MCP server if enabled
+async function startMcpServerIfEnabled() {
+  if (process.env.MCP_ENABLED === "true") {
+    try {
+      const { startMcpServer } = await import("./mcp/server");
+      startMcpServer();
+    } catch (error) {
+      console.error("Failed to start MCP server:", error);
+    }
+  }
+}
+
 // Start server
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
+
+  // Start MCP server alongside main API
+  startMcpServerIfEnabled();
 }
 
 export default app;
