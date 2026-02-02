@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.7.0](https://github.com/bocan/codex/compare/v2.6.2...v2.7.0) (2026-02-02)
+
+
+### Features
+
+* add MCP server for AI agent access ([c6232c6](https://github.com/bocan/codex/commit/c6232c6653ea1ecdd59840b2c03adb9a8863fff7))
+
 ## [2.6.2](https://github.com/bocan/codex/compare/v2.6.1...v2.6.2) (2026-02-02)
 
 ## [2.6.1](https://github.com/bocan/codex/compare/v2.6.0...v2.6.1) (2026-02-02)
