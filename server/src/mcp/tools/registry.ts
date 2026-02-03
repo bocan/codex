@@ -28,6 +28,13 @@ import {
   renameFolderTool,
 } from './folders';
 
+import {
+  listAttachmentsTool,
+  uploadAttachmentTool,
+  deleteAttachmentTool,
+  getAttachmentTool,
+} from './attachments';
+
 /**
  * All registered tools
  */
@@ -46,6 +53,11 @@ export const tools: RegisteredTool[] = [
   asRegisteredTool(createFolderTool),
   asRegisteredTool(deleteFolderTool),
   asRegisteredTool(renameFolderTool),
+  // Attachment operations
+  asRegisteredTool(listAttachmentsTool),
+  asRegisteredTool(uploadAttachmentTool),
+  asRegisteredTool(getAttachmentTool),
+  asRegisteredTool(deleteAttachmentTool),
 ];
 
 /**

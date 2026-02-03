@@ -274,8 +274,8 @@ describe('MCP Configuration', () => {
 
 describe('MCP Tool Registry', () => {
   describe('Tool Registration', () => {
-    it('should have 12 registered tools', () => {
-      expect(tools).toHaveLength(12);
+    it('should have 16 registered tools', () => {
+      expect(tools).toHaveLength(16);
     });
 
     it('should register all page tools', () => {
@@ -304,6 +304,19 @@ describe('MCP Tool Registry', () => {
       ];
 
       for (const name of folderToolNames) {
+        expect(getTool(name)).toBeDefined();
+      }
+    });
+
+    it('should register all attachment tools', () => {
+      const attachmentToolNames = [
+        'list_attachments',
+        'upload_attachment',
+        'get_attachment',
+        'delete_attachment',
+      ];
+
+      for (const name of attachmentToolNames) {
         expect(getTool(name)).toBeDefined();
       }
     });
