@@ -603,7 +603,6 @@ The MCP server exposes 12 tools for AI agents:
 For full documentation, see [server/src/mcp/README.md](server/src/mcp/README.md).
 
 ## 📡 API Documentation
-
 The REST API is available at `http://localhost:3001/api`
 
 ### Health Check

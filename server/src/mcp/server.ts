@@ -204,11 +204,26 @@ export function startMcpServer(): void {
         try {
           // Get or create transport for this session
           let transport: StreamableHTTPServerTransport;
+          let isNewSession = false;
 
           if (sessionId && transports.has(sessionId)) {
+            // Existing session - reuse transport
             transport = transports.get(sessionId)!;
+          } else if (sessionId) {
+            // Session ID provided but transport not found - session expired
+            sendJson(res, 400, {
+              jsonrpc: '2.0',
+              error: {
+                code: -32000,
+                message: 'Bad Request: Session not found or expired',
+              },
+              id: null,
+            });
+            return;
           } else {
-            // Create new transport
+            // No session ID - this should be an initialize request
+            // Create new transport for the session
+            isNewSession = true;
             transport = new StreamableHTTPServerTransport({
               sessionIdGenerator: () => {
                 const session = sessionStore.create(extractApiKey(req));
@@ -216,19 +231,17 @@ export function startMcpServer(): void {
               },
               onsessioninitialized: (newSessionId) => {
                 sessionStore.initialize(newSessionId);
+                transports.set(newSessionId, transport);
                 if (config.debug) {
                   console.log(`[MCP] Session initialized: ${newSessionId}`);
                 }
               },
+              // Enable JSON responses for clients that don't support SSE
+              enableJsonResponse: true,
             });
 
-            // Connect MCP server to transport
+            // Connect MCP server to transport for new sessions
             await mcpServer.connect(transport);
-
-            // Store transport if session was created
-            if (transport.sessionId) {
-              transports.set(transport.sessionId, transport);
-            }
           }
 
           // Parse body and handle request
