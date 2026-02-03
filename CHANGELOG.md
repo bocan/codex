@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.8.0](https://github.com/bocan/codex/compare/v2.7.0...v2.8.0) (2026-02-03)
+
+
+### Features
+
+* **attachments:** add tools for managing file attachments via MCP ([f2439db](https://github.com/bocan/codex/commit/f2439db6d9170d6063203c7b980d0d288691031d))
+* **tests:** update MCP Tool Registry tests to include attachment tools ([4af4bf2](https://github.com/bocan/codex/commit/4af4bf266a14e9d2b2e154d2040c045433164688))
+
 ## [2.7.0](https://github.com/bocan/codex/compare/v2.6.2...v2.7.0) (2026-02-02)
 
 
