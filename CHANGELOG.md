@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.9.1](https://github.com/bocan/codex/compare/v2.9.0...v2.9.1) (2026-02-04)
+
+
+### Documentation
+
+* enhance supply chain security section with SBOM details ([38ece84](https://github.com/bocan/codex/commit/38ece84b731ceabc3f46c8f96e6f8c6f50dbc601))
+
 ## [2.9.0](https://github.com/bocan/codex/compare/v2.8.1...v2.9.0) (2026-02-04)
 
 
