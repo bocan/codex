@@ -90,7 +90,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Install Cosign
-        uses: sigstore/cosign-installer@v3
+        uses: sigstore/cosign-installer@v4
 
       - name: Extract metadata
         id: meta
@@ -121,12 +121,3 @@ jobs:
         run: |
           cosign sign --yes \
             docker.io/bocan/codex@${{ steps.build-push.outputs.digest }}
-
-      - name: Generate SBOM attestation
-        run: |
-          cosign attest --yes \
-            --predicate /tmp/sbom-spdx.json \
-            --type spdxjson \
-            docker.io/bocan/codex@${{ steps.build-push.outputs.digest }}
-        env:
-          COSIGN_EXPERIMENTAL: 1

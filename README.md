@@ -466,7 +466,15 @@ cosign verify bocan/codex:latest \
   --certificate-oidc-issuer=https://token.actions.githubusercontent.com
 ```
 
-All images include SBOM attestations and provenance metadata for supply chain security.
+**Supply chain security**:
+- Images are signed with Cosign for authenticity verification
+- SBOM (Software Bill of Materials) embedded in image metadata
+- Provenance attestations document the build process
+
+To inspect the SBOM:
+```bash
+docker buildx imagetools inspect bocan/codex:latest --format "{{ json .SBOM }}"
+```
 
 ### Using Docker Compose (Recommended)
 
