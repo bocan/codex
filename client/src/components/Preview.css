@@ -170,7 +170,7 @@
 }
 
 .preview-content h1 {
-  font-family: var(--font-display);
+  font-family: 'Spectral', Georgia, serif;
   font-size: var(--text-3xl);
   font-weight: 600;
   margin: 1.5em 0 0.75em;
@@ -186,7 +186,7 @@
 }
 
 .preview-content h2 {
-  font-family: var(--font-display);
+  font-family: 'Spectral', Georgia, serif;
   font-size: var(--text-2xl);
   font-weight: 600;
   margin: 1.75em 0 0.75em;
@@ -198,7 +198,7 @@
 }
 
 .preview-content h3 {
-  font-family: var(--font-display);
+  font-family: 'Spectral', Georgia, serif;
   font-size: var(--text-xl);
   font-weight: 600;
   margin: 1.5em 0 0.5em;
@@ -207,7 +207,7 @@
 }
 
 .preview-content h4 {
-  font-family: var(--font-body);
+  font-family: 'Spectral', Georgia, serif;
   font-size: var(--text-lg);
   font-weight: 600;
   margin: 1.25em 0 0.5em;
