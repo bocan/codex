@@ -52,10 +52,10 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         imgSrc: ["'self'", "data:", "blob:", "https:"],
-        fontSrc: ["'self'"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
         connectSrc: ["'self'"],
         objectSrc: ["'none'"],
         frameAncestors: ["'none'"],
