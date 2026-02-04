@@ -204,7 +204,7 @@ export const Editor: React.FC<EditorProps> = ({
       if (isListening && recognitionRef.current) {
         try {
           recognitionRef.current.start();
-        } catch (_e) {
+        } catch {
           // Already started, ignore
         }
       }

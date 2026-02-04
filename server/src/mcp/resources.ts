@@ -50,7 +50,7 @@ export function registerResources(server: McpServer): void {
             text: content,
           }],
         };
-      } catch (error) {
+      } catch {
         throw new Error(`Page not found: ${pagePath}`);
       }
     }

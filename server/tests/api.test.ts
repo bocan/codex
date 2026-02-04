@@ -29,7 +29,7 @@ describe('API Tests', () => {
     // Clean up test data
     try {
       await fs.rm(TEST_DATA_DIR, { recursive: true, force: true });
-    } catch (error) {
+    } catch {
       // Ignore errors
     }
   });
@@ -40,7 +40,7 @@ describe('API Tests', () => {
       await fs.rm(TEST_DATA_DIR, { recursive: true, force: true });
       await fs.mkdir(TEST_DATA_DIR, { recursive: true });
       await testGitService.initialize();
-    } catch (error) {
+    } catch {
       // Ignore errors
     }
   });
