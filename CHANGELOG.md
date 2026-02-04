@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.8.1](https://github.com/bocan/codex/compare/v2.8.0...v2.8.1) (2026-02-04)
+
+
+### Documentation
+
+* add contributing guidelines for Codex ([17b1dc4](https://github.com/bocan/codex/commit/17b1dc440da3bf3cdc32eb2841442a77baa7f4ec))
+
 ## [2.8.0](https://github.com/bocan/codex/compare/v2.7.0...v2.8.0) (2026-02-03)
 
 
