@@ -445,6 +445,29 @@ This creates optimized production builds in:
 
 Codex can be run in Docker for simplified deployment. In production mode, Express serves both the API and the React UI from a single port (3001).
 
+### Pre-built Images
+
+Official multi-architecture (AMD64/ARM64) images are available on Docker Hub:
+
+```bash
+docker pull bocan/codex:latest
+```
+
+**Available tags**:
+- `latest` - Latest stable release
+- `2.7.0` - Specific version (example)
+- `2.7` - Minor version (example)
+- `2` - Major version (example)
+
+**Image verification** (signed with Cosign):
+```bash
+cosign verify bocan/codex:latest \
+  --certificate-identity-regexp=https://github.com/bocan/codex \
+  --certificate-oidc-issuer=https://token.actions.githubusercontent.com
+```
+
+All images include SBOM attestations and provenance metadata for supply chain security.
+
 ### Using Docker Compose (Recommended)
 
 ```bash
