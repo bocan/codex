@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.9.3](https://github.com/bocan/codex/compare/v2.9.2...v2.9.3) (2026-02-04)
+
+
+### Code Refactoring
+
+* simplify error handling in multiple components ([edbc960](https://github.com/bocan/codex/commit/edbc96087f114dcd97844001055e0618d741abc8))
+
 ## [2.9.2](https://github.com/bocan/codex/compare/v2.9.1...v2.9.2) (2026-02-04)
 
 ## [2.9.1](https://github.com/bocan/codex/compare/v2.9.0...v2.9.1) (2026-02-04)
