@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.9.0](https://github.com/bocan/codex/compare/v2.8.1...v2.9.0) (2026-02-04)
+
+
+### Features
+
+* **docker:** add multi-architecture support and image verification details ([08ff02d](https://github.com/bocan/codex/commit/08ff02db9243335ae38d2696e7ddc925a4437117))
+
 ## [2.8.1](https://github.com/bocan/codex/compare/v2.8.0...v2.8.1) (2026-02-04)
 
 
