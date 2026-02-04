@@ -3,7 +3,6 @@
  * Comprehensive tests for the Model Context Protocol server.
  */
 
-import request from 'supertest';
 import { createServer, Server, IncomingMessage, ServerResponse } from 'http';
 import { setServices } from '../src/index';
 import { FileSystemService } from '../src/services/fileSystem';
@@ -75,7 +74,8 @@ describe('MCP Session Store', () => {
       const retrieved = store.get(created.id);
 
       expect(retrieved).toBeDefined();
-      expect(retrieved!.id).toBe(created.id);
+      if (!retrieved) throw new Error('Retrieved should be defined');
+      expect(retrieved.id).toBe(created.id);
     });
 
     it('should return undefined for non-existent session', () => {
@@ -93,7 +93,8 @@ describe('MCP Session Store', () => {
 
       const retrieved = store.get(created.id);
 
-      expect(retrieved!.lastAccessedAt).toBeGreaterThan(initialAccessTime);
+      if (!retrieved) throw new Error('Retrieved should be defined');
+      expect(retrieved.lastAccessedAt).toBeGreaterThan(initialAccessTime);
     });
   });
 
@@ -107,8 +108,9 @@ describe('MCP Session Store', () => {
       expect(result).toBe(true);
 
       const retrieved = store.get(session.id);
-      expect(retrieved!.initialized).toBe(true);
-      expect(retrieved!.protocolVersion).toBe('2024-11-05');
+      if (!retrieved) throw new Error('Retrieved should be defined');
+      expect(retrieved.initialized).toBe(true);
+      expect(retrieved.protocolVersion).toBe('2024-11-05');
     });
 
     it('should return false for non-existent session', () => {
@@ -432,7 +434,7 @@ describe('MCP HTTP Server Integration', () => {
     // Clean up test data
     try {
       await fs.rm(TEST_DATA_DIR, { recursive: true, force: true });
-    } catch (error) {
+    } catch {
       // Ignore errors
     }
   });
@@ -495,7 +497,8 @@ describe('MCP HTTP Server Integration', () => {
     beforeAll(async () => {
       mcpServer = createTestMcpServer();
       await new Promise<void>((resolve) => {
-        mcpServer!.listen(MCP_PORT, () => resolve());
+        if (!mcpServer) throw new Error('Server not created');
+        mcpServer.listen(MCP_PORT, () => resolve());
       });
     });
 
@@ -532,7 +535,8 @@ describe('MCP HTTP Server Integration', () => {
       if (!mcpServer) {
         mcpServer = createTestMcpServer();
         await new Promise<void>((resolve) => {
-          mcpServer!.listen(MCP_PORT, () => resolve());
+          if (!mcpServer) throw new Error('Server not created');
+          mcpServer.listen(MCP_PORT, () => resolve());
         });
       }
     });
@@ -569,7 +573,8 @@ describe('MCP HTTP Server Integration', () => {
       if (!mcpServer) {
         mcpServer = createTestMcpServer();
         await new Promise<void>((resolve) => {
-          mcpServer!.listen(MCP_PORT, () => resolve());
+          if (!mcpServer) throw new Error('Server not created');
+          mcpServer.listen(MCP_PORT, () => resolve());
         });
       }
     });
@@ -624,7 +629,7 @@ describe('MCP Tools with FileSystem', () => {
   afterAll(async () => {
     try {
       await fs.rm(TEST_DATA_DIR, { recursive: true, force: true });
-    } catch (error) {
+    } catch {
       // Ignore errors
     }
   });
@@ -635,7 +640,7 @@ describe('MCP Tools with FileSystem', () => {
       await fs.rm(TEST_DATA_DIR, { recursive: true, force: true });
       await fs.mkdir(TEST_DATA_DIR, { recursive: true });
       await testGitService.initialize();
-    } catch (error) {
+    } catch {
       // Ignore errors
     }
   });

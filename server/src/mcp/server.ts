@@ -204,11 +204,14 @@ export function startMcpServer(): void {
         try {
           // Get or create transport for this session
           let transport: StreamableHTTPServerTransport;
-          let isNewSession = false;
 
           if (sessionId && transports.has(sessionId)) {
             // Existing session - reuse transport
-            transport = transports.get(sessionId)!;
+            const existingTransport = transports.get(sessionId);
+            if (!existingTransport) {
+              throw new Error('Transport not found despite has() check');
+            }
+            transport = existingTransport;
           } else if (sessionId) {
             // Session ID provided but transport not found - session expired
             sendJson(res, 400, {
@@ -223,7 +226,6 @@ export function startMcpServer(): void {
           } else {
             // No session ID - this should be an initialize request
             // Create new transport for the session
-            isNewSession = true;
             transport = new StreamableHTTPServerTransport({
               sessionIdGenerator: () => {
                 const session = sessionStore.create(extractApiKey(req));
@@ -269,7 +271,11 @@ export function startMcpServer(): void {
           return;
         }
 
-        const transport = transports.get(sessionId)!;
+        const transport = transports.get(sessionId);
+        if (!transport) {
+          sendJson(res, 400, { error: 'Transport not found' });
+          return;
+        }
         await transport.handleRequest(req, res);
         return;
       }

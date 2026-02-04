@@ -1,4 +1,4 @@
-import simpleGit, { SimpleGit, LogResult, DiffResult } from "simple-git";
+import simpleGit, { SimpleGit, LogResult } from "simple-git";
 import path from "path";
 import fs from "fs/promises";
 
@@ -70,7 +70,7 @@ export class GitService {
     try {
       await this.git.addConfig("user.name", "Codex", false, "local");
       await this.git.addConfig("user.email", "codex@local", false, "local");
-    } catch (_error) {
+    } catch {
       // Config might already exist, that's fine
     }
   }
@@ -158,7 +158,7 @@ export class GitService {
         message: commit.message,
         author: commit.author_name,
       }));
-    } catch (error) {
+    } catch {
       // File might not have any commits yet
       return [];
     }
@@ -212,7 +212,7 @@ export class GitService {
         filePath,
       ]);
       return diff;
-    } catch (error) {
+    } catch {
       return "";
     }
   }

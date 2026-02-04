@@ -26,7 +26,7 @@ describe('Authentication', () => {
     // Clean up test data
     try {
       await fs.rm(TEST_DATA_DIR, { recursive: true, force: true });
-    } catch (error) {
+    } catch {
       // Ignore errors
     }
   });
