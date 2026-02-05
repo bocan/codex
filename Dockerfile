@@ -29,7 +29,7 @@ RUN apk add --no-cache git
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S codex && \
-    adduser -S codex -u 1001 -G codex
+  adduser -S codex -u 1001 -G codex
 
 # Copy package files
 COPY package.json package-lock.json ./
@@ -58,7 +58,7 @@ ENV PORT=3001
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:3001/api || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3001/api || exit 1
 
 # Start the server (serves both API and static client files)
 CMD ["node", "server/dist/index.js"]
