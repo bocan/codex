@@ -46,18 +46,25 @@ export class FileSystemService {
    * @throws Error if path traversal is detected
    */
   private validatePath(relativePath: string): string {
+    // Strip leading slashes to ensure it's treated as relative
+    let normalizedPath = relativePath.replace(/^\/+/, '');
+
     // Normalize empty paths and root indicators
-    const normalizedPath = !relativePath || relativePath === "/" || relativePath === "."
-      ? ""
-      : relativePath;
+    if (!normalizedPath || normalizedPath === "/" || normalizedPath === ".") {
+      normalizedPath = "";
+    }
 
     // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
     // This IS the path validation function - it checks for traversal attacks
     const fullPath = path.resolve(this.dataDir, normalizedPath);
     const resolvedDataDir = path.resolve(this.dataDir);
 
-    // Ensure the resolved path is within the data directory
-    if (!fullPath.startsWith(resolvedDataDir + path.sep) && fullPath !== resolvedDataDir) {
+    // Use path.relative to check if the path is within the data directory
+    // If the relative path starts with "..", it's trying to escape
+    const relativeToDataDir = path.relative(resolvedDataDir, fullPath);
+    const isOutside = relativeToDataDir.startsWith("..") || path.isAbsolute(relativeToDataDir);
+
+    if (isOutside) {
       throw new Error("Invalid path: path traversal detected");
     }
 
