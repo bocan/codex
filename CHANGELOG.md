@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.10.1](https://github.com/bocan/codex/compare/v2.10.0...v2.10.1) (2026-02-05)
+
 ## [2.10.0](https://github.com/bocan/codex/compare/v2.9.4...v2.10.0) (2026-02-05)
 
 
