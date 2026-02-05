@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.10.0](https://github.com/bocan/codex/compare/v2.9.4...v2.10.0) (2026-02-05)
+
+
+### Features
+
+* **workflow:** add Docker image rebuild workflow with signing and tagging ([d7d93e9](https://github.com/bocan/codex/commit/d7d93e9dae1182a84f0bee3b175614d517b007fc))
+
+
+### Styles
+
+* **Dockerfile:** adjust indentation for user creation and health check ([1d2b34a](https://github.com/bocan/codex/commit/1d2b34a4aefc31037bf378c52e5692c562872b2a))
+
 ## [2.9.4](https://github.com/bocan/codex/compare/v2.9.3...v2.9.4) (2026-02-05)
 
 
