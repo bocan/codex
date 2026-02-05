@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.9.4](https://github.com/bocan/codex/compare/v2.9.3...v2.9.4) (2026-02-05)
+
+
+### Bug Fixes
+
+* **folder:** add error logging for folder creation failure ([41ccc1c](https://github.com/bocan/codex/commit/41ccc1c5c5ad72199c137690c60c7becf9131adc))
+
+
+### Styles
+
+* **Preview:** update font family for headings to 'Spectral' ([e18342c](https://github.com/bocan/codex/commit/e18342c13d76441f650a601ac00e3831aeff5bd4))
+* **Security:** update CSP to allow scripts and styles from specific sources ([42d29fa](https://github.com/bocan/codex/commit/42d29faa072f4f42e7fd8b4eff55af9e1e1a9c57))
+
 ## [2.9.3](https://github.com/bocan/codex/compare/v2.9.2...v2.9.3) (2026-02-04)
 
 
