@@ -26,6 +26,7 @@ export const createFolder = async (req: Request, res: Response) => {
     await fileSystemService.createFolder(path);
     res.status(201).json({ message: "Folder created successfully", path });
   } catch (error) {
+    console.error("Failed to create folder:", error);
     res
       .status(500)
       .json({

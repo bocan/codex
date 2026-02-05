@@ -28,15 +28,16 @@ export function setServices(git: GitService, fs: FileSystemService) {
   fileSystemService = fs;
 }
 
-// Initialize Git repository on startup (skip in test mode)
+// Initialize file system and Git repository on startup (skip in test mode)
 if (!process.env.TEST_DATA_DIR) {
   (async () => {
     try {
+      await fileSystemService.initialize();
       await gitService.initialize();
       await gitService.commitPendingChanges();
-      console.log("Git repository initialized and pending changes committed");
+      console.log("File system and Git repository initialized successfully");
     } catch (error) {
-      console.error("Failed to initialize Git repository:", error);
+      console.error("Failed to initialize services:", error);
     }
   })();
 }
