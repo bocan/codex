@@ -199,23 +199,24 @@ export class FileSystemService {
 
     await fs.writeFile(fullPath, content, "utf-8");
 
-    // Invalidate caches
-    const folderPath = path.dirname(relativePath);
+    // Invalidate caches - use validated relative path
+    const validatedRelative = path.relative(this.dataDir, fullPath);
+    const folderPath = path.dirname(validatedRelative);
     this.cache.invalidate(`pages:${folderPath}`);
-    this.cache.invalidateKey(`page:${relativePath}`);
+    this.cache.invalidateKey(`page:${validatedRelative}`);
 
     // Commit the new page (non-blocking in production, blocking in tests)
     if (this.gitService) {
       if (process.env.TEST_DATA_DIR) {
         // In test mode, wait for commit and let errors propagate
         await this.gitService.commitFile(
-          relativePath,
-          `Created page: ${relativePath}`,
+          validatedRelative,
+          `Created page: ${validatedRelative}`,
         );
       } else {
         // In production, fire and forget
         this.gitService
-          .commitFile(relativePath, `Created page: ${relativePath}`)
+          .commitFile(validatedRelative, `Created page: ${validatedRelative}`)
           .catch((err) => console.error("Git commit failed:", err));
       }
     }
@@ -241,21 +242,22 @@ export class FileSystemService {
     const fullPath = this.validatePath(relativePath);
     await fs.writeFile(fullPath, content, "utf-8");
 
-    // Invalidate page cache
-    this.cache.invalidateKey(`page:${relativePath}`);
+    // Invalidate page cache - use validated relative path
+    const validatedRelative = path.relative(this.dataDir, fullPath);
+    this.cache.invalidateKey(`page:${validatedRelative}`);
 
     // Commit the update (non-blocking in production, blocking in tests)
     if (this.gitService) {
       if (process.env.TEST_DATA_DIR) {
         // In test mode, wait for commit and let errors propagate
         await this.gitService.commitFile(
-          relativePath,
-          `Updated page: ${relativePath}`,
+          validatedRelative,
+          `Updated page: ${validatedRelative}`,
         );
       } else {
         // In production, fire and forget
         this.gitService
-          .commitFile(relativePath, `Updated page: ${relativePath}`)
+          .commitFile(validatedRelative, `Updated page: ${validatedRelative}`)
           .catch((err) => console.error("Git commit failed:", err));
       }
     }
@@ -265,23 +267,24 @@ export class FileSystemService {
     const fullPath = this.validatePath(relativePath);
     await fs.unlink(fullPath);
 
-    // Invalidate caches
-    const folderPath = path.dirname(relativePath);
+    // Invalidate caches - use validated relative path
+    const validatedRelative = path.relative(this.dataDir, fullPath);
+    const folderPath = path.dirname(validatedRelative);
     this.cache.invalidate(`pages:${folderPath}`);
-    this.cache.invalidateKey(`page:${relativePath}`);
+    this.cache.invalidateKey(`page:${validatedRelative}`);
 
     // Commit the deletion (non-blocking in production, blocking in tests)
     if (this.gitService) {
       if (process.env.TEST_DATA_DIR) {
         // In test mode, wait for commit and let errors propagate
         await this.gitService.commitFile(
-          relativePath,
-          `Deleted page: ${relativePath}`,
+          validatedRelative,
+          `Deleted page: ${validatedRelative}`,
         );
       } else {
         // In production, fire and forget
         this.gitService
-          .commitFile(relativePath, `Deleted page: ${relativePath}`)
+          .commitFile(validatedRelative, `Deleted page: ${validatedRelative}`)
           .catch((err) => console.error("Git commit failed:", err));
       }
     }
@@ -297,28 +300,30 @@ export class FileSystemService {
 
     await fs.rename(oldFullPath, newFullPath);
 
-    // Invalidate caches for both old and new paths
-    const oldFolderPath = path.dirname(oldPath);
-    const newFolderPath = path.dirname(newPath);
+    // Invalidate caches - use validated relative paths
+    const oldRelative = path.relative(this.dataDir, oldFullPath);
+    const newRelative = path.relative(this.dataDir, newFullPath);
+    const oldFolderPath = path.dirname(oldRelative);
+    const newFolderPath = path.dirname(newRelative);
     this.cache.invalidate(`pages:${oldFolderPath}`);
     this.cache.invalidate(`pages:${newFolderPath}`);
-    this.cache.invalidateKey(`page:${oldPath}`);
-    this.cache.invalidateKey(`page:${newPath}`);
+    this.cache.invalidateKey(`page:${oldRelative}`);
+    this.cache.invalidateKey(`page:${newRelative}`);
 
     // Commit the rename (non-blocking in production, blocking in tests)
     if (this.gitService) {
       if (process.env.TEST_DATA_DIR) {
         // In test mode, wait for commit and let errors propagate
         await this.gitService.commitFiles(
-          [oldPath, newPath],
-          `Renamed page: ${oldPath} → ${newPath}`,
+          [oldRelative, newRelative],
+          `Renamed page: ${oldRelative} → ${newRelative}`,
         );
       } else {
         // In production, fire and forget
         this.gitService
           .commitFiles(
-            [oldPath, newPath],
-            `Renamed page: ${oldPath} → ${newPath}`,
+            [oldRelative, newRelative],
+            `Renamed page: ${oldRelative} → ${newRelative}`,
           )
           .catch((err) => console.error("Git commit failed:", err));
       }
@@ -326,10 +331,9 @@ export class FileSystemService {
   }
 
   async movePage(oldPath: string, newFolderPath: string): Promise<string> {
+    // Validate paths first to prevent path traversal
     const oldFullPath = this.validatePath(oldPath);
-    const fileName = path.basename(oldPath);
-    // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
-    // Safe: newPath is validated by validatePath() immediately after construction
+    const fileName = path.basename(oldFullPath); // Use validated path
     const newPath = newFolderPath
       ? path.join(newFolderPath, fileName)
       : fileName;
@@ -356,32 +360,36 @@ export class FileSystemService {
 
     await fs.rename(oldFullPath, newFullPath);
 
-    // Invalidate caches for both old and new locations
-    const oldFolderPath = path.dirname(oldPath);
+    // Invalidate caches - use validated paths relative to dataDir
+    const oldRelative = path.relative(this.dataDir, oldFullPath);
+    const newRelative = path.relative(this.dataDir, newFullPath);
+    const oldFolderPath = path.dirname(oldRelative);
+    const newFolderRelative = path.relative(this.dataDir, newDir);
+
     this.cache.invalidate(`pages:${oldFolderPath}`);
-    this.cache.invalidate(`pages:${newFolderPath}`);
-    this.cache.invalidateKey(`page:${oldPath}`);
-    this.cache.invalidateKey(`page:${newPath}`);
+    this.cache.invalidate(`pages:${newFolderRelative}`);
+    this.cache.invalidateKey(`page:${oldRelative}`);
+    this.cache.invalidateKey(`page:${newRelative}`);
 
     // Commit the move (non-blocking in production, blocking in tests)
     if (this.gitService) {
       if (process.env.TEST_DATA_DIR) {
         // In test mode, wait for commit and let errors propagate
         await this.gitService.commitFiles(
-          [oldPath, newPath],
-          `Moved page: ${oldPath} → ${newPath}`,
+          [oldRelative, newRelative],
+          `Moved page: ${oldRelative} → ${newRelative}`,
         );
       } else {
         // In production, fire and forget
         this.gitService
           .commitFiles(
-            [oldPath, newPath],
-            `Moved page: ${oldPath} → ${newPath}`,
+            [oldRelative, newRelative],
+            `Moved page: ${oldRelative} → ${newRelative}`,
           )
           .catch((err) => console.error("Git commit failed:", err));
       }
     }
 
-    return newPath;
+    return newRelative;
   }
 }
