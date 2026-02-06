@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.11.0](https://github.com/bocan/codex/compare/v2.10.1...v2.11.0) (2026-02-06)
+
+
+### Features
+
+* **editor:** change keyboard shortcuts for headings in text editor ([99b2b66](https://github.com/bocan/codex/commit/99b2b66b18a827c918ee7b4d27a0c1b38929f3f3))
+
 ## [2.10.1](https://github.com/bocan/codex/compare/v2.10.0...v2.10.1) (2026-02-05)
 
 ## [2.10.0](https://github.com/bocan/codex/compare/v2.9.4...v2.10.0) (2026-02-05)
