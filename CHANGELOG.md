@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.12.0](https://github.com/bocan/codex/compare/v2.11.0...v2.12.0) (2026-02-06)
+
+
+### Features
+
+* **rateLimiters:** implement rate limiting for file operations and transfers ([bcd0c6e](https://github.com/bocan/codex/commit/bcd0c6e3a4d4491e53107e08f55a76ebd2c00d29))
+
+
+### Code Refactoring
+
+* **fileSystem:** use validated paths for cache invalidation and commits ([1db11cb](https://github.com/bocan/codex/commit/1db11cbb6de8b34406e24780d3749773566ec9ae))
+
 ## [2.11.0](https://github.com/bocan/codex/compare/v2.10.1...v2.11.0) (2026-02-06)
 
 
