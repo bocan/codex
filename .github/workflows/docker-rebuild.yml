@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  contents: read   # Required to checkout code
   id-token: write  # Required for cosign keyless signing
   packages: write  # Required for GHCR (optional)
 

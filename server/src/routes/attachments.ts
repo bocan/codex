@@ -3,6 +3,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs/promises";
 import { DATA_DIR } from "../services/fileSystem";
+import { fileTransferLimiter, fileOperationLimiter } from "../middleware/rateLimiters";
 
 const router = Router();
 
@@ -61,7 +62,7 @@ const upload = multer({
 });
 
 // Upload attachment
-router.post("/", upload.single("file"), async (req: Request, res: Response) => {
+router.post("/", fileTransferLimiter, upload.single("file"), async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -117,7 +118,7 @@ router.get("/", async (req: Request, res: Response) => {
 });
 
 // Delete attachment
-router.delete("/:filename", async (req: Request, res: Response) => {
+router.delete("/:filename", fileOperationLimiter, async (req: Request, res: Response) => {
   try {
     const folderPath = (req.query.folder as string) || "";
     const filename = req.params.filename;
@@ -140,7 +141,7 @@ router.delete("/:filename", async (req: Request, res: Response) => {
 });
 
 // Get/download attachment
-router.get("/:filename", async (req: Request, res: Response) => {
+router.get("/:filename", fileTransferLimiter, async (req: Request, res: Response) => {
   try {
     const folderPath = (req.query.folder as string) || "";
     const filename = req.params.filename;

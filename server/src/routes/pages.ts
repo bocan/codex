@@ -1,13 +1,14 @@
 import { Router } from "express";
 import * as pageController from "../controllers/pageController";
+import { fileOperationLimiter } from "../middleware/rateLimiters";
 
 const router = Router();
 
 // Specific routes must come before wildcard routes
 router.get("/", pageController.getPages);
-router.post("/", pageController.createPage);
-router.put("/move", pageController.movePage);
-router.put("/rename/file", pageController.renamePage);
+router.post("/", fileOperationLimiter, pageController.createPage);
+router.put("/move", fileOperationLimiter, pageController.movePage);
+router.put("/rename/file", fileOperationLimiter, pageController.renamePage);
 
 // Wildcard routes - order matters!
 // These need to check for specific suffixes before falling back to generic handlers
@@ -44,7 +45,7 @@ router.get("/:path(*)", (req, res, next) => {
   return pageController.getPage(req, res);
 });
 
-router.post("/:path(*)", (req, res) => {
+router.post("/:path(*)", fileOperationLimiter, (req, res) => {
   const path = req.params.path;
 
   // Check for /restore/:hash pattern
@@ -59,7 +60,7 @@ router.post("/:path(*)", (req, res) => {
   res.status(404).json({ error: "Not found" });
 });
 
-router.put("/:path(*)", pageController.updatePage);
-router.delete("/:path(*)", pageController.deletePage);
+router.put("/:path(*)", fileOperationLimiter, pageController.updatePage);
+router.delete("/:path(*)", fileOperationLimiter, pageController.deletePage);
 
 export default router;
