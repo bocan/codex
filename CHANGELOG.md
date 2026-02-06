@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.12.1](https://github.com/bocan/codex/compare/v2.12.0...v2.12.1) (2026-02-06)
+
+
+### Documentation
+
+* update README with MCP server setup and Docker image details ([14155b2](https://github.com/bocan/codex/commit/14155b201e5ff0ed34ac7423157a1d8e9ddc103b))
+
 ## [2.12.0](https://github.com/bocan/codex/compare/v2.11.0...v2.12.0) (2026-02-06)
 
 
