@@ -337,21 +337,18 @@ export const Editor: React.FC<EditorProps> = ({
           e.preventDefault();
           insertFormatting("`", "`", "code");
           break;
-      }
-    }
-
-    // Alt/Option + number for headings
-    if (e.altKey) {
-      switch (e.key) {
         case "1":
+          // Heading 1 (Cmd/Ctrl + 1)
           e.preventDefault();
           insertLinePrefix("# ");
           break;
         case "2":
+          // Heading 2 (Cmd/Ctrl + 2)
           e.preventDefault();
           insertLinePrefix("## ");
           break;
         case "3":
+          // Heading 3 (Cmd/Ctrl + 3)
           e.preventDefault();
           insertLinePrefix("### ");
           break;
