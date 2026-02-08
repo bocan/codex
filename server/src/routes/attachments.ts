@@ -2,10 +2,30 @@ import { Router, Request, Response } from "express";
 import multer from "multer";
 import path from "path";
 import fs from "fs/promises";
-import { DATA_DIR } from "../services/fileSystem";
+import { DATA_DIR as DEFAULT_DATA_DIR } from "../services/fileSystem";
 import { fileTransferLimiter, fileOperationLimiter } from "../middleware/rateLimiters";
 
 const router = Router();
+
+const getDataDir = (): string => {
+  return process.env.TEST_DATA_DIR || process.env.DATA_DIR || DEFAULT_DATA_DIR;
+};
+
+const getFolderQueryParam = (req: Request): string => {
+  const folderQuery = req.query.folder;
+  if (typeof folderQuery === "string") {
+    return folderQuery;
+  }
+
+  // Fallback: parse raw URL so '+' is treated as space (x-www-form-urlencoded semantics)
+  // This matches how browsers/axios tend to encode URL query parameters.
+  try {
+    const url = new URL(req.originalUrl, "http://localhost");
+    return url.searchParams.get("folder") || "";
+  } catch {
+    return "";
+  }
+};
 
 /**
  * Validates and sanitizes a path to prevent path traversal attacks.
@@ -33,10 +53,12 @@ const validatePath = (basePath: string, ...userPath: string[]): string => {
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
     try {
-      const folderPath = (req.query.folder as string) || "";
+      const folderPath = getFolderQueryParam(req);
+
+      const dataDir = getDataDir();
 
       // Validate path to prevent traversal
-      const attachmentsDir = validatePath(DATA_DIR, folderPath, ".attachments");
+      const attachmentsDir = validatePath(dataDir, folderPath, ".attachments");
 
       // Create .attachments directory if it doesn't exist
       await fs.mkdir(attachmentsDir, { recursive: true });
@@ -83,10 +105,12 @@ router.post("/", fileTransferLimiter, upload.single("file"), async (req: Request
 // List attachments for a folder
 router.get("/", async (req: Request, res: Response) => {
   try {
-    const folderPath = (req.query.folder as string) || "";
+    const folderPath = getFolderQueryParam(req);
+
+    const dataDir = getDataDir();
 
     // Validate path to prevent traversal
-    const attachmentsDir = validatePath(DATA_DIR, folderPath, ".attachments");
+    const attachmentsDir = validatePath(dataDir, folderPath, ".attachments");
 
     try {
       const files = await fs.readdir(attachmentsDir);
@@ -120,7 +144,7 @@ router.get("/", async (req: Request, res: Response) => {
 // Delete attachment
 router.delete("/:filename", fileOperationLimiter, async (req: Request, res: Response) => {
   try {
-    const folderPath = (req.query.folder as string) || "";
+    const folderPath = getFolderQueryParam(req);
     const filenameParam = req.params.filename;
 
     if (!filenameParam || Array.isArray(filenameParam)) {
@@ -129,8 +153,10 @@ router.delete("/:filename", fileOperationLimiter, async (req: Request, res: Resp
 
     const filename = filenameParam;
 
+    const dataDir = getDataDir();
+
     // Validate path to prevent traversal - this validates both folderPath and filename
-    const filePath = validatePath(DATA_DIR, folderPath, ".attachments", filename);
+    const filePath = validatePath(dataDir, folderPath, ".attachments", filename);
 
     await fs.unlink(filePath);
     res.json({ success: true });
@@ -149,7 +175,7 @@ router.delete("/:filename", fileOperationLimiter, async (req: Request, res: Resp
 // Get/download attachment
 router.get("/:filename", fileTransferLimiter, async (req: Request, res: Response) => {
   try {
-    const folderPath = (req.query.folder as string) || "";
+    const folderPath = getFolderQueryParam(req);
     const filenameParam = req.params.filename;
 
     if (!filenameParam || Array.isArray(filenameParam)) {
@@ -158,12 +184,39 @@ router.get("/:filename", fileTransferLimiter, async (req: Request, res: Response
 
     const filename = filenameParam;
 
+    const dataDir = getDataDir();
+
     // Validate path to prevent traversal - this validates both folderPath and filename
-    const filePath = validatePath(DATA_DIR, folderPath, ".attachments", filename);
+    const filePath = validatePath(dataDir, folderPath, ".attachments", filename);
 
     // nosemgrep: javascript.express.security.audit.express-res-sendfile.express-res-sendfile
     // Safe: filePath has been validated by validatePath() to prevent directory traversal
-    res.sendFile(filePath);
+    res.sendFile(filePath, { dotfiles: "allow" }, (error) => {
+      if (!error) {
+        return;
+      }
+
+      // `send` defaults to ignoring dotfiles; our attachments live under `.attachments`.
+      // Explicitly allow dotfiles above; remaining errors indicate missing/forbidden files.
+      if ((error as any).code === "ENOENT" || (error as any).statusCode === 404) {
+        if (!res.headersSent) {
+          res.status(404).json({ error: "File not found" });
+        }
+        return;
+      }
+
+      if ((error as any).code === "EACCES" || (error as any).statusCode === 403) {
+        if (!res.headersSent) {
+          res.status(403).json({ error: "Forbidden" });
+        }
+        return;
+      }
+
+      console.error("Get attachment sendFile error:", error);
+      if (!res.headersSent) {
+        res.status(500).json({ error: "Failed to retrieve file" });
+      }
+    });
   } catch (error: any) {
     if (error.message === "Path traversal detected") {
       return res.status(403).json({ error: "Invalid file path" });
