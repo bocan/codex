@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.12.8](https://github.com/bocan/codex/compare/v2.12.7...v2.12.8) (2026-02-08)
+
+
+### Bug Fixes
+
+* **attachments:** update folder path for attachment download test ([f876e2a](https://github.com/bocan/codex/commit/f876e2a4c213a2ae46253e4b8347aa80cd9b9ec0))
+* **tests:** update test command instructions for root directory ([9fca18c](https://github.com/bocan/codex/commit/9fca18c1fdde657bde4fbaa552025fe2fd17371e))
+
 ## [2.12.7](https://github.com/bocan/codex/compare/v2.12.6...v2.12.7) (2026-02-08)
 
 

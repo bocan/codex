@@ -1,6 +1,6 @@
 {
   "name": "Codex",
-  "version": "2.12.7",
+  "version": "2.12.8",
   "description": "Your Personal Wiki and Document Store",
   "private": true,
   "workspaces": [
