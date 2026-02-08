@@ -37,3 +37,18 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+
+  # Docker - keep base images up to date
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "09:00"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "automated"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
