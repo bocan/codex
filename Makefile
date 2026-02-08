@@ -1,7 +1,7 @@
 # Codex Makefile
 # Convenient commands for building, testing, and running the application
 
-.PHONY: help install dev dev-server dev-client build build-server build-client test test-server test-client clean clean-server clean-client
+.PHONY: help install dev dev-server dev-client build build-server build-client test test-server test-mcp test-client clean clean-server clean-client
 
 # Colors for output
 BLUE := \033[0;34m
@@ -65,6 +65,10 @@ test: ## Run all tests (server and client)
 test-server: ## Run server tests only
 	@echo "$(GREEN)Running server tests...$(NC)"
 	@cd server && npm test
+
+test-mcp: ## Run MCP server tests only
+	@echo "$(GREEN)Running MCP tests...$(NC)"
+	@cd server && npm test -- tests/mcp.test.ts
 
 test-client: ## Run client tests only
 	@echo "$(GREEN)Running client tests...$(NC)"
