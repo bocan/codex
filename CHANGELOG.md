@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.12.6](https://github.com/bocan/codex/compare/v2.12.5...v2.12.6) (2026-02-08)
+
+
+### Code Refactoring
+
+* **routes:** update route parameters for folder and page controllers ([5385827](https://github.com/bocan/codex/commit/5385827507582ad1b4f428fbad0b8ca086b25bd5))
+
+
+### Tests
+
+* add MCP server tests to Makefile ([359997b](https://github.com/bocan/codex/commit/359997bcfab7c24895bc0fdebc19473a405e2679))
+
+
+### Chores
+
+* **deps:** update concurrently to version 9.2.1 and clean up dependencies ([92acbe0](https://github.com/bocan/codex/commit/92acbe07cde09cfc8bed0aab1d468f9124da1236))
+* **version:** unhide chore section in version configuration ([30d0e3e](https://github.com/bocan/codex/commit/30d0e3e32a7b8abfbc76d4fa9c17e57f22c5fb55))
+
 ## [2.12.5](https://github.com/bocan/codex/compare/v2.12.4...v2.12.5) (2026-02-08)
 
 ## [2.12.4](https://github.com/bocan/codex/compare/v2.12.3...v2.12.4) (2026-02-08)
