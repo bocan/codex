@@ -38,7 +38,8 @@ export const createFolder = async (req: Request, res: Response) => {
 
 export const deleteFolder = async (req: Request, res: Response) => {
   try {
-    const { path } = req.params;
+    const pathParam = req.params.path;
+    const path = Array.isArray(pathParam) ? pathParam.join("/") : pathParam;
 
     if (!path) {
       return res.status(400).json({ error: "Path is required" });

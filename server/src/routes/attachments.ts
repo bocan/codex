@@ -121,7 +121,13 @@ router.get("/", async (req: Request, res: Response) => {
 router.delete("/:filename", fileOperationLimiter, async (req: Request, res: Response) => {
   try {
     const folderPath = (req.query.folder as string) || "";
-    const filename = req.params.filename;
+    const filenameParam = req.params.filename;
+
+    if (!filenameParam || Array.isArray(filenameParam)) {
+      return res.status(400).json({ error: "Invalid filename" });
+    }
+
+    const filename = filenameParam;
 
     // Validate path to prevent traversal - this validates both folderPath and filename
     const filePath = validatePath(DATA_DIR, folderPath, ".attachments", filename);
@@ -144,7 +150,13 @@ router.delete("/:filename", fileOperationLimiter, async (req: Request, res: Resp
 router.get("/:filename", fileTransferLimiter, async (req: Request, res: Response) => {
   try {
     const folderPath = (req.query.folder as string) || "";
-    const filename = req.params.filename;
+    const filenameParam = req.params.filename;
+
+    if (!filenameParam || Array.isArray(filenameParam)) {
+      return res.status(400).json({ error: "Invalid filename" });
+    }
+
+    const filename = filenameParam;
 
     // Validate path to prevent traversal - this validates both folderPath and filename
     const filePath = validatePath(DATA_DIR, folderPath, ".attachments", filename);

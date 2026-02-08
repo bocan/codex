@@ -37,7 +37,8 @@ export const getPages = async (req: Request, res: Response) => {
 
 export const getPage = async (req: Request, res: Response) => {
   try {
-    const { path } = req.params;
+    const pathParam = req.params.path;
+    const path = Array.isArray(pathParam) ? pathParam.join("/") : pathParam;
 
     if (!path) {
       return res.status(400).json({ error: "Path is required" });
@@ -74,7 +75,8 @@ export const createPage = async (req: Request, res: Response) => {
 
 export const updatePage = async (req: Request, res: Response) => {
   try {
-    const { path } = req.params;
+    const pathParam = req.params.path;
+    const path = Array.isArray(pathParam) ? pathParam.join("/") : pathParam;
     const { content } = req.body;
 
     if (!path) {
@@ -99,7 +101,8 @@ export const updatePage = async (req: Request, res: Response) => {
 
 export const deletePage = async (req: Request, res: Response) => {
   try {
-    const { path } = req.params;
+    const pathParam = req.params.path;
+    const path = Array.isArray(pathParam) ? pathParam.join("/") : pathParam;
 
     if (!path) {
       return res.status(400).json({ error: "Path is required" });
@@ -141,7 +144,8 @@ export const renamePage = async (req: Request, res: Response) => {
 
 export const getPageHistory = async (req: Request, res: Response) => {
   try {
-    const { path } = req.params;
+    const pathParam = req.params.path;
+    const path = Array.isArray(pathParam) ? pathParam.join("/") : pathParam;
 
     if (!path) {
       return res.status(400).json({ error: "Path is required" });
@@ -161,7 +165,10 @@ export const getPageHistory = async (req: Request, res: Response) => {
 
 export const getPageVersion = async (req: Request, res: Response) => {
   try {
-    const { path, hash } = req.params;
+    const pathParam = req.params.path;
+    const hashParam = req.params.hash;
+    const path = Array.isArray(pathParam) ? pathParam.join("/") : pathParam;
+    const hash = Array.isArray(hashParam) ? hashParam.join("/") : hashParam;
 
     if (!path || !hash) {
       return res.status(400).json({ error: "Path and hash are required" });
@@ -186,7 +193,10 @@ export const getPageVersion = async (req: Request, res: Response) => {
 
 export const restorePageVersion = async (req: Request, res: Response) => {
   try {
-    const { path, hash } = req.params;
+    const pathParam = req.params.path;
+    const hashParam = req.params.hash;
+    const path = Array.isArray(pathParam) ? pathParam.join("/") : pathParam;
+    const hash = Array.isArray(hashParam) ? hashParam.join("/") : hashParam;
 
     if (!path || !hash) {
       return res.status(400).json({ error: "Path and hash are required" });
