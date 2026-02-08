@@ -1,7 +1,7 @@
 services:
   codex:
     container_name: codex
-    image: codex:latest
+    image: bocan/codex:latest
     restart: unless-stopped
     ports:
       - "3001:3001"
@@ -12,10 +12,12 @@ services:
       - NODE_ENV=production
       - PORT=3001
       # Set AUTH_PASSWORD to enable authentication
-      # - AUTH_PASSWORD=m1dland
+      # - AUTH_PASSWORD=changeme
       # Set TRUST_PROXY=true when behind a reverse proxy (nginx, traefik, etc.)
       # This makes Express read X-Forwarded-Proto header for secure cookies
       # - TRUST_PROXY=true
+      # - MCP_ENABLED=true
+      # - MCP_API_KEY=whatevertoo
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api"]
       interval: 30s

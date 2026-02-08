@@ -182,14 +182,14 @@ describe('API Tests', () => {
 
   describe('Attachment Operations', () => {
     it('should download an attachment from a .attachments folder', async () => {
-      const attachmentsDir = path.join(TEST_DATA_DIR, 'Howden', '.attachments');
+      const attachmentsDir = path.join(TEST_DATA_DIR, 'TestMe', '.attachments');
       await fs.mkdir(attachmentsDir, { recursive: true });
 
       const filename = 'test-attachment.txt';
       const filePath = path.join(attachmentsDir, filename);
       await fs.writeFile(filePath, 'hello attachment');
 
-      const response = await request(app).get(`/api/attachments/${filename}?folder=Howden`);
+      const response = await request(app).get(`/api/attachments/${filename}?folder=TestMe`);
 
       expect(response.status).toBe(200);
       expect(response.text).toBe('hello attachment');

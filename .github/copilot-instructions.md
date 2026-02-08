@@ -73,6 +73,7 @@ Self-documenting API available at `GET /api` returns all endpoints with examples
 - Keyboard navigation uses arrow keys AND vim-style `j`/`k` (see `FolderTree.tsx`, `PageList.tsx`, `Search.tsx`)
 
 ### Testing
+- If you need to run tests via `make test`, be sure to run from the root directory.
 - **Server tests**: Jest + supertest in `server/tests/api.test.ts`, uses isolated `test-data/` directory
 - **Client tests**: Vitest + React Testing Library, co-located with components
 - Tests must clean up: server tests recreate `TEST_DATA_DIR` in `beforeEach`
@@ -215,4 +216,4 @@ export const exampleTool = defineTool({
 
 - **CI** (`ci.yml`): Runs on PRs - linting, tests, build verification
 - **Release** (`release.yml`): Auto-runs on merge to main - bumps version via `commit-and-tag-version`, creates GitHub Release with auto-generated notes
-- Uses Node 24.x, npm workspaces (single lock file at root)
+- Uses Node 25.x, npm workspaces (single lock file at root)
