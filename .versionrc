@@ -31,7 +31,7 @@
     {
       "type": "chore",
       "section": "Chores",
-      "hidden": true
+      "hidden": false
     },
     {
       "type": "build",
