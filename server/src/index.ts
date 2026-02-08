@@ -11,14 +11,14 @@ import searchRoutes from "./routes/search";
 import attachmentRoutes from "./routes/attachments";
 import { requireAuth } from "./middleware/auth";
 import { GitService } from "./services/gitService";
-import { FileSystemService } from "./services/fileSystem";
+import { DATA_DIR as DEFAULT_DATA_DIR, FileSystemService } from "./services/fileSystem";
 
 const app: Express = express();
 const PORT = process.env.PORT || 3001;
 
 // Initialize Git service
 const DATA_DIR =
-  process.env.TEST_DATA_DIR || path.join(__dirname, "../../data");
+  process.env.TEST_DATA_DIR || process.env.DATA_DIR || DEFAULT_DATA_DIR;
 export let gitService = new GitService(DATA_DIR);
 export let fileSystemService = new FileSystemService(DATA_DIR, gitService);
 
@@ -238,7 +238,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static(clientDistPath));
 
   // Handle client-side routing - serve index.html for all non-API routes
-  app.get("*", (req: Request, res: Response) => {
+  app.get(/.*/, (req: Request, res: Response) => {
     res.sendFile(path.join(clientDistPath, "index.html"));
   });
 }
