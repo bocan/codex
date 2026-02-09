@@ -245,6 +245,61 @@
   line-height: 1.6;
 }
 
+.mermaid-diagram-wrapper {
+  position: relative;
+  margin: 1.25em 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  overflow-x: auto;
+}
+
+.mermaid-diagram {
+  /* Mermaid outputs inline SVG; keep it responsive where possible */
+  width: 100%;
+}
+
+.mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.mermaid-download-btn {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.mermaid-download-btn:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+.mermaid-download-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mermaid-error {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
 /* Remove default pre/code styling inside code block wrapper - SyntaxHighlighter handles this */
 .code-block-wrapper pre,
 .code-block-wrapper code {

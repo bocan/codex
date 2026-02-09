@@ -16,6 +16,7 @@
     "diff": "^8.0.3",
     "github-slugger": "^2.0.0",
     "html-docx-js-typescript": "^0.1.5",
+    "mermaid": "^11.4.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-markdown": "^10.1.0",
