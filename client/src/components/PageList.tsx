@@ -126,16 +126,11 @@ export const PageList: React.FC<PageListProps> = ({
   }, [selectedFolder]);
 
   const loadPages = async () => {
-    if (!selectedFolder) {
-      setPages([]);
-      setError(null);
-      return;
-    }
-
     setLoading(true);
     setError(null);
     try {
-      const folderPath = selectedFolder === "/" ? "" : selectedFolder;
+      // Treat null, undefined, or "/" as root folder
+      const folderPath = !selectedFolder || selectedFolder === "/" ? "" : selectedFolder;
       const data = await api.getPages(folderPath);
       setPages(data);
     } catch (err) {
@@ -147,15 +142,14 @@ export const PageList: React.FC<PageListProps> = ({
   };
 
   const handleCreatePage = async () => {
-    if (!selectedFolder) return;
-
+    // Allow creating pages in root (selectedFolder can be null or "/")
     const pageName = prompt("Enter page name (without .md extension):");
     if (pageName) {
       setIsCreating(true);
       try {
         const fileName = pageName.endsWith(".md") ? pageName : `${pageName}.md`;
         const pagePath =
-          selectedFolder === "/" ? fileName : `${selectedFolder}/${fileName}`;
+          !selectedFolder || selectedFolder === "/" ? fileName : `${selectedFolder}/${fileName}`;
         await api.createPage(pagePath, `# ${pageName}\n\nStart writing...`);
         loadPages();
         onRefresh();
@@ -306,7 +300,7 @@ export const PageList: React.FC<PageListProps> = ({
           </div>
           <button
             onClick={handleCreatePage}
-            disabled={!selectedFolder || isCreating}
+            disabled={isCreating}
             className={`new-page-btn ${isCreating ? "loading" : ""}`}
             aria-label="Create new page"
             title="Create new page"
@@ -344,13 +338,6 @@ export const PageList: React.FC<PageListProps> = ({
         >
           <div className="loading-spinner" aria-hidden="true"></div>
           <span>Loading pages...</span>
-        </div>
-      ) : !selectedFolder ? (
-        <div className="empty-state" role="status">
-          <span className="empty-icon" aria-hidden="true">
-            📂
-          </span>
-          <span>Select a folder to view pages</span>
         </div>
       ) : !loading && pages.length === 0 && !error ? (
         <div className="empty-state" role="status">
