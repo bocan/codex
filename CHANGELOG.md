@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.14.0](https://github.com/bocan/codex/compare/v2.13.1...v2.14.0) (2026-02-09)
+
+
+### Features
+
+* add mermaid diagramming ([4c3f3ac](https://github.com/bocan/codex/commit/4c3f3acdb3de36e4f07f46b2dce3183289277dde))
+
+
+### Bug Fixes
+
+* correct make build issue ([630debc](https://github.com/bocan/codex/commit/630debcc548d0a196d219d862e983654689b7da9))
+
 ## [2.13.1](https://github.com/bocan/codex/compare/v2.13.0...v2.13.1) (2026-02-09)
 
 
