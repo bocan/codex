@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.13.0](https://github.com/bocan/codex/compare/v2.12.9...v2.13.0) (2026-02-09)
+
+
+### Features
+
+* **editor:** implement Zustand store for content and scroll synchronization ([6afb37e](https://github.com/bocan/codex/commit/6afb37e1e06fd0ea85b053a1fc98a4841e96b6c3))
+
 ## [2.12.9](https://github.com/bocan/codex/compare/v2.12.8...v2.12.9) (2026-02-09)
 
 
