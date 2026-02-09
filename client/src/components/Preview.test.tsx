@@ -74,7 +74,12 @@ describe("Preview", () => {
     vi.mocked(mermaid.render).mockResolvedValue({
       svg: '<svg data-testid="mmd"><g><text>OK</text></g></svg>',
       bindFunctions: undefined,
-    } as unknown as { svg: string; bindFunctions?: (element: Element) => void });
+      diagramType: "flowchart",
+    } as unknown as {
+      svg: string;
+      bindFunctions?: (element: Element) => void;
+      diagramType: string;
+    });
 
     document.documentElement.setAttribute("data-theme", "dark");
 
