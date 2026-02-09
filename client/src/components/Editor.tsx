@@ -2,21 +2,16 @@ import React, { useState, useEffect, useRef } from "react";
 import { api } from "../services/api";
 import VersionHistory from "./VersionHistory";
 import { Attachments } from "./Attachments";
+import { useEditorStore } from "../store/editorStore";
 import "./Editor.css";
 
 interface EditorProps {
   pagePath: string | null;
   onClose: () => void;
-  onContentChange?: (content: string) => void;
-  onScroll?: (percent: number) => void;
 }
 
-export const Editor: React.FC<EditorProps> = ({
-  pagePath,
-  onClose,
-  onContentChange,
-  onScroll,
-}) => {
+export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
+  const { setContent: setStoreContent, scrollEditor } = useEditorStore();
   const [content, setContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +24,7 @@ export const Editor: React.FC<EditorProps> = ({
   const [isListening, setIsListening] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollThrottleRef = useRef<number | null>(null);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
   const contentRef = useRef<string>(content); // Track current content for speech recognition
@@ -38,11 +34,29 @@ export const Editor: React.FC<EditorProps> = ({
     contentRef.current = content;
   }, [content]);
 
+  // Debounced store update - only update preview after typing pauses
+  useEffect(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    debounceTimerRef.current = setTimeout(() => {
+      setStoreContent(content);
+    }, 600); // 600ms debounce
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [content, setStoreContent]);
+
   useEffect(() => {
     if (pagePath) {
       loadPage();
     } else {
       setContent("");
+      setStoreContent("");
       setError(null);
     }
   }, [pagePath]);
@@ -55,10 +69,8 @@ export const Editor: React.FC<EditorProps> = ({
     try {
       const page = await api.getPage(pagePath);
       setContent(page.content);
-      // Notify parent of initial content
-      if (onContentChange) {
-        onContentChange(page.content);
-      }
+      // Update store with initial content
+      setStoreContent(page.content);
     } catch (err) {
       console.error("Failed to load page:", err);
       setError("Failed to load page. Click to retry.");
@@ -117,8 +129,6 @@ export const Editor: React.FC<EditorProps> = ({
 
   // Handle editor scroll - sends scroll position to preview (throttled)
   const handleScroll = (e: React.UIEvent<HTMLTextAreaElement>) => {
-    if (!onScroll) return;
-
     const target = e.currentTarget;
     const scrollTop = target.scrollTop;
     const maxScroll = target.scrollHeight - target.clientHeight;
@@ -129,7 +139,7 @@ export const Editor: React.FC<EditorProps> = ({
     scrollThrottleRef.current = requestAnimationFrame(() => {
       scrollThrottleRef.current = null;
       if (maxScroll > 0) {
-        onScroll(scrollTop / maxScroll);
+        scrollEditor(scrollTop / maxScroll);
       }
     });
   };
@@ -174,9 +184,7 @@ export const Editor: React.FC<EditorProps> = ({
           currentContent.slice(end);
 
         setContent(newContent);
-        if (onContentChange) {
-          onContentChange(newContent);
-        }
+        // Store update is debounced via useEffect
 
         // Move cursor to end of inserted text
         const newCursorPos = start + finalTranscript.length;
@@ -241,9 +249,7 @@ export const Editor: React.FC<EditorProps> = ({
       const end = textarea.selectionEnd;
       const newContent = content.substring(0, start) + text + content.substring(end);
       setContent(newContent);
-      if (onContentChange) {
-        onContentChange(newContent);
-      }
+      // Store update is debounced via useEffect
     }
   };
 
@@ -656,10 +662,7 @@ export const Editor: React.FC<EditorProps> = ({
         value={content}
         onChange={(e) => {
           setContent(e.target.value);
-          // Notify parent of content change immediately for live preview
-          if (onContentChange) {
-            onContentChange(e.target.value);
-          }
+          // Store update is debounced via useEffect
         }}
         onScroll={handleScroll}
         onKeyDown={handleKeyDown}
