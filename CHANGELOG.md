@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.13.1](https://github.com/bocan/codex/compare/v2.13.0...v2.13.1) (2026-02-09)
+
+
+### Chores
+
+* **ci:** bump Node.js version to 25.x in CI workflows ([a7f6de5](https://github.com/bocan/codex/commit/a7f6de56ac72bc4ae4afde4d756e7c0a5f008573))
+
 ## [2.13.0](https://github.com/bocan/codex/compare/v2.12.9...v2.13.0) (2026-02-09)
 
 
