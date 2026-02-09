@@ -36,8 +36,6 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [leftPaneCollapsed, setLeftPaneCollapsed] = useState(false);
   const [rightPaneCollapsed, setRightPaneCollapsed] = useState(false);
-  const [editorContent, setEditorContent] = useState<string>(""); // Track live editor content for preview
-  const [scrollPercent, setScrollPercent] = useState<number>(0); // Synchronized scroll position (editor -> preview)
   const [isMobile, setIsMobile] = useState(false); // Track if we're on mobile for overlay behavior
   const [showAbout, setShowAbout] = useState(false); // About modal visibility
 
@@ -318,13 +316,6 @@ function App() {
 
   const handleSelectPage = (path: string) => {
     setSelectedPage(path);
-    // Reset scroll position when changing pages
-    setScrollPercent(0);
-  };
-
-  // Handle scroll from editor - syncs to preview
-  const handleEditorScroll = (percent: number) => {
-    setScrollPercent(percent);
   };
 
   const handleCloseEditor = () => {
@@ -620,8 +611,6 @@ function App() {
               <Editor
                 pagePath={selectedPage}
                 onClose={handleCloseEditor}
-                onContentChange={setEditorContent}
-                onScroll={handleEditorScroll}
               />
             </section>
 
@@ -656,9 +645,7 @@ function App() {
                   <div className="pane-content">
                     <Preview
                       pagePath={selectedPage}
-                      liveContent={editorContent}
                       onNavigate={handleSelectPage}
-                      scrollPercent={scrollPercent}
                     />
                   </div>
                 </>

@@ -38,7 +38,7 @@
 - 🔐 **Password Protection**: Simple password-based authentication to secure your data
 - 🛡️ **Security Features**: Rate limiting, request logging, and security headers
 
-## 🔐 Security & Logging
+## 🔐 Security & Logging.
 
 Codex includes several security features to protect your data:
 

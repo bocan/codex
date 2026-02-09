@@ -7,6 +7,7 @@ import { oneDark, oneLight } from "react-syntax-highlighter/dist/esm/styles/pris
 import { asBlob } from "html-docx-js-typescript";
 import { api } from "../services/api";
 import { TableOfContents } from "./TableOfContents";
+import { useEditorStore } from "../store/editorStore";
 import "./Preview.css";
 
 // CodeBlock component with copy functionality
@@ -88,17 +89,16 @@ const CodeBlock: React.FC<{ language?: string; children: string }> = ({ language
 
 interface PreviewProps {
   pagePath: string | null;
-  liveContent?: string;
   onNavigate?: (path: string) => void;
-  scrollPercent?: number;
 }
 
 export const Preview: React.FC<PreviewProps> = ({
   pagePath,
-  liveContent,
   onNavigate,
-  scrollPercent,
 }) => {
+  const liveContent = useEditorStore((state) => state.content);
+  const scrollSource = useEditorStore((state) => state.scrollSource);
+  const editorScrollPercent = useEditorStore((state) => state.editorScrollPercent);
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
@@ -137,17 +137,17 @@ export const Preview: React.FC<PreviewProps> = ({
 
   // Sync scroll from editor (smooth)
   useEffect(() => {
-    if (contentRef.current && scrollPercent !== undefined) {
+    if (contentRef.current && scrollSource === 'editor') {
       const container = contentRef.current;
       const maxScroll = container.scrollHeight - container.clientHeight;
       if (maxScroll > 0) {
         // Use requestAnimationFrame for smoother scrolling
         requestAnimationFrame(() => {
-          container.scrollTop = maxScroll * scrollPercent;
+          container.scrollTop = maxScroll * editorScrollPercent;
         });
       }
     }
-  }, [scrollPercent]);
+  }, [scrollSource, editorScrollPercent]);
 
   // Close export menu when clicking outside
   useEffect(() => {
