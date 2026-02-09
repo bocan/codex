@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.12.9](https://github.com/bocan/codex/compare/v2.12.8...v2.12.9) (2026-02-09)
+
+
+### Bug Fixes
+
+* **PageList:** allow creating and display of pages in root folder and simplify folder path logic ([fd7fadc](https://github.com/bocan/codex/commit/fd7fadc0608b62204a89a25dcefbb6b9e7b9d462))
+
 ## [2.12.8](https://github.com/bocan/codex/compare/v2.12.7...v2.12.8) (2026-02-08)
 
 
