@@ -75,11 +75,7 @@ describe("Preview", () => {
       svg: '<svg data-testid="mmd"><g><text>OK</text></g></svg>',
       bindFunctions: undefined,
       diagramType: "flowchart",
-    } as unknown as {
-      svg: string;
-      bindFunctions?: (element: Element) => void;
-      diagramType: string;
-    });
+    } as unknown as { svg: string; bindFunctions?: (element: Element) => void; diagramType: string });
 
     document.documentElement.setAttribute("data-theme", "dark");
 
