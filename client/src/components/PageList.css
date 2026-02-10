@@ -335,6 +335,7 @@
   margin-bottom: 16px;
   max-height: 400px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .folder-option {
@@ -347,12 +348,15 @@
   font-size: 14px;
   transition: all 0.2s;
   color: var(--text-primary, #333);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .folder-option:hover {
   background: var(--bg-tertiary, #e8e8e8);
   border-color: #667eea;
-  transform: translateX(4px);
 }
 
 .cancel-btn {

@@ -166,7 +166,7 @@
   line-height: 1.7;
   color: var(--text-primary);
   max-width: 75ch;
-  margin: 0 auto;
+  margin: 0;
 }
 
 .preview-content h1 {

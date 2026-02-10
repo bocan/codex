@@ -39,3 +39,10 @@ export interface SearchResult {
   snippet: string;
   matches: number;
 }
+
+export interface TemplateDefinition {
+  path: string;
+  template: string;
+  autoname: boolean;
+  content: string;
+}

@@ -9,6 +9,7 @@ import pageRoutes from "./routes/pages";
 import authRoutes from "./routes/auth";
 import searchRoutes from "./routes/search";
 import attachmentRoutes from "./routes/attachments";
+import templatesRoutes from "./routes/templates";
 import { requireAuth } from "./middleware/auth";
 import { GitService } from "./services/gitService";
 import { DATA_DIR as DEFAULT_DATA_DIR, FileSystemService } from "./services/fileSystem";
@@ -224,6 +225,7 @@ app.get("/api", (req: Request, res: Response) => {
 app.use("/api/auth", authRoutes); // Auth routes (public)
 app.use("/api/folders", requireAuth, folderRoutes); // Protected
 app.use("/api/pages", requireAuth, pageRoutes); // Protected
+app.use("/api/templates", requireAuth, templatesRoutes); // Protected
 app.use("/api/search", requireAuth, searchRoutes); // Protected
 app.use("/api/attachments", requireAuth, attachmentRoutes); // Protected
 

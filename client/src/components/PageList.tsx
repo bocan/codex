@@ -3,6 +3,13 @@ import { FileNode, FolderNode } from "../types";
 import { api } from "../services/api";
 import "./PageList.css";
 
+type TemplateOption = {
+  path: string;
+  template: string;
+  autoname: boolean;
+  content: string;
+};
+
 type SortField = "name" | "createdAt" | "modifiedAt";
 type SortDirection = "asc" | "desc";
 
@@ -44,6 +51,10 @@ export const PageList: React.FC<PageListProps> = ({
   const [newPageName, setNewPageName] = useState("");
   const [movingPage, setMovingPage] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [showTemplatePicker, setShowTemplatePicker] = useState(false);
+  const [templates, setTemplates] = useState<TemplateOption[]>([]);
+  const [templatesLoading, setTemplatesLoading] = useState(false);
+  const [templatesError, setTemplatesError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [isMoving, setIsMoving] = useState(false);
   const [sortField, setSortField] = useState<SortField>("name");
@@ -141,25 +152,111 @@ export const PageList: React.FC<PageListProps> = ({
     }
   };
 
-  const handleCreatePage = async () => {
-    // Allow creating pages in root (selectedFolder can be null or "/")
+  const getSelectedFolderPath = (): string => {
+    return !selectedFolder || selectedFolder === "/" ? "" : selectedFolder;
+  };
+
+  const promptForPageName = (): string | null => {
     const pageName = prompt("Enter page name (without .md extension):");
-    if (pageName) {
-      setIsCreating(true);
-      try {
-        const fileName = pageName.endsWith(".md") ? pageName : `${pageName}.md`;
-        const pagePath =
-          !selectedFolder || selectedFolder === "/" ? fileName : `${selectedFolder}/${fileName}`;
-        await api.createPage(pagePath, `# ${pageName}\n\nStart writing...`);
-        loadPages();
-        onRefresh();
-      } catch (err) {
-        console.error("Failed to create page:", err);
-        setError("Failed to create page. Please try again.");
-      } finally {
-        setIsCreating(false);
-      }
+    if (!pageName) return null;
+    return pageName.trim() ? pageName.trim() : null;
+  };
+
+  const buildPagePath = (folderPath: string, fileName: string): string => {
+    return folderPath ? `${folderPath}/${fileName}` : fileName;
+  };
+
+  const formatTimestamp = (date: Date): string => {
+    const pad2 = (n: number) => String(n).padStart(2, "0");
+    const y = date.getFullYear();
+    const m = pad2(date.getMonth() + 1);
+    const d = pad2(date.getDate());
+    const hh = pad2(date.getHours());
+    const mm = pad2(date.getMinutes());
+    return `${y}-${m}-${d}-${hh}-${mm}`;
+  };
+
+  const slugFromTemplateName = (name: string): string => {
+    return name
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^A-Za-z0-9._-]/g, "")
+      .replace(/-+/g, "-");
+  };
+
+  const ensureMd = (name: string): string => {
+    return name.endsWith(".md") ? name : `${name}.md`;
+  };
+
+  const openTemplatePicker = async () => {
+    setShowTemplatePicker(true);
+    setTemplatesError(null);
+    setTemplatesLoading(true);
+    try {
+      const data = await api.getTemplates();
+      setTemplates(data);
+    } catch (err) {
+      console.error("Failed to load templates:", err);
+      setTemplatesError("Failed to load templates.");
+      setTemplates([]);
+    } finally {
+      setTemplatesLoading(false);
     }
+  };
+
+  const createFromBlank = async () => {
+    const pageName = promptForPageName();
+    if (!pageName) return;
+
+    setIsCreating(true);
+    try {
+      const folderPath = getSelectedFolderPath();
+      const fileName = ensureMd(pageName);
+      const pagePath = buildPagePath(folderPath, fileName);
+      await api.createPage(pagePath, `# ${pageName}\n\nStart writing...`);
+      await loadPages();
+      onRefresh();
+      onSelectPage(pagePath);
+    } catch (err) {
+      console.error("Failed to create page:", err);
+      setError("Failed to create page. Please try again.");
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const createFromTemplate = async (t: TemplateOption) => {
+    const folderPath = getSelectedFolderPath();
+
+    let fileName: string | null;
+    if (t.autoname) {
+      const slug = slugFromTemplateName(t.template);
+      const stamp = formatTimestamp(new Date());
+      fileName = ensureMd(`${slug}-${stamp}`);
+    } else {
+      const pageName = promptForPageName();
+      if (!pageName) return;
+      fileName = ensureMd(pageName);
+    }
+
+    const pagePath = buildPagePath(folderPath, fileName);
+
+    setIsCreating(true);
+    try {
+      await api.createPage(pagePath, t.content);
+      await loadPages();
+      onRefresh();
+      onSelectPage(pagePath);
+    } catch (err) {
+      console.error("Failed to create page from template:", err);
+      setError("Failed to create page. Please try again.");
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleCreatePage = async () => {
+    await openTemplatePicker();
   };
 
   const handleDeletePage = async (path: string, e: React.MouseEvent) => {
@@ -468,6 +565,70 @@ export const PageList: React.FC<PageListProps> = ({
               onClick={() => setMovingPage(null)}
               disabled={isMoving}
               aria-label="Cancel moving page"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Template Picker Modal */}
+      {showTemplatePicker && (
+        <div
+          className="modal-overlay"
+          onClick={() => !isCreating && setShowTemplatePicker(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Create page from template"
+        >
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Create New Page</h3>
+            <p>Choose a template</p>
+
+            {templatesLoading ? (
+              <div className="modal-loading" role="status" aria-label="Loading templates">
+                <div className="loading-spinner" aria-hidden="true"></div>
+                <span>Loading templates...</span>
+              </div>
+            ) : templatesError ? (
+              <div className="error-state" role="alert">
+                <span className="error-icon" aria-hidden="true">
+                  ⚠️
+                </span>
+                <span>{templatesError}</span>
+              </div>
+            ) : (
+              <div className="folder-list" role="list">
+                <button
+                  className="folder-option"
+                  onClick={async () => {
+                    setShowTemplatePicker(false);
+                    await createFromBlank();
+                  }}
+                  disabled={isCreating}
+                >
+                  Blank page
+                </button>
+                {templates.map((t) => (
+                  <button
+                    key={t.path}
+                    className="folder-option"
+                    onClick={async () => {
+                      setShowTemplatePicker(false);
+                      await createFromTemplate(t);
+                    }}
+                    disabled={isCreating}
+                  >
+                    {t.template}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <button
+              className="cancel-btn"
+              onClick={() => setShowTemplatePicker(false)}
+              disabled={isCreating}
             >
               Cancel
             </button>

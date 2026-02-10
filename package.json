@@ -23,6 +23,7 @@
     "release:major": "commit-and-tag-version --release-as major"
   },
   "dependencies": {
+    "@types/node": "^25.2.3",
     "axios": "^1.13.5",
     "bcrypt": "^6.0.0",
     "express-rate-limit": "^8.2.1",
