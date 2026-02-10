@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.16.0](https://github.com/bocan/codex/compare/v2.15.0...v2.16.0) (2026-02-10)
+
+
+### Features
+
+* **api:** add endpoints for templates, search, and version history ([c4789f8](https://github.com/bocan/codex/commit/c4789f885405df0d557d537d8b46082cba0bbb9a))
+
 ## [2.15.0](https://github.com/bocan/codex/compare/v2.14.1...v2.15.0) (2026-02-10)
 
 
