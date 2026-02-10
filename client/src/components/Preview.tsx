@@ -774,9 +774,9 @@ export const Preview: React.FC<PreviewProps> = ({
                 const svgTagMatch = rawSvg.match(/<svg\b[^>]*>/i);
                 if (!svgTagMatch) return rawSvg;
                 const svgTag = svgTagMatch[0];
-                const hasStyleAttr = /\sstyle\s*=/.test(svgTag);
+                const hasStyleAttr = /style*=/.test(svgTag);
                 const nextSvgTag = hasStyleAttr
-                  ? svgTag.replace(/\sstyle\s*=\s*"([^"]*)"/i, function(_m, styleValue) {
+                  ? svgTag.replace(/style*=*"([^"]*)"/i, function(_m, styleValue) {
                       const nextStyle = styleValue.indexOf('background') >= 0
                         ? styleValue
                         : (styleValue + ';background:' + bg);
