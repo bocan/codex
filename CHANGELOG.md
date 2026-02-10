@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.14.1](https://github.com/bocan/codex/compare/v2.14.0...v2.14.1) (2026-02-10)
+
+
+### Chores
+
+* bump @typescript-eslint/eslint-plugin and related packages to 8.55.0 ([81deece](https://github.com/bocan/codex/commit/81deece01a052050213e5cb3d8503af27562c6e1))
+
 ## [2.14.0](https://github.com/bocan/codex/compare/v2.13.1...v2.14.0) (2026-02-09)
 
 
