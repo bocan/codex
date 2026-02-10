@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.15.0](https://github.com/bocan/codex/compare/v2.14.1...v2.15.0) (2026-02-10)
+
+
+### Features
+
+* **templates:** add template management functionality and UI integration ([b2271ee](https://github.com/bocan/codex/commit/b2271eeaede34d007e3b3fcbe7364ec84ae66189))
+
 ## [2.14.1](https://github.com/bocan/codex/compare/v2.14.0...v2.14.1) (2026-02-10)
 
 
