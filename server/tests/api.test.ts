@@ -236,6 +236,28 @@ describe('API Tests', () => {
     });
   });
 
+  describe('API Documentation', () => {
+    it('should include templates, search, and version history endpoints', async () => {
+      const response = await request(app).get('/api');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('endpoints');
+
+      expect(response.body.endpoints).toHaveProperty('templates');
+      expect(response.body.endpoints).toHaveProperty('search');
+
+      expect(response.body.endpoints.pages).toHaveProperty(
+        'GET /api/pages/:path/history',
+      );
+      expect(response.body.endpoints.pages).toHaveProperty(
+        'GET /api/pages/:path/versions/:hash',
+      );
+      expect(response.body.endpoints.pages).toHaveProperty(
+        'POST /api/pages/:path/restore/:hash',
+      );
+    });
+  });
+
   describe('Version History', () => {
     it('should track page creation and updates in Git', async () => {
       // Create a page

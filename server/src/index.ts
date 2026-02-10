@@ -132,6 +132,18 @@ app.get("/api", (req: Request, res: Response) => {
           description: "Get page content",
           example: `curl ${baseUrl}/api/pages/My%20Folder/page.md`,
         },
+        "GET /api/pages/:path/history": {
+          description: "Get Git-backed version history for a page",
+          example: `curl ${baseUrl}/api/pages/My%20Folder/page.md/history`,
+        },
+        "GET /api/pages/:path/versions/:hash": {
+          description: "Get a specific historical version of a page",
+          example: `curl ${baseUrl}/api/pages/My%20Folder/page.md/versions/<commit-hash>`,
+        },
+        "POST /api/pages/:path/restore/:hash": {
+          description: "Restore a page to a specific historical version",
+          example: `curl -X POST ${baseUrl}/api/pages/My%20Folder/page.md/restore/<commit-hash>`,
+        },
         "POST /api/pages": {
           description: "Create a new page",
           body: { path: "folder/page.md", content: "markdown content" },
@@ -156,6 +168,22 @@ app.get("/api", (req: Request, res: Response) => {
           body: { oldPath: "folder1/page.md", newFolderPath: "folder2" },
           returns: { success: true, newPath: "folder2/page.md" },
           example: `curl -X PUT ${baseUrl}/api/pages/move -H "Content-Type: application/json" -d '{"oldPath": "folder1/page.md", "newFolderPath": "folder2"}'`,
+        },
+      },
+      templates: {
+        "GET /api/templates": {
+          description: "List available page templates (from the data/templates folder)",
+          returns: "Array of templates with path, template name, autoname, and content",
+          example: `curl ${baseUrl}/api/templates`,
+        },
+      },
+      search: {
+        "GET /api/search": {
+          description: "Full-text search across all pages",
+          query: { q: "search term" },
+          returns:
+            "Array of results with path, title, snippet (HTML), and match count",
+          example: `curl "${baseUrl}/api/search?q=terraform"`,
         },
       },
       auth: {
