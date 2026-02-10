@@ -180,6 +180,38 @@ describe('API Tests', () => {
     });
   });
 
+  describe('Template Operations', () => {
+    it('should return empty array when templates folder does not exist', async () => {
+      const response = await request(app).get('/api/templates');
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body)).toBe(true);
+      expect(response.body).toHaveLength(0);
+    });
+
+    it('should list templates from templates folder and strip frontmatter', async () => {
+      await testFileSystemService.createFolder('templates');
+      await testFileSystemService.createPage(
+        'templates/meeting.md',
+        ['---', 'template: Meeting Notes', 'autoname: true', '---', '', '# Meeting', '', '- Attendees:', ''].join('\n'),
+      );
+      await testFileSystemService.createPage(
+        'templates/not-a-template.md',
+        ['---', 'autoname: true', '---', '', '# Should Not Appear'].join('\n'),
+      );
+
+      const response = await request(app).get('/api/templates');
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveLength(1);
+      expect(response.body[0]).toMatchObject({
+        path: 'templates/meeting.md',
+        template: 'Meeting Notes',
+        autoname: true,
+      });
+      expect(response.body[0].content).toContain('# Meeting');
+      expect(response.body[0].content).not.toContain('template:');
+    });
+  });
+
   describe('Attachment Operations', () => {
     it('should download an attachment from a .attachments folder', async () => {
       const attachmentsDir = path.join(TEST_DATA_DIR, 'TestMe', '.attachments');

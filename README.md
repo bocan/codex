@@ -14,6 +14,8 @@
 
 - 📁 **Folder Management**: Create, delete, and rename folders in a collapsible tree view with right-click context menus
 - 📝 **Markdown Pages**: Create and edit markdown documents with GitHub Flavored Markdown support
+- 🧩 **Smart Templates**: Create new pages from reusable templates (stored under `data/templates/`)
+- 📊 **Mermaid Diagrams**: Render Mermaid code fences in preview/reading mode, with export/download support
 - 🎨 **Three-Pane Layout**: Folder tree (left), markdown editor (center), live preview (right)
 - 📐 **Fully Resizable**: Drag to resize both horizontal panes (left/right) and vertical sections (folder tree/page list)
 - 🌓 **Theme Options**: Auto-detects system theme preference with manual override - cycles through auto/light/dark/high-contrast modes
@@ -37,6 +39,31 @@
 - 🚀 **Fast & Lightweight**: Built with Vite for lightning-fast development
 - 🔐 **Password Protection**: Simple password-based authentication to secure your data
 - 🛡️ **Security Features**: Rate limiting, request logging, and security headers
+
+## 🧩 Smart Templates
+
+When creating a new page, Codex can start from a template instead of a blank page.
+
+- Templates live in `data/templates/*.md`
+- Optional frontmatter at the top of the template file:
+  - `template: Your Template Name` (display name)
+  - `autoname: true|false` (auto-generate a filename when creating)
+- The frontmatter is stripped from the created page content automatically
+
+## 📊 Mermaid Diagrams
+
+Codex supports Mermaid diagrams in markdown via fenced code blocks:
+
+````md
+```mermaid
+graph TD
+  A --> B
+```
+````
+
+- Diagrams render in the live preview and in reading mode (open in new window)
+- You can download rendered diagrams as SVG
+- Export flows (e.g. Word/PDF) include diagrams as images rather than raw Mermaid text
 
 ## 🔐 Security & Logging
 

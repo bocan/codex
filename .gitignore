@@ -11,3 +11,4 @@ test-data/
 # Data folder - only track Codex Documentation
 data/*
 !data/Codex Documentation/
+!data/templates/

@@ -20,6 +20,49 @@ export interface FileNode {
   modifiedAt: string;
 }
 
+export interface TemplateDefinition {
+  path: string;
+  template: string;
+  autoname: boolean;
+  content: string;
+}
+
+function parseFrontmatter(raw: string): {
+  frontmatter: { template?: string; autoname?: boolean };
+  content: string;
+} {
+  if (!raw?.startsWith("---\n")) {
+    return { frontmatter: {}, content: raw };
+  }
+
+  const endIndex = raw.indexOf("\n---", 4);
+  if (endIndex === -1) {
+    return { frontmatter: {}, content: raw };
+  }
+
+  const fmBlock = raw.slice(4, endIndex).trim();
+  const rest = raw.slice(endIndex + "\n---".length);
+  const content = rest.startsWith("\n") ? rest.slice(1) : rest;
+
+  const frontmatter: { template?: string; autoname?: boolean } = {};
+  for (const line of fmBlock.split("\n")) {
+    const match = line.match(/^([A-Za-z0-9_-]+)\s*:\s*(.*)$/);
+    if (!match) continue;
+
+    const key = match[1];
+    const valueRaw = match[2].trim();
+    const value = valueRaw.replace(/^['"]|['"]$/g, "");
+
+    if (key === "template") {
+      frontmatter.template = value;
+    } else if (key === "autoname") {
+      frontmatter.autoname = value.toLowerCase() === "true";
+    }
+  }
+
+  return { frontmatter, content };
+}
+
 export class FileSystemService {
   private dataDir: string;
   private gitService: GitService | null;
@@ -188,6 +231,33 @@ export class FileSystemService {
     // Cache the result
     this.cache.set(cacheKey, result);
     return result;
+  }
+
+  async getTemplates(): Promise<TemplateDefinition[]> {
+    try {
+      const pages = await this.getPages("templates");
+      const templates: TemplateDefinition[] = [];
+
+      for (const page of pages) {
+        const raw = await this.getPageContent(page.path);
+        const parsed = parseFrontmatter(raw);
+        if (!parsed.frontmatter.template) continue;
+
+        templates.push({
+          path: page.path,
+          template: parsed.frontmatter.template,
+          autoname: parsed.frontmatter.autoname === true,
+          content: parsed.content,
+        });
+      }
+
+      return templates.sort((a, b) => a.template.localeCompare(b.template));
+    } catch (error: any) {
+      if (error?.code === "ENOENT") {
+        return [];
+      }
+      throw error;
+    }
   }
 
   async createPage(relativePath: string, content: string = ""): Promise<void> {

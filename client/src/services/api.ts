@@ -6,6 +6,7 @@ import {
   CommitInfo,
   VersionContent,
   SearchResult,
+  TemplateDefinition,
 } from "../types";
 
 const API_BASE = "/api";
@@ -77,6 +78,12 @@ export const api = {
 
   createPage: async (path: string, content: string = ""): Promise<void> => {
     await axios.post(`${API_BASE}/pages`, { path, content });
+  },
+
+  // Template operations
+  getTemplates: async (): Promise<TemplateDefinition[]> => {
+    const response = await axios.get(`${API_BASE}/templates`);
+    return response.data;
   },
 
   updatePage: async (path: string, content: string): Promise<void> => {
