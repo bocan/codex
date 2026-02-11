@@ -8,7 +8,7 @@
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb)](https://reactjs.org/)
-[![Express](https://img.shields.io/badge/Express-4.18-green)](https://expressjs.com/)
+[![Express](https://img.shields.io/badge/Express-5.2.1-green)](https://expressjs.com/)
 
 ## ✨ Features
 
@@ -378,7 +378,7 @@ Then open [http://localhost:3000](http://localhost:3000) in your browser!
 
 ### Prerequisites
 
-- Node.js 18+ and npm
+- Node.js 25+ and npm
 - macOS, Linux, or Windows with WSL
 
 ### Option 1: Using Make (Recommended)
@@ -482,8 +482,8 @@ docker pull bocan/codex:latest
 
 **Available tags**:
 - `latest` - Latest stable release
-- `2.7.0` - Specific version (example)
-- `2.7` - Minor version (example)
+- `2.16.0` - Specific version (example)
+- `2.16` - Minor version (example)
 - `2` - Major version (example)
 
 **Image verification** (signed with Cosign):
@@ -1037,31 +1037,31 @@ The TOC appears as a floating widget on the right side of the preview pane when 
 ## 💻 Tech Stack
 
 ### Backend
-- **[Express](https://expressjs.com/)** `^4.18.2` - Fast, unopinionated web framework
+- **[Express](https://expressjs.com/)** `^5.2.1` - Fast, unopinionated web framework
 - **[TypeScript](https://www.typescriptlang.org/)** `^5.3.3` - Type-safe JavaScript
-- **[CORS](https://www.npmjs.com/package/cors)** `^2.8.5` - Cross-origin resource sharing
+- **[CORS](https://www.npmjs.com/package/cors)** `^2.8.6` - Cross-origin resource sharing
 - **[ts-node-dev](https://www.npmjs.com/package/ts-node-dev)** `^2.0.0` - Development server with auto-reload
 
 **Testing:**
-- **[Jest](https://jestjs.io/)** `^29.7.0` - Testing framework
-- **[Supertest](https://www.npmjs.com/package/supertest)** `^6.3.3` - HTTP assertion library
+- **[Jest](https://jestjs.io/)** `^30.2.0` - Testing framework
+- **[Supertest](https://www.npmjs.com/package/supertest)** `^7.2.2` - HTTP assertion library
 - **[ts-jest](https://www.npmjs.com/package/ts-jest)** `^29.1.1` - TypeScript preprocessor for Jest
 
 ### Frontend
-- **[React](https://reactjs.org/)** `^18.2.0` - UI library
+- **[React](https://reactjs.org/)** `^19.2.4` - UI library
 - **[TypeScript](https://www.typescriptlang.org/)** `^5.3.3` - Type-safe JavaScript
-- **[Vite](https://vitejs.dev/)** `^5.0.11` - Next-generation frontend tooling
-- **[React Markdown](https://www.npmjs.com/package/react-markdown)** `^9.0.1` - Markdown renderer
+- **[Vite](https://vitejs.dev/)** `^7.3.1` - Next-generation frontend tooling
+- **[React Markdown](https://www.npmjs.com/package/react-markdown)** `^10.1.0` - Markdown renderer
 - **[remark-gfm](https://www.npmjs.com/package/remark-gfm)** `^4.0.0` - GitHub Flavored Markdown
-- **[Axios](https://axios-http.com/)** `^1.6.5` - HTTP client
+- **[Axios](https://axios-http.com/)** `^1.13.4` - HTTP client
 
 **Testing:**
-- **[Vitest](https://vitest.dev/)** `^1.1.3` - Unit test framework
+- **[Vitest](https://vitest.dev/)** `^4.0.18` - Unit test framework
 - **[Testing Library](https://testing-library.com/)** - React testing utilities
-- **[jsdom](https://www.npmjs.com/package/jsdom)** `^23.2.0` - DOM implementation
+- **[jsdom](https://www.npmjs.com/package/jsdom)** `^28.0.0` - DOM implementation
 
 ### Development Tools
-- **[Concurrently](https://www.npmjs.com/package/concurrently)** `^8.2.2` - Run multiple commands
+- **[Concurrently](https://www.npmjs.com/package/concurrently)** `^9.2.1` - Run multiple commands
 - **ESLint** - Code linting
 - **Prettier** - Code formatting (optional)
 
