@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.18.0](https://github.com/bocan/codex/compare/v2.17.0...v2.18.0) (2026-02-11)
+
+
+### Features
+
+* **docker:** include built-in documentation and templates for seeding ([5e580d2](https://github.com/bocan/codex/commit/5e580d237b0190c4b2ac351ba5fa7c04a441242e))
+
 ## [2.17.0](https://github.com/bocan/codex/compare/v2.16.0...v2.17.0) (2026-02-11)
 
 
