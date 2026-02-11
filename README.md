@@ -550,6 +550,9 @@ docker stop codex && docker rm codex
 **Volume Mounting**:
 - `./data:/app/data` - Persists your wiki data outside the container
 
+**Templates on first run**:
+- The Docker image includes built-in starter templates; on first startup, if `data/templates/` is missing or empty, Codex will copy the defaults into it.
+
 ### Authentication in Docker
 
 **Important**: Due to secure cookie requirements, there are two ways to run Codex with authentication:

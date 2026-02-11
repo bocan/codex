@@ -120,6 +120,67 @@ export class FileSystemService {
     } catch {
       await fs.mkdir(this.dataDir, { recursive: true });
     }
+
+    await this.seedTemplatesIfConfigured();
+  }
+
+  private async seedTemplatesIfConfigured(): Promise<void> {
+    if (process.env.CODEX_SEED_TEMPLATES !== "true") {
+      return;
+    }
+
+    const seedDir = process.env.CODEX_SEED_TEMPLATES_DIR;
+    if (!seedDir) {
+      return;
+    }
+
+    const templatesDir = this.validatePath("templates");
+
+    let shouldSeed = false;
+    try {
+      const entries = await fs.readdir(templatesDir, { withFileTypes: true });
+      // Seed only when the directory is empty (ignore dotfiles like .DS_Store)
+      const visibleEntries = entries.filter((entry) => !entry.name.startsWith("."));
+      shouldSeed = visibleEntries.length === 0;
+    } catch (error: any) {
+      if (error?.code === "ENOENT") {
+        shouldSeed = true;
+      } else {
+        return;
+      }
+    }
+
+    if (!shouldSeed) {
+      return;
+    }
+
+    try {
+      await fs.mkdir(templatesDir, { recursive: true });
+      const seedEntries = await fs.readdir(seedDir, { withFileTypes: true });
+      const templateFiles = seedEntries
+        .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".md"))
+        .map((entry) => entry.name);
+
+      for (const filename of templateFiles) {
+        const sourcePath = path.join(seedDir, filename);
+        const destPath = path.join(templatesDir, filename);
+        try {
+          await fs.access(destPath);
+          // Don't overwrite existing files
+          continue;
+        } catch {
+          // ok
+        }
+
+        await fs.copyFile(sourcePath, destPath);
+      }
+
+      // Invalidate caches that might be affected
+      this.cache.invalidate("folder-tree:");
+      this.cache.invalidate("pages:templates");
+    } catch {
+      // Best-effort seeding; ignore failures to avoid blocking startup
+    }
   }
 
   async getFolderTree(relativePath: string = ""): Promise<FolderNode> {
