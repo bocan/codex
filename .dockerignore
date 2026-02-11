@@ -12,6 +12,7 @@ dist/
 .github/
 *.md
 !README.md
+!data/templates/**
 .env*
 .DS_Store
 *.log

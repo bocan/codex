@@ -43,6 +43,9 @@ RUN npm ci --omit=dev
 COPY --from=builder /app/server/dist ./server/dist
 COPY --from=builder /app/client/dist ./client/dist
 
+# Include default templates in the image for first-run seeding into the mounted data volume
+COPY data/templates ./seed/templates
+
 # Create data directory and set permissions
 RUN mkdir -p /app/data && chown -R codex:codex /app
 
@@ -55,6 +58,11 @@ EXPOSE 3001
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3001
+ENV DATA_DIR=/app/data
+
+# Seed templates into the data volume on first run (only if data/templates is missing or empty)
+ENV CODEX_SEED_TEMPLATES=true
+ENV CODEX_SEED_TEMPLATES_DIR=/app/seed/templates
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
