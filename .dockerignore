@@ -13,6 +13,7 @@ dist/
 *.md
 !README.md
 !data/templates/**
+!data/Codex Documentation/README.md
 .env*
 .DS_Store
 *.log

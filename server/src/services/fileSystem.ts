@@ -121,7 +121,37 @@ export class FileSystemService {
       await fs.mkdir(this.dataDir, { recursive: true });
     }
 
+    await this.syncBuiltinDocsIfConfigured();
     await this.seedTemplatesIfConfigured();
+  }
+
+  private async syncBuiltinDocsIfConfigured(): Promise<void> {
+    if (process.env.CODEX_SYNC_BUILTIN_DOCS !== "true") {
+      return;
+    }
+
+    const seedDir = process.env.CODEX_SYNC_BUILTIN_DOCS_DIR;
+    if (!seedDir) {
+      return;
+    }
+
+    const sourceReadme = path.join(seedDir, "Codex Documentation", "README.md");
+    const destReadmeRelative = path.join("Codex Documentation", "README.md");
+
+    try {
+      const destDir = this.validatePath("Codex Documentation");
+      await fs.mkdir(destDir, { recursive: true });
+
+      const destReadme = this.validatePath(destReadmeRelative);
+      await fs.copyFile(sourceReadme, destReadme);
+
+      // Invalidate caches that might be affected
+      this.cache.invalidate("folder-tree:");
+      this.cache.invalidate("pages:Codex Documentation");
+      this.cache.invalidate(`page:${destReadmeRelative}`);
+    } catch {
+      // Best-effort sync; ignore failures to avoid blocking startup
+    }
   }
 
   private async seedTemplatesIfConfigured(): Promise<void> {

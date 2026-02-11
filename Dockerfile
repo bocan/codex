@@ -46,6 +46,9 @@ COPY --from=builder /app/client/dist ./client/dist
 # Include default templates in the image for first-run seeding into the mounted data volume
 COPY data/templates ./seed/templates
 
+# Include built-in documentation that should always be synced into the mounted data volume
+COPY ["data/Codex Documentation/README.md", "./seed/docs/Codex Documentation/README.md"]
+
 # Create data directory and set permissions
 RUN mkdir -p /app/data && chown -R codex:codex /app
 
@@ -63,6 +66,10 @@ ENV DATA_DIR=/app/data
 # Seed templates into the data volume on first run (only if data/templates is missing or empty)
 ENV CODEX_SEED_TEMPLATES=true
 ENV CODEX_SEED_TEMPLATES_DIR=/app/seed/templates
+
+# Always sync built-in documentation README into the data volume on startup
+ENV CODEX_SYNC_BUILTIN_DOCS=true
+ENV CODEX_SYNC_BUILTIN_DOCS_DIR=/app/seed/docs
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
