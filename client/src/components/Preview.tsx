@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
@@ -373,13 +373,212 @@ interface PreviewProps {
   onNavigate?: (path: string) => void;
 }
 
+const PreviewScrollSync: React.FC<{ contentRef: React.RefObject<HTMLDivElement> }> = ({
+  contentRef,
+}) => {
+  const scrollSource = useEditorStore((state) => state.scrollSource);
+  const editorScrollPercent = useEditorStore(
+    (state) => state.editorScrollPercent,
+  );
+
+  // Sync scroll from editor (smooth). This is isolated so scroll updates
+  // don't cause the entire Preview (and markdown parsing) to re-render.
+  useEffect(() => {
+    if (contentRef.current && scrollSource === "editor") {
+      const container = contentRef.current;
+      const maxScroll = container.scrollHeight - container.clientHeight;
+      if (maxScroll > 0) {
+        requestAnimationFrame(() => {
+          container.scrollTop = maxScroll * editorScrollPercent;
+        });
+      }
+    }
+  }, [scrollSource, editorScrollPercent, contentRef]);
+
+  return null;
+};
+
+const MarkdownRenderer = React.memo(function MarkdownRenderer({
+  content,
+  pagePath,
+  onNavigate,
+}: {
+  content: string;
+  pagePath: string | null;
+  onNavigate?: (path: string) => void;
+}) {
+  const remarkPlugins = useMemo(() => [remarkGfm], []);
+  const rehypePlugins = useMemo(() => [rehypeSlug], []);
+
+  const handleLinkClick = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement>) => {
+      const href = event.currentTarget.getAttribute("href");
+      if (!href) return;
+
+      // Handle anchor links (same document)
+      if (href.startsWith("#")) {
+        event.preventDefault();
+        const targetId = href.substring(1);
+        const previewContent = event.currentTarget.closest(".preview-content");
+        if (previewContent) {
+          const element = previewContent.querySelector(`#${targetId}`);
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }
+        return;
+      }
+
+      // Handle internal markdown links
+      if (
+        href.endsWith(".md") &&
+        !href.startsWith("http://") &&
+        !href.startsWith("https://")
+      ) {
+        event.preventDefault();
+
+        let targetPath = href;
+        if (pagePath && !href.startsWith("/")) {
+          const currentDir = pagePath.substring(0, pagePath.lastIndexOf("/"));
+          targetPath = currentDir ? `${currentDir}/${href}` : href;
+        } else if (href.startsWith("/")) {
+          targetPath = href.substring(1);
+        }
+
+        if (onNavigate) {
+          onNavigate(targetPath);
+        }
+      }
+    },
+    [onNavigate, pagePath],
+  );
+
+  const components = useMemo(
+    () => ({
+      // Override pre to be a transparent wrapper - our CodeBlock handles all styling
+      pre: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+      code: ({
+        node: _node,
+        className,
+        children,
+        ...props
+      }: {
+        node?: unknown;
+        className?: string;
+        children?: React.ReactNode;
+      } & React.HTMLAttributes<HTMLElement>) => {
+        const match = /language-(\w+)/.exec(className || "");
+        const language = match ? match[1] : undefined;
+        const codeString = String(children).replace(/\n$/, "");
+
+        const isCodeBlock = match || codeString.includes("\n");
+
+        if (isCodeBlock) {
+          if (language === "mermaid") {
+            return <MermaidBlock code={codeString} />;
+          }
+          return <CodeBlock language={language}>{codeString}</CodeBlock>;
+        }
+
+        return (
+          <code className={className} {...props}>
+            {children}
+          </code>
+        );
+      },
+      a: ({ node: _node, ...props }: { node?: unknown } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+        const href = props.href || "";
+
+        // Handle attachment links
+        if (href.startsWith(".attachments/")) {
+          const folderPath = pagePath
+            ? pagePath.substring(0, pagePath.lastIndexOf("/")) || ""
+            : "";
+          const filename = href.replace(".attachments/", "");
+          const fullUrl = api.getAttachmentUrl(folderPath, filename);
+          return (
+            <a
+              {...props}
+              href={fullUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+            />
+          );
+        }
+
+        return <a {...props} onClick={handleLinkClick} />;
+      },
+      img: ({ node: _node, ...props }: { node?: unknown } & React.ImgHTMLAttributes<HTMLImageElement>) => {
+        const src = props.src || "";
+        const alt = props.alt || "";
+
+        // Handle attachment images
+        if (src.startsWith(".attachments/")) {
+          const folderPath = pagePath
+            ? pagePath.substring(0, pagePath.lastIndexOf("/")) || ""
+            : "";
+          const filename = src.replace(".attachments/", "");
+          const fullUrl = api.getAttachmentUrl(folderPath, filename);
+
+          // Wrap in figure with caption if alt text exists
+          if (alt) {
+            return (
+              <figure style={{ margin: "16px 0", textAlign: "center" }}>
+                <img {...props} src={fullUrl} alt={alt} />
+                <figcaption
+                  style={{
+                    marginTop: "8px",
+                    fontSize: "0.9em",
+                    color: "var(--text-secondary)",
+                    fontStyle: "italic",
+                  }}
+                >
+                  {alt}
+                </figcaption>
+              </figure>
+            );
+          }
+          return <img {...props} src={fullUrl} alt={filename} />;
+        }
+
+        // For non-attachment images, still show caption if alt text exists
+        if (alt) {
+          return (
+            <figure style={{ margin: "16px 0", textAlign: "center" }}>
+              <img {...props} />
+              <figcaption
+                style={{
+                  marginTop: "8px",
+                  fontSize: "0.9em",
+                  color: "var(--text-secondary)",
+                  fontStyle: "italic",
+                }}
+              >
+                {alt}
+              </figcaption>
+            </figure>
+          );
+        }
+
+        return <img {...props} />;
+      },
+    }),
+    [handleLinkClick, pagePath],
+  );
+
+  return (
+    <ReactMarkdown remarkPlugins={remarkPlugins} rehypePlugins={rehypePlugins} components={components}>
+      {content}
+    </ReactMarkdown>
+  );
+}, (prev, next) => prev.content === next.content && prev.pagePath === next.pagePath && prev.onNavigate === next.onNavigate);
+
 export const Preview: React.FC<PreviewProps> = ({
   pagePath,
   onNavigate,
 }) => {
   const liveContent = useEditorStore((state) => state.content);
-  const scrollSource = useEditorStore((state) => state.scrollSource);
-  const editorScrollPercent = useEditorStore((state) => state.editorScrollPercent);
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
@@ -416,19 +615,7 @@ export const Preview: React.FC<PreviewProps> = ({
     }
   };
 
-  // Sync scroll from editor (smooth)
-  useEffect(() => {
-    if (contentRef.current && scrollSource === 'editor') {
-      const container = contentRef.current;
-      const maxScroll = container.scrollHeight - container.clientHeight;
-      if (maxScroll > 0) {
-        // Use requestAnimationFrame for smoother scrolling
-        requestAnimationFrame(() => {
-          container.scrollTop = maxScroll * editorScrollPercent;
-        });
-      }
-    }
-  }, [scrollSource, editorScrollPercent]);
+  // Scroll sync is handled in PreviewScrollSync (isolated from markdown parsing)
 
   // Close export menu when clicking outside
   useEffect(() => {
@@ -1481,52 +1668,6 @@ ${htmlContent}
     newWindow.document.close();
   };
 
-  // Handle link clicks in preview
-  const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    const href = event.currentTarget.getAttribute("href");
-    if (!href) return;
-
-    // Handle anchor links (same document)
-    if (href.startsWith("#")) {
-      event.preventDefault();
-      const targetId = href.substring(1);
-      // Look for the element within the preview content
-      const previewContent = event.currentTarget.closest(".preview-content");
-      if (previewContent) {
-        const element = previewContent.querySelector(`#${targetId}`);
-        if (element) {
-          element.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      }
-      return;
-    }
-
-    // Handle internal markdown links
-    if (
-      href.endsWith(".md") &&
-      !href.startsWith("http://") &&
-      !href.startsWith("https://")
-    ) {
-      event.preventDefault();
-
-      // Resolve relative path
-      let targetPath = href;
-      if (pagePath && !href.startsWith("/")) {
-        // Relative path - resolve from current page's directory
-        const currentDir = pagePath.substring(0, pagePath.lastIndexOf("/"));
-        targetPath = currentDir ? `${currentDir}/${href}` : href;
-      } else if (href.startsWith("/")) {
-        // Absolute path - remove leading slash
-        targetPath = href.substring(1);
-      }
-
-      if (onNavigate) {
-        onNavigate(targetPath);
-      }
-    }
-    // External links open normally (default behavior)
-  };
-
   if (!pagePath) {
     return (
       <div className="preview empty" role="status">
@@ -1661,116 +1802,8 @@ ${htmlContent}
         role="region"
         aria-label="Rendered markdown content"
       >
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          rehypePlugins={[rehypeSlug]}
-          components={{
-            // Override pre to be a transparent wrapper - our CodeBlock handles all styling
-            pre: ({ children }) => <>{children}</>,
-            code: ({ node: _node, className, children, ...props }) => {
-              const match = /language-(\w+)/.exec(className || "");
-              const language = match ? match[1] : undefined;
-              const codeString = String(children).replace(/\n$/, "");
-
-              // Check if this is an inline code or a code block
-              // Code blocks have a parent <pre> element, which ReactMarkdown handles
-              // by wrapping the code component. We detect blocks by checking if
-              // className exists (language specified) or if content has newlines
-              const isCodeBlock = match || codeString.includes("\n");
-
-              if (isCodeBlock) {
-                if (language === "mermaid") {
-                  return <MermaidBlock code={codeString} />;
-                }
-                return <CodeBlock language={language}>{codeString}</CodeBlock>;
-              }
-
-              // Inline code
-              return (
-                <code className={className} {...props}>
-                  {children}
-                </code>
-              );
-            },
-            a: ({ node: _node, ...props }) => {
-              const href = props.href || "";
-              // Handle attachment links
-              if (href.startsWith(".attachments/")) {
-                const folderPath = pagePath
-                  ? pagePath.substring(0, pagePath.lastIndexOf("/")) || ""
-                  : "";
-                const filename = href.replace(".attachments/", "");
-                const fullUrl = api.getAttachmentUrl(folderPath, filename);
-                return (
-                  <a
-                    {...props}
-                    href={fullUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    download
-                  />
-                );
-              }
-              return <a {...props} onClick={handleLinkClick} />;
-            },
-            img: ({ node: _node, ...props }) => {
-              const src = props.src || "";
-              const alt = props.alt || "";
-
-              // Handle attachment images
-              if (src.startsWith(".attachments/")) {
-                const folderPath = pagePath
-                  ? pagePath.substring(0, pagePath.lastIndexOf("/")) || ""
-                  : "";
-                const filename = src.replace(".attachments/", "");
-                const fullUrl = api.getAttachmentUrl(folderPath, filename);
-
-                // Wrap in figure with caption if alt text exists
-                if (alt) {
-                  return (
-                    <figure style={{ margin: "16px 0", textAlign: "center" }}>
-                      <img {...props} src={fullUrl} alt={alt} />
-                      <figcaption
-                        style={{
-                          marginTop: "8px",
-                          fontSize: "0.9em",
-                          color: "var(--text-secondary)",
-                          fontStyle: "italic",
-                        }}
-                      >
-                        {alt}
-                      </figcaption>
-                    </figure>
-                  );
-                }
-                return <img {...props} src={fullUrl} alt={filename} />;
-              }
-
-              // For non-attachment images, still show caption if alt text exists
-              if (alt) {
-                return (
-                  <figure style={{ margin: "16px 0", textAlign: "center" }}>
-                    <img {...props} />
-                    <figcaption
-                      style={{
-                        marginTop: "8px",
-                        fontSize: "0.9em",
-                        color: "var(--text-secondary)",
-                        fontStyle: "italic",
-                      }}
-                    >
-                      {alt}
-                    </figcaption>
-                  </figure>
-                );
-              }
-
-              return <img {...props} />;
-            },
-          }}
-        >
-          {content}
-        </ReactMarkdown>
+        <PreviewScrollSync contentRef={contentRef} />
+        <MarkdownRenderer content={content} pagePath={pagePath} onNavigate={onNavigate} />
       </div>
     </article>
   );
