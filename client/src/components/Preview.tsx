@@ -373,7 +373,9 @@ interface PreviewProps {
   onNavigate?: (path: string) => void;
 }
 
-const PreviewScrollSync: React.FC<{ contentRef: React.RefObject<HTMLDivElement> }> = ({
+const PreviewScrollSync: React.FC<{
+  contentRef: React.RefObject<HTMLDivElement | null>;
+}> = ({
   contentRef,
 }) => {
   const scrollSource = useEditorStore((state) => state.scrollSource);
