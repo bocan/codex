@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.19.0](https://github.com/bocan/codex/compare/v2.18.0...v2.19.0) (2026-02-13)
+
+
+### Features
+
+* **preview:** optimise scroll synchronization after profiling ([2a4d4d6](https://github.com/bocan/codex/commit/2a4d4d6b5a130a14e233651e144cae5539252089))
+
+
+### Chores
+
+* **deps:** update @types/react to version 19.2.14 ([8dfd201](https://github.com/bocan/codex/commit/8dfd201465703362edf3b367fbbdce2a88d18f17))
+
 ## [2.18.0](https://github.com/bocan/codex/compare/v2.17.0...v2.18.0) (2026-02-11)
 
 
