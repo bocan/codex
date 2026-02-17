@@ -30,7 +30,7 @@
     "express-session": "^1.19.0",
     "helmet": "^8.1.0",
     "morgan": "^1.10.1",
-    "simple-git": "^3.30.0"
+    "simple-git": "^3.31.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
