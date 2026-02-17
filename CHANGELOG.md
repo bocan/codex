@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.19.2](https://github.com/bocan/codex/compare/v2.19.1...v2.19.2) (2026-02-17)
+
+
+### Chores
+
+* **deps:** bump [@chevrotain](https://github.com/chevrotain) and related packages to latest versions ([17ac911](https://github.com/bocan/codex/commit/17ac911bf793f5a84e88878e2489461192b86ebc))
+* **server:** replace ts-node-dev with tsx for development scripts ([ab0075a](https://github.com/bocan/codex/commit/ab0075a1a8cfcad6617ac1d55f32c578fad23fc6))
+
 ## [2.19.1](https://github.com/bocan/codex/compare/v2.19.0...v2.19.1) (2026-02-17)
 
 
