@@ -4,8 +4,8 @@
   "description": "Backend API for Codex",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "dev:mcp": "MCP_ENABLED=true ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "tsx watch src/index.ts",
+    "dev:mcp": "MCP_ENABLED=true tsx watch src/index.ts",
     "mcp": "node --loader ts-node/esm src/mcp/standalone.ts",
     "build": "tsc",
     "start": "node dist/index.js",
@@ -30,7 +30,7 @@
     "jest": "^30.2.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.1.1",
-    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.3.3"
   }
 }
