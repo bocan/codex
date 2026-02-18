@@ -113,14 +113,17 @@ function parseBody(req: IncomingMessage): Promise<unknown> {
   });
 }
 
-// Store active transports per session
-const transports = new Map<string, StreamableHTTPServerTransport>();
+// Store active sessions (transport + server pairs)
+interface SessionContext {
+  transport: StreamableHTTPServerTransport;
+  server: McpServer;
+}
+const sessions = new Map<string, SessionContext>();
 
 /**
  * Start the MCP server
  */
 export function startMcpServer(): void {
-  const mcpServer = createMcpServer();
 
   const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
     // CORS headers
@@ -187,10 +190,10 @@ export function startMcpServer(): void {
       // Handle DELETE - session termination
       if (req.method === 'DELETE') {
         if (sessionId) {
-          const transport = transports.get(sessionId);
-          if (transport) {
-            await transport.close();
-            transports.delete(sessionId);
+          const sessionCtx = sessions.get(sessionId);
+          if (sessionCtx) {
+            await sessionCtx.transport.close();
+            sessions.delete(sessionId);
           }
           sessionStore.delete(sessionId);
         }
@@ -205,13 +208,13 @@ export function startMcpServer(): void {
           // Get or create transport for this session
           let transport: StreamableHTTPServerTransport;
 
-          if (sessionId && transports.has(sessionId)) {
+          if (sessionId && sessions.has(sessionId)) {
             // Existing session - reuse transport
-            const existingTransport = transports.get(sessionId);
-            if (!existingTransport) {
-              throw new Error('Transport not found despite has() check');
+            const sessionCtx = sessions.get(sessionId);
+            if (!sessionCtx) {
+              throw new Error('Session not found despite has() check');
             }
-            transport = existingTransport;
+            transport = sessionCtx.transport;
           } else if (sessionId) {
             // Session ID provided but transport not found - session expired
             sendJson(res, 400, {
@@ -225,6 +228,9 @@ export function startMcpServer(): void {
             return;
           } else {
             // No session ID - this should be an initialize request
+            // Create new MCP server instance for this session
+            const sessionServer = createMcpServer();
+
             // Create new transport for the session
             transport = new StreamableHTTPServerTransport({
               sessionIdGenerator: () => {
@@ -233,7 +239,7 @@ export function startMcpServer(): void {
               },
               onsessioninitialized: (newSessionId) => {
                 sessionStore.initialize(newSessionId);
-                transports.set(newSessionId, transport);
+                sessions.set(newSessionId, { transport, server: sessionServer });
                 if (config.debug) {
                   console.log(`[MCP] Session initialized: ${newSessionId}`);
                 }
@@ -243,7 +249,7 @@ export function startMcpServer(): void {
             });
 
             // Connect MCP server to transport for new sessions
-            await mcpServer.connect(transport);
+            await sessionServer.connect(transport);
           }
 
           // Parse body and handle request
@@ -266,17 +272,17 @@ export function startMcpServer(): void {
 
       // Handle GET - SSE streaming (for server-initiated messages)
       if (req.method === 'GET') {
-        if (!sessionId || !transports.has(sessionId)) {
+        if (!sessionId || !sessions.has(sessionId)) {
           sendJson(res, 400, { error: 'Session ID required for SSE connection' });
           return;
         }
 
-        const transport = transports.get(sessionId);
-        if (!transport) {
-          sendJson(res, 400, { error: 'Transport not found' });
+        const sessionCtx = sessions.get(sessionId);
+        if (!sessionCtx) {
+          sendJson(res, 400, { error: 'Session not found' });
           return;
         }
-        await transport.handleRequest(req, res);
+        await sessionCtx.transport.handleRequest(req, res);
         return;
       }
 
