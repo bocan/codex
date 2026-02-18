@@ -262,6 +262,14 @@ app.get("/api/health", (req: Request, res: Response) => {
   res.json({ status: "ok" });
 });
 
+// Handle .well-known/* routes that aren't supported (for MCP clients doing OAuth discovery)
+app.get("/.well-known/oauth-authorization-server", (req: Request, res: Response) => {
+  res.status(404).json({ error: "OAuth not supported", message: "This server uses API key authentication" });
+});
+app.get("/.well-known/openid-configuration", (req: Request, res: Response) => {
+  res.status(404).json({ error: "OIDC not supported", message: "This server uses API key authentication" });
+});
+
 // Serve static files in production
 if (process.env.NODE_ENV === "production") {
   const clientDistPath = path.join(__dirname, "../../client/dist");
