@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.20.0](https://github.com/bocan/codex/compare/v2.19.2...v2.20.0) (2026-02-18)
+
+
+### Features
+
+* handle unsupported .well-known routes for OAuth discovery ([cfd224b](https://github.com/bocan/codex/commit/cfd224bb6398c57188a149b3c8f7dde19a0d8789))
+
+
+### Chores
+
+* **deps:** update fast-xml-parser to version 5.3.6 and strnum to 2.1.2 ([303515d](https://github.com/bocan/codex/commit/303515d3fdb7831a6ba40187cf352742a51eb2d3))
+
 ## [2.19.2](https://github.com/bocan/codex/compare/v2.19.1...v2.19.2) (2026-02-17)
 
 
