@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.20.1](https://github.com/bocan/codex/compare/v2.20.0...v2.20.1) (2026-02-18)
+
+
+### Code Refactoring
+
+* **server:** replace transports with sessions for session management ([192e5ea](https://github.com/bocan/codex/commit/192e5eaf1202f0345d427efc8263330c2c136072))
+
 ## [2.20.0](https://github.com/bocan/codex/compare/v2.19.2...v2.20.0) (2026-02-18)
 
 
