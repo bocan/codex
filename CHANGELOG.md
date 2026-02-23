@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.20.3](https://github.com/bocan/codex/compare/v2.20.2...v2.20.3) (2026-02-23)
+
+
+### Documentation
+
+* **mcp:** update available tools and client configuration details ([8e48733](https://github.com/bocan/codex/commit/8e487336ff461aabdadd1c0b412b219ba4264da3))
+
+
+### Chores
+
+* **deps-dev:** bump eslint from 9.39.2 to 10.0.1 ([9647d7b](https://github.com/bocan/codex/commit/9647d7b8c9dbb5731ebab477448b47f07d003e54))
+
 ## [2.20.2](https://github.com/bocan/codex/compare/v2.20.1...v2.20.2) (2026-02-23)
 
 
