@@ -39,7 +39,7 @@ The Codex MCP (Model Context Protocol) server allows AI agents like Claude, GitH
 
 ## Available Tools
 
-The MCP server exposes 12 tools:
+The MCP server exposes 16 tools:
 
 ### Page Operations
 - **`search_pages`** - Search documentation by query string
@@ -57,6 +57,12 @@ The MCP server exposes 12 tools:
 - **`delete_folder`** - Delete an empty folder
 - **`rename_folder`** - Rename a folder
 
+### Attachment Operations
+- **`list_attachments`** - List attachments in a folder
+- **`upload_attachment`** - Upload a file attachment (base64 encoded)
+- **`get_attachment`** - Download an attachment
+- **`delete_attachment`** - Delete an attachment
+
 ## Available Resources
 
 - **`codex://page/{path}`** - Access any documentation page by path
@@ -70,16 +76,40 @@ Set `MCP_API_KEY` to require authentication. Clients must provide the key via:
 
 ## Connecting with Claude Desktop
 
+> **Important**: Claude Desktop only supports **stdio** transport and cannot connect to HTTP-based MCP servers directly. You must use [`mcp-remote`](https://www.npmjs.com/package/mcp-remote) as a bridge.
+
 Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
 
 ```json
 {
   "mcpServers": {
     "codex": {
-      "url": "http://localhost:3002/mcp",
-      "headers": {
-        "Authorization": "Bearer your-api-key"
-      }
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "http://localhost:3002/mcp",
+        "--header",
+        "Authorization: Bearer your-api-key"
+      ]
+    }
+  }
+}
+```
+
+For a remote/production server:
+```json
+{
+  "mcpServers": {
+    "codex": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://your-codex-server.com/mcp",
+        "--header",
+        "Authorization: Bearer your-api-key"
+      ]
     }
   }
 }
@@ -87,7 +117,9 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 
 ## Connecting with VS Code (GitHub Copilot)
 
-Configure in your VS Code settings or `mcp.json`:
+VS Code / GitHub Copilot supports **native HTTP transport**, so no bridge is needed.
+
+Configure in your VS Code settings or `.vscode/mcp.json`:
 
 ```json
 {

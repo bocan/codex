@@ -617,7 +617,7 @@ Codex includes a [Model Context Protocol](https://modelcontextprotocol.io/) (MCP
 
 ### Available Tools
 
-The MCP server exposes 12 tools for AI agents:
+The MCP server exposes 16 tools for AI agents:
 
 | Tool | Description |
 |------|-------------|
@@ -633,22 +633,58 @@ The MCP server exposes 12 tools for AI agents:
 | `create_folder` | Create a new folder |
 | `delete_folder` | Delete an empty folder |
 | `rename_folder` | Rename a folder |
+| `list_attachments` | List attachments in a folder |
+| `upload_attachment` | Upload a file attachment |
+| `get_attachment` | Download an attachment |
+| `delete_attachment` | Delete an attachment |
 
 ### Client Configuration
 
+> **Important**: Claude Desktop only supports **stdio** transport and cannot connect to HTTP-based MCP servers directly. You must use [`mcp-remote`](https://www.npmjs.com/package/mcp-remote) as a bridge. VS Code/GitHub Copilot supports native HTTP connections.
+
 **Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+Claude Desktop requires `mcp-remote` to bridge stdio to HTTP:
+
 ```json
 {
   "mcpServers": {
     "codex": {
-      "url": "http://localhost:3002/mcp",
-      "headers": { "Authorization": "Bearer your-api-key" }
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://your-codex-server.com/mcp",
+        "--header",
+        "Authorization: Bearer your-api-key"
+      ]
     }
   }
 }
 ```
 
-**VS Code / GitHub Copilot** (settings or `mcp.json`):
+For local development:
+```json
+{
+  "mcpServers": {
+    "codex": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "http://localhost:3002/mcp",
+        "--header",
+        "Authorization: Bearer your-api-key"
+      ]
+    }
+  }
+}
+```
+
+**VS Code / GitHub Copilot** (settings or `.vscode/mcp.json`):
+
+VS Code supports native HTTP transport:
+
 ```json
 {
   "servers": {
