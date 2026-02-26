@@ -28,13 +28,18 @@ export const searchPages = async (req: Request, res: Response) => {
 
     // Get all folders recursively
     const getAllFolders = async (
-      node: any,
+      node: unknown,
       folders: string[] = [],
     ): Promise<string[]> => {
-      folders.push(node.path || "");
-      if (node.children) {
-        for (const child of node.children) {
-          await getAllFolders(child, folders);
+      if (node && typeof node === "object" && "path" in node) {
+        folders.push((node as { path?: string }).path || "");
+      }
+      if (node && typeof node === "object" && "children" in node) {
+        const children = (node as { children?: unknown[] }).children;
+        if (Array.isArray(children)) {
+          for (const child of children) {
+            await getAllFolders(child, folders);
+          }
         }
       }
       return folders;

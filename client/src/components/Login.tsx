@@ -25,9 +25,11 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     try {
       await api.login(password);
       onLoginSuccess();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Login failed:", err);
-      setError(err.response?.data?.error || "Invalid password");
+      setError(
+        (err as { response?: { data?: { error?: string } } })?.response?.data?.error || "Invalid password"
+      );
     } finally {
       setIsLoading(false);
     }

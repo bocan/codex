@@ -149,7 +149,7 @@ export const api = {
     });
   },
 
-  getAttachments: async (folderPath: string): Promise<any[]> => {
+  getAttachments: async (folderPath: string): Promise<unknown[]> => {
     const response = await axios.get(`${API_BASE}/attachments`, {
       params: { folder: folderPath },
     });

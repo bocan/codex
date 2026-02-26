@@ -147,8 +147,8 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
   // Speech recognition functions
   const startListening = () => {
     const SpeechRecognition =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
+      ((window as unknown) as Record<string, unknown>).SpeechRecognition ||
+      ((window as unknown) as Record<string, unknown>).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert(
         "Speech recognition is not supported in this browser. Try Chrome or Edge.",
@@ -163,10 +163,18 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
 
     let finalTranscript = "";
 
-    recognition.onresult = (event: any) => {
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
+    recognition.onresult = (event: unknown) => {
+      const typedEvent = event as {
+        resultIndex: number;
+        results: { isFinal: boolean; [index: number]: { transcript: string } }[];
+      };
+      for (
+        let i = typedEvent.resultIndex;
+        i < typedEvent.results.length;
+        i++
+      ) {
+        const transcript = typedEvent.results[i][0].transcript;
+        if (typedEvent.results[i].isFinal) {
           finalTranscript += transcript + " ";
         }
       }
@@ -197,9 +205,10 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
       }
     };
 
-    recognition.onerror = (event: any) => {
-      console.error("Speech recognition error:", event.error);
-      if (event.error === "not-allowed") {
+    recognition.onerror = (event: unknown) => {
+      const typedEvent = event as { error?: string };
+      console.error("Speech recognition error:", typedEvent.error);
+      if (typedEvent.error === "not-allowed") {
         alert(
           "Microphone access denied. Please allow microphone access and try again.",
         );
@@ -240,7 +249,6 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
     textarea.focus();
 
     // execCommand preserves native undo stack
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const success = document.execCommand("insertText", false, text);
 
     if (!success) {

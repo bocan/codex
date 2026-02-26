@@ -271,10 +271,10 @@ function App() {
       if (!selectedFolder) {
         setSelectedFolder(tree.path);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to load folder tree:", error);
       const message =
-        error.response?.status === 401
+        (error as { response?: { status?: number } })?.response?.status === 401
           ? "Session expired. Please log in again."
           : "Failed to load folders. Please try refreshing the page.";
       setError(message);
@@ -302,10 +302,10 @@ function App() {
         if (readme) {
           setSelectedPage(readme.path);
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Failed to check for README.md:", error);
         const message =
-          error.response?.status === 401
+          (error as { response?: { status?: number } })?.response?.status === 401
             ? "Session expired. Please log in again."
             : `Failed to load pages from folder: ${path}`;
         setError(message);
