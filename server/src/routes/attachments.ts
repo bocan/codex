@@ -103,7 +103,7 @@ router.post("/", fileTransferLimiter, upload.single("file"), async (req: Request
 });
 
 // List attachments for a folder
-router.get("/", async (req: Request, res: Response) => {
+router.get("/", fileTransferLimiter, async (req: Request, res: Response) => {
   try {
     const folderPath = getFolderQueryParam(req);
 

@@ -11,6 +11,7 @@ import searchRoutes from "./routes/search";
 import attachmentRoutes from "./routes/attachments";
 import templatesRoutes from "./routes/templates";
 import { requireAuth } from "./middleware/auth";
+import { healthCheckLimiter, staticFileLimiter } from "./middleware/rateLimiters";
 import { GitService } from "./services/gitService";
 import { DATA_DIR as DEFAULT_DATA_DIR, FileSystemService } from "./services/fileSystem";
 
@@ -258,25 +259,25 @@ app.use("/api/search", requireAuth, searchRoutes); // Protected
 app.use("/api/attachments", requireAuth, attachmentRoutes); // Protected
 
 // Health check
-app.get("/api/health", (req: Request, res: Response) => {
+app.get("/api/health", healthCheckLimiter, (req: Request, res: Response) => {
   res.json({ status: "ok" });
 });
 
 // Handle .well-known/* routes that aren't supported (for MCP clients doing OAuth discovery)
-app.get("/.well-known/oauth-authorization-server", (req: Request, res: Response) => {
+app.get("/.well-known/oauth-authorization-server", healthCheckLimiter, (req: Request, res: Response) => {
   res.status(404).json({ error: "OAuth not supported", message: "This server uses API key authentication" });
 });
-app.get("/.well-known/openid-configuration", (req: Request, res: Response) => {
+app.get("/.well-known/openid-configuration", healthCheckLimiter, (req: Request, res: Response) => {
   res.status(404).json({ error: "OIDC not supported", message: "This server uses API key authentication" });
 });
 
 // Serve static files in production
 if (process.env.NODE_ENV === "production") {
   const clientDistPath = path.join(__dirname, "../../client/dist");
-  app.use(express.static(clientDistPath));
+  app.use(staticFileLimiter, express.static(clientDistPath));
 
   // Handle client-side routing - serve index.html for all non-API routes
-  app.get(/.*/, (req: Request, res: Response) => {
+  app.get(/.*/, staticFileLimiter, (req: Request, res: Response) => {
     res.sendFile(path.join(clientDistPath, "index.html"));
   });
 }
