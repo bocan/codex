@@ -1,6 +1,45 @@
 import rateLimit from "express-rate-limit";
 
 /**
+ * Rate limiter for read operations (get pages, list folders, view history)
+ * These read from the file system but don't modify it
+ * Limit: 120 requests per minute per IP
+ */
+export const readLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 120,
+  message: { error: "Too many read requests, please slow down" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/**
+ * Rate limiter for static file serving
+ * Used for serving the SPA and static assets
+ * Limit: 200 requests per minute per IP (generous for page loads with many assets)
+ */
+export const staticFileLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 200,
+  message: { error: "Too many requests, please slow down" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/**
+ * Rate limiter for health check and metadata endpoints
+ * These are lightweight but should still be protected
+ * Limit: 60 requests per minute per IP
+ */
+export const healthCheckLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 60,
+  message: { error: "Too many health check requests" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/**
  * Rate limiter for file operations (create, update, delete, rename, move)
  * These are expensive operations that modify the file system and git history
  * Limit: 30 requests per minute per IP
