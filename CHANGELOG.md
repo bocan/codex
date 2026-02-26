@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.21.0](https://github.com/bocan/codex/compare/v2.20.3...v2.21.0) (2026-02-26)
+
+
+### Features
+
+* **rateLimiters:** implement rate limiting for various endpoints ([137c688](https://github.com/bocan/codex/commit/137c68888149eed6b3ce0b58675e72867375a2a4))
+
+
+### Chores
+
+* update dependencies to latest versions in package-lock.json ([5bff19d](https://github.com/bocan/codex/commit/5bff19d6050391bc33f1f6d9877b4498b1b2839b))
+
 ## [2.20.3](https://github.com/bocan/codex/compare/v2.20.2...v2.20.3) (2026-02-23)
 
 
