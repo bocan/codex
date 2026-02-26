@@ -146,9 +146,15 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
 
   // Speech recognition functions
   const startListening = () => {
+    interface WindowWithSpeech extends Window {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      SpeechRecognition?: { new(): any };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      webkitSpeechRecognition?: { new(): any };
+    }
     const SpeechRecognition =
-      ((window as unknown) as Record<string, unknown>).SpeechRecognition ||
-      ((window as unknown) as Record<string, unknown>).webkitSpeechRecognition;
+      (window as unknown as WindowWithSpeech).SpeechRecognition ||
+      (window as unknown as WindowWithSpeech).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert(
         "Speech recognition is not supported in this browser. Try Chrome or Edge.",
