@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.21.1](https://github.com/bocan/codex/compare/v2.21.0...v2.21.1) (2026-02-27)
+
+
+### Bug Fixes
+
+* **attachments:** cast fetched attachments data to Attachment type ([5e7d49e](https://github.com/bocan/codex/commit/5e7d49e9ecb20b3ed1206b74841fa012f576bb66))
+
+
+### Code Refactoring
+
+* replace 'any' with 'unknown' for better type safety ([355234b](https://github.com/bocan/codex/commit/355234be0e6b6394e55e9464f207114e6fcd098f))
+
+
+### Chores
+
+* update dependencies to latest versions in package.json and package-lock.json ([7cdf121](https://github.com/bocan/codex/commit/7cdf121e4e5f066572ff5295fe828fec93e91cef))
+
 ## [2.21.0](https://github.com/bocan/codex/compare/v2.20.3...v2.21.0) (2026-02-26)
 
 
