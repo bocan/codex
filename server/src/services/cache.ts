@@ -2,7 +2,7 @@
  * Simple in-memory cache service with TTL support
  */
 export class CacheService {
-  private cache = new Map<string, { data: any; timestamp: number }>();
+  private cache = new Map<string, { data: unknown; timestamp: number }>();
   private ttl: number;
 
   constructor(ttlMs: number = 30000) {
@@ -31,7 +31,7 @@ export class CacheService {
   /**
    * Store data in cache with current timestamp
    */
-  set(key: string, data: any): void {
+  set(key: string, data: unknown): void {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),

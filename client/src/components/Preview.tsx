@@ -1450,7 +1450,7 @@ ${htmlContent}
     const blob =
       docxBlob instanceof Blob
         ? docxBlob
-        : new Blob([new Uint8Array(docxBlob as any)], {
+        : new Blob([new Uint8Array((docxBlob as unknown) as ArrayBuffer)], {
             type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           });
 

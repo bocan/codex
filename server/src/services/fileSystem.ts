@@ -166,14 +166,14 @@ export class FileSystemService {
 
     const templatesDir = this.validatePath("templates");
 
-    let shouldSeed = false;
+    let shouldSeed: boolean;
     try {
       const entries = await fs.readdir(templatesDir, { withFileTypes: true });
       // Seed only when the directory is empty (ignore dotfiles like .DS_Store)
       const visibleEntries = entries.filter((entry) => !entry.name.startsWith("."));
       shouldSeed = visibleEntries.length === 0;
-    } catch (error: any) {
-      if (error?.code === "ENOENT") {
+    } catch (error: unknown) {
+      if ((error as NodeJS.ErrnoException)?.code === "ENOENT") {
         shouldSeed = true;
       } else {
         return;
@@ -343,8 +343,8 @@ export class FileSystemService {
       }
 
       return templates.sort((a, b) => a.template.localeCompare(b.template));
-    } catch (error: any) {
-      if (error?.code === "ENOENT") {
+    } catch (error: unknown) {
+      if ((error as NodeJS.ErrnoException)?.code === "ENOENT") {
         return [];
       }
       throw error;
@@ -513,8 +513,8 @@ export class FileSystemService {
       throw new Error(
         "A file with this name already exists in the destination folder",
       );
-    } catch (error: any) {
-      if (error.code !== "ENOENT") {
+    } catch (error: unknown) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
         throw error;
       }
     }

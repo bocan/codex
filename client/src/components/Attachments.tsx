@@ -35,7 +35,7 @@ export const Attachments: React.FC<AttachmentsProps> = ({
     setError(null);
     try {
       const data = await api.getAttachments(folderPath);
-      setAttachments(data);
+      setAttachments(data as Attachment[]);
     } catch (err) {
       console.error("Failed to load attachments:", err);
       setError("Failed to load attachments");

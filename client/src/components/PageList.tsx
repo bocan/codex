@@ -339,10 +339,10 @@ export const PageList: React.FC<PageListProps> = ({
         onSelectPage(result.newPath);
       }
       setMovingPage(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to move page:", err);
       setError(
-        err.response?.data?.error || "Failed to move page. Please try again.",
+        (err as { response?: { data?: { error?: string } } })?.response?.data?.error || "Failed to move page. Please try again.",
       );
       setMovingPage(null);
     } finally {

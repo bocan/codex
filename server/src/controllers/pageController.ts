@@ -14,9 +14,9 @@ export const movePage = async (req: Request, res: Response) => {
       newFolderPath || "",
     );
     res.json({ success: true, newPath });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Move page error:", error);
-    res.status(500).json({ error: error.message || "Failed to move page" });
+    res.status(500).json({ error: (error as { message?: string })?.message || "Failed to move page" });
   }
 };
 
