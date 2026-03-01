@@ -2,6 +2,8 @@
   box-sizing: border-box;
 }
 
+svg.lucide { vertical-align: -0.125em; flex-shrink: 0; }
+
 :root {
   /* Typography */
   --font-display: 'Fraunces', Georgia, serif;
@@ -39,11 +41,12 @@
   --border-hover: #a8a29e;
   --shadow: rgba(28, 25, 23, 0.08);
   --shadow-lg: rgba(28, 25, 23, 0.12);
-  --header-bg: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  --accent-color: #4f46e5;
-  --accent-hover: #4338ca;
-  --accent-bg: rgba(79, 70, 229, 0.08);
-  --accent-border: rgba(79, 70, 229, 0.2);
+  --header-bg: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+  --accent-color: #b45309;
+  --accent-hover: #92400e;
+  --accent-bg: rgba(180, 83, 9, 0.08);
+  --accent-border: rgba(180, 83, 9, 0.2);
+  --accent-text: #ffffff;
   --success-color: #059669;
   --error-color: #dc2626;
 
@@ -62,6 +65,15 @@
   --radius-md: 6px;
   --radius-lg: 8px;
   --radius-xl: 12px;
+
+  /* Grain texture */
+  --noise-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  --noise-opacity: 0.035;
+
+  /* Per-pane directional gradients */
+  --pane-left-bg: linear-gradient(180deg, #f7f5f2 0%, #edeae3 100%);
+  --pane-center-bg: linear-gradient(155deg, #fffffe 0%, #fdfcfa 55%, #f6f2ec 100%);
+  --pane-right-bg: linear-gradient(180deg, #fdfcfa 0%, #f1ede7 100%);
 }
 
 [data-theme="dark"] {
@@ -77,17 +89,25 @@
   --border-hover: #52525b;
   --shadow: rgba(0, 0, 0, 0.3);
   --shadow-lg: rgba(0, 0, 0, 0.4);
-  --header-bg: linear-gradient(135deg, #3730a3 0%, #5b21b6 100%);
-  --accent-color: #818cf8;
-  --accent-hover: #a5b4fc;
-  --accent-bg: rgba(129, 140, 248, 0.12);
-  --accent-border: rgba(129, 140, 248, 0.25);
+  --header-bg: linear-gradient(135deg, #451a03 0%, #78350f 100%);
+  --accent-color: #fbbf24;
+  --accent-hover: #fcd34d;
+  --accent-bg: rgba(251, 191, 36, 0.12);
+  --accent-border: rgba(251, 191, 36, 0.25);
+  --accent-text: #1c1917;
   --success-color: #10b981;
   --error-color: #f87171;
 
   --editor-bg: #0f0f12;
   --editor-line-number: #3f3f46;
   --selection-bg: #264f78;
+
+  --noise-opacity: 0.055;
+
+  /* Per-pane directional gradients */
+  --pane-left-bg: linear-gradient(180deg, #27272a 0%, #1c1c1f 100%);
+  --pane-center-bg: linear-gradient(155deg, #1e1e24 0%, #18181b 55%, #111113 100%);
+  --pane-right-bg: linear-gradient(180deg, #18181b 0%, #111113 100%);
 }
 
 [data-theme="high-contrast"] {
@@ -108,6 +128,7 @@
   --accent-hover: #00cccc;
   --accent-bg: rgba(0, 255, 255, 0.2);
   --accent-border: rgba(0, 255, 255, 0.4);
+  --accent-text: #000000;
   --success-color: #00ff00;
   --error-color: #ff0000;
 
@@ -397,6 +418,9 @@ body {
 }
 
 .about-features li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 6px 0;
   font-size: 13px;
   color: var(--text-primary);
@@ -426,7 +450,7 @@ body {
   width: 48px;
   height: 48px;
   border: 4px solid var(--border-color);
-  border-top-color: #667eea;
+  border-top-color: var(--accent-color);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -507,7 +531,7 @@ body {
 }
 
 .left-pane {
-  background: var(--bg-secondary);
+  background: var(--pane-left-bg);
 }
 
 .left-pane.collapsed {
@@ -517,7 +541,7 @@ body {
 }
 
 .right-pane {
-  background: var(--bg-primary);
+  background: var(--pane-right-bg);
   border-left: 1px solid var(--border-color);
 }
 
@@ -533,6 +557,7 @@ body {
   flex-direction: column;
   overflow: hidden;
   min-width: 0;
+  position: relative;
 }
 
 .pane-content {
@@ -617,6 +642,21 @@ body {
   background: var(--bg-tertiary);
 }
 
+/* Grain texture overlay — applied to all three panes for a consistent paper-like surface */
+.left-pane::after,
+.center-pane::after,
+.right-pane::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--noise-texture);
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  opacity: var(--noise-opacity);
+  pointer-events: none;
+  z-index: 1;
+}
+
 /* Resize handles */
 .resize-handle {
   z-index: 10;
@@ -624,11 +664,11 @@ body {
 }
 
 .resize-handle:hover {
-  background-color: rgba(102, 126, 234, 0.3);
+  background-color: var(--accent-border);
 }
 
 .resize-handle:active {
-  background-color: rgba(102, 126, 234, 0.5);
+  background-color: var(--accent-color);
 }
 
 /* Vertical resize handles (left/right panes) */

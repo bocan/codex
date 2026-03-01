@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import GithubSlugger from "github-slugger";
+import { Menu } from "lucide-react";
 import "./TableOfContents.css";
 
 interface Heading {
@@ -114,7 +115,7 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
         aria-expanded={!isCollapsed}
         aria-controls="toc-dropdown"
       >
-        <span aria-hidden="true">☰</span> Contents
+        <Menu size={16} aria-hidden="true" /> Contents
       </button>
 
       {!isCollapsed && (

@@ -9,6 +9,7 @@ import mermaid from "mermaid";
 import { api } from "../services/api";
 import { TableOfContents } from "./TableOfContents";
 import { useEditorStore } from "../store/editorStore";
+import { Check, Copy, ArrowUp, ChevronDown } from "lucide-react";
 import "./Preview.css";
 
 // CodeBlock component with copy functionality
@@ -66,7 +67,7 @@ const CodeBlock: React.FC<{ language?: string; children: string }> = ({ language
           title={copied ? "Copied!" : "Copy code"}
           aria-label={copied ? "Copied to clipboard" : "Copy code to clipboard"}
         >
-          {copied ? "✓ Copied" : "📋 Copy"}
+          {copied ? <><Check size={12} /> Copied</> : <><Copy size={12} /> Copy</>}
         </button>
       </div>
       <SyntaxHighlighter
@@ -687,7 +688,7 @@ export const Preview: React.FC<PreviewProps> = ({
               top: 0;
               left: 0;
               right: 0;
-              background: ${isHighContrast ? "#000000" : `linear-gradient(135deg, ${isDark ? "#4a5f8f 0%, #5a3a72 100%" : "#667eea 0%, #764ba2 100%"})`};
+              background: ${isHighContrast ? "#000000" : `linear-gradient(135deg, ${isDark ? "#451a03 0%, #78350f 100%" : "#78350f 0%, #92400e 100%"})`};
               color: white;
               padding: 16px 20px;
               box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -857,7 +858,7 @@ export const Preview: React.FC<PreviewProps> = ({
               background: ${isHighContrast ? "#0d0d0d" : isDark ? "#222222" : "#fafafa"};
             }
             a {
-              color: ${isHighContrast ? "#00ffff" : isDark ? "#8a9ff0" : "#5568d3"};
+              color: ${isHighContrast ? "#00ffff" : isDark ? "#fbbf24" : "#b45309"};
               text-decoration: underline;
             }
             a:hover {
@@ -923,10 +924,10 @@ export const Preview: React.FC<PreviewProps> = ({
         </head>
         <body>
           <div class="header">
-            <h1>📖 ${pagePath?.split("/").pop()?.replace(".md", "") || "Reading Mode"}</h1>
+            <h1>${pagePath?.split("/").pop()?.replace(".md", "") || "Reading Mode"}</h1>
             <div class="header-actions">
               <div class="toc-container">
-                <button class="toc-toggle" id="tocToggle">☰ Contents</button>
+                <button class="toc-toggle" id="tocToggle"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg> Contents</button>
                 <div class="toc-dropdown" id="tocDropdown">
                   <ul class="toc-list" id="tocList"></ul>
                 </div>
@@ -1719,7 +1720,7 @@ ${htmlContent}
                 <path d="M9 2L9 3L12.3 3L6 9.3L6.7 10L13 3.7L13 7L14 7L14 2L9 2z" />
                 <path d="M12 12L4 12L4 4L7 4L7 3L3 3L3 13L13 13L13 9L12 9L12 12z" />
               </svg>
-              <span aria-hidden="true">▼</span>
+              <ChevronDown size={10} aria-hidden="true" />
             </button>
             {showExportMenu && (
               <div
@@ -1794,7 +1795,7 @@ ${htmlContent}
             title="Scroll to top"
             aria-label="Scroll preview to top"
           >
-            <span aria-hidden="true">↑</span>
+            <ArrowUp size={14} aria-hidden="true" />
           </button>
         </div>
       </div>

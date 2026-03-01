@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { FileNode, FolderNode } from "../types";
 import { api } from "../services/api";
+import {
+  ArrowUp,
+  ArrowDown,
+  FileText,
+  Loader2,
+  AlertTriangle,
+  Folder,
+} from "lucide-react";
 import "./PageList.css";
 
 type TemplateOption = {
@@ -392,7 +400,7 @@ export const PageList: React.FC<PageListProps> = ({
               aria-label={`Sort ${sortDirection === "asc" ? "descending" : "ascending"}`}
               title={sortDirection === "asc" ? "Oldest/A first" : "Newest/Z first"}
             >
-              {sortDirection === "asc" ? "↑" : "↓"}
+              {sortDirection === "asc" ? <ArrowUp size={12} /> : <ArrowDown size={12} />}
             </button>
           </div>
           <button
@@ -418,9 +426,7 @@ export const PageList: React.FC<PageListProps> = ({
           role="alert"
           aria-live="polite"
         >
-          <span className="error-icon" aria-hidden="true">
-            ⚠️
-          </span>
+          <AlertTriangle size={32} className="error-icon" aria-hidden="true" />
           <span>{error}</span>
         </div>
       )}
@@ -433,14 +439,12 @@ export const PageList: React.FC<PageListProps> = ({
           aria-live="polite"
           aria-label="Loading pages"
         >
-          <div className="loading-spinner" aria-hidden="true"></div>
+          <Loader2 size={24} className="loading-spinner" aria-hidden="true" />
           <span>Loading pages...</span>
         </div>
       ) : !loading && pages.length === 0 && !error ? (
         <div className="empty-state" role="status">
-          <span className="empty-icon" aria-hidden="true">
-            📄
-          </span>
+          <FileText size={32} className="empty-icon" aria-hidden="true" />
           <span>No pages yet</span>
           <button
             onClick={handleCreatePage}
@@ -468,7 +472,7 @@ export const PageList: React.FC<PageListProps> = ({
               title={getPageTooltip(page)}
             >
               <span className="page-icon" aria-hidden="true">
-                {isDeleting === page.path ? "⏳" : "📄"}
+                {isDeleting === page.path ? <Loader2 size={14} className="loading-spinner" /> : <FileText size={14} />}
               </span>
               {renamingPage === page.path ? (
                 <input
@@ -541,7 +545,7 @@ export const PageList: React.FC<PageListProps> = ({
             </p>
             {isMoving ? (
               <div className="modal-loading" role="status" aria-live="polite">
-                <div className="loading-spinner" aria-hidden="true"></div>
+                <Loader2 size={24} className="loading-spinner" aria-hidden="true" />
                 <span>Moving page...</span>
               </div>
             ) : (
@@ -555,7 +559,7 @@ export const PageList: React.FC<PageListProps> = ({
                     role="listitem"
                     aria-label={`Move to ${folder.display}`}
                   >
-                    <span aria-hidden="true">📁</span> {folder.display}
+                    <Folder size={14} aria-hidden="true" /> {folder.display}
                   </button>
                 ))}
               </div>
@@ -587,14 +591,12 @@ export const PageList: React.FC<PageListProps> = ({
 
             {templatesLoading ? (
               <div className="modal-loading" role="status" aria-label="Loading templates">
-                <div className="loading-spinner" aria-hidden="true"></div>
+                <Loader2 size={24} className="loading-spinner" aria-hidden="true" />
                 <span>Loading templates...</span>
               </div>
             ) : templatesError ? (
               <div className="error-state" role="alert">
-                <span className="error-icon" aria-hidden="true">
-                  ⚠️
-                </span>
+                <AlertTriangle size={32} className="error-icon" aria-hidden="true" />
                 <span>{templatesError}</span>
               </div>
             ) : (

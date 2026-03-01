@@ -148,7 +148,7 @@
 }
 
 .loading-indicator {
-  color: #007bff;
+  color: var(--accent-color);
   animation: pulse 1s infinite;
 }
 

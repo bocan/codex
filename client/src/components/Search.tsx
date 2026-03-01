@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { api } from "../services/api";
 import { SearchResult } from "../types";
+import { Search as SearchIcon, Loader2 } from "lucide-react";
 import "./Search.css";
 
 interface SearchProps {
@@ -113,9 +114,7 @@ export const Search: React.FC<SearchProps> = ({ onSelectPage }) => {
         title="Search (⌘K)"
         aria-label="Search pages (keyboard shortcut: Command K)"
       >
-        <span className="search-icon" aria-hidden="true">
-          🔍
-        </span>
+        <SearchIcon size={16} className="search-icon" aria-hidden="true" />
         <span className="search-hint">Search...</span>
         <span className="search-shortcut" aria-hidden="true">
           ⌘K
@@ -131,9 +130,7 @@ export const Search: React.FC<SearchProps> = ({ onSelectPage }) => {
         >
           <div className="search-modal" ref={modalRef}>
             <div className="search-input-container">
-              <span className="search-input-icon" aria-hidden="true">
-                🔍
-              </span>
+              <SearchIcon size={20} className="search-input-icon" aria-hidden="true" />
               <input
                 ref={inputRef}
                 type="text"
@@ -146,15 +143,12 @@ export const Search: React.FC<SearchProps> = ({ onSelectPage }) => {
                 id="search-label"
               />
               {isSearching && (
-                <span
+                <Loader2
+                  size={16}
                   className="search-spinner"
                   aria-label="Searching"
                   role="status"
-                  aria-live="polite"
-                  aria-hidden="true"
-                >
-                  ⏳
-                </span>
+                />
               )}
             </div>
 

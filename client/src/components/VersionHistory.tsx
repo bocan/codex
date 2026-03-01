@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import * as Diff from "diff";
 import { api } from "../services/api";
 import { CommitInfo, VersionContent } from "../types";
+import { History, X } from "lucide-react";
 import "./VersionHistory.css";
 
 interface VersionHistoryProps {
@@ -148,9 +149,9 @@ export default function VersionHistory({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="version-history-header">
-          <h2>📜 Version History</h2>
+          <h2><History size={24} /> Version History</h2>
           <button className="close-btn" onClick={onClose}>
-            ×
+            <X size={20} />
           </button>
         </div>
 
