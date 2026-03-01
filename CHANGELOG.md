@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.22.0](https://github.com/bocan/codex/compare/v2.21.1...v2.22.0) (2026-03-01)
+
+
+### Features
+
+* add per-pane directional gradients for depth ([953d63c](https://github.com/bocan/codex/commit/953d63c374575f54f22bcc7c157be439f8177e77))
+* add subtle grain texture to all three panes ([94c8135](https://github.com/bocan/codex/commit/94c8135d23aaf4f344df9c619c18488cec76972d))
+
+
+### Chores
+
+* restore point before grain texture experiment ([8fe0e35](https://github.com/bocan/codex/commit/8fe0e35957d7858c099cccb80cca886bce2f2e30))
+* update dependencies for @types/node and axios ([ca718bf](https://github.com/bocan/codex/commit/ca718bf719c29b3b23066c1a4aa3c8441f684c57))
+
 ## [2.21.1](https://github.com/bocan/codex/compare/v2.21.0...v2.21.1) (2026-02-27)
 
 
