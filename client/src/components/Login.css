@@ -52,7 +52,7 @@
 }
 
 .form-group input:focus {
-  border-color: #667eea;
+  border-color: var(--accent-color);
 }
 
 .form-group input.error {
@@ -85,8 +85,8 @@
   padding: 12px 16px;
   font-size: 16px;
   font-weight: 600;
-  background: #667eea;
-  color: white;
+  background: var(--accent-color);
+  color: var(--accent-text);
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -94,7 +94,7 @@
 }
 
 .login-button:hover:not(:disabled) {
-  background: #5a6fd6;
+  background: var(--accent-hover);
 }
 
 .login-button:disabled {

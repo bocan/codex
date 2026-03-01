@@ -148,7 +148,7 @@
 
 .btn-insert {
   background: var(--accent-color);
-  color: white;
+  color: var(--accent-text);
   border: none;
   padding: 6px 12px;
   border-radius: 4px;

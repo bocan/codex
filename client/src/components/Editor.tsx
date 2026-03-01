@@ -3,6 +3,21 @@ import { api } from "../services/api";
 import VersionHistory from "./VersionHistory";
 import { Attachments } from "./Attachments";
 import { useEditorStore } from "../store/editorStore";
+import {
+  Pilcrow,
+  List,
+  ListTodo,
+  Link,
+  Image,
+  Minus,
+  Mic,
+  Paperclip,
+  History,
+  AlertTriangle,
+  PenLine,
+  Save,
+  X,
+} from "lucide-react";
 import "./Editor.css";
 
 interface EditorProps {
@@ -397,9 +412,7 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
     return (
       <div className="editor empty" role="status">
         <div className="empty-state">
-          <span className="empty-icon" aria-hidden="true">
-            ✏️
-          </span>
+          <PenLine size={48} className="empty-icon" aria-hidden="true" />
           <p>Select a page to start editing</p>
         </div>
       </div>
@@ -426,9 +439,7 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
     return (
       <div className="editor error" role="alert">
         <div className="error-state" onClick={loadPage}>
-          <span className="error-icon" aria-hidden="true">
-            ⚠️
-          </span>
+          <AlertTriangle size={48} className="error-icon" aria-hidden="true" />
           <p>{error}</p>
         </div>
       </div>
@@ -474,7 +485,7 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
             aria-label={showFormatToolbar ? "Hide formatting toolbar" : "Show formatting toolbar"}
             aria-pressed={showFormatToolbar}
           >
-            <span aria-hidden="true">¶</span>
+            <Pilcrow size={14} aria-hidden="true" />
           </button>
         </div>
         <div className="editor-actions">
@@ -485,7 +496,7 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
               role="alert"
               aria-live="assertive"
             >
-              <span aria-hidden="true">⚠️</span> {error}
+              <AlertTriangle size={14} aria-hidden="true" /> {error}
             </span>
           )}
           {lastSaved && !error && (
@@ -511,7 +522,7 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
             }
             aria-pressed={isListening}
           >
-            <span aria-hidden="true">🎤</span>{" "}
+            <Mic size={14} aria-hidden="true" />{" "}
             {isListening ? "Stop" : "Dictate"}
           </button>
           <button
@@ -520,7 +531,7 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
             title="Manage attachments"
             aria-label="Manage attachments"
           >
-            <span aria-hidden="true">📎</span> Attachments
+            <Paperclip size={14} aria-hidden="true" /> Attachments
           </button>
           <button
             onClick={() => setShowHistory(true)}
@@ -528,7 +539,7 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
             title="View version history"
             aria-label="View version history"
           >
-            <span aria-hidden="true">📜</span> History
+            <History size={14} aria-hidden="true" /> History
           </button>
           <button
             onClick={handleSave}
@@ -536,10 +547,10 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
             title="Save page"
             aria-label="Save page"
           >
-            {isSaving ? "Saving..." : "Save"}
+            <Save size={14} aria-hidden="true" /> {isSaving ? "Saving..." : "Save"}
           </button>
           <button onClick={onClose} title="Close editor" aria-label="Close editor">
-            Close
+            <X size={14} aria-hidden="true" /> Close
           </button>
         </div>
       </div>
@@ -612,7 +623,7 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
               title="Bullet list"
               aria-label="Bullet list"
             >
-              •
+              <List size={14} />
             </button>
             <button
               onClick={() => insertLinePrefix("1. ")}
@@ -633,7 +644,7 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
               title="Task list"
               aria-label="Task list"
             >
-              ☐
+              <ListTodo size={14} />
             </button>
           </div>
           <div className="format-separator" aria-hidden="true"></div>
@@ -644,14 +655,14 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
               aria-label="Insert link"
               data-shortcut="⌘K"
             >
-              🔗
+              <Link size={14} />
             </button>
             <button
               onClick={() => insertFormatting("![", "](image-url)", "alt text")}
               title="Image"
               aria-label="Insert image"
             >
-              🖼️
+              <Image size={14} />
             </button>
             <button
               onClick={() => insertFormatting("\n```\n", "\n```\n", "code block")}
@@ -665,7 +676,7 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
               title="Horizontal rule"
               aria-label="Insert horizontal rule"
             >
-              ―
+              <Minus size={14} />
             </button>
           </div>
         </div>

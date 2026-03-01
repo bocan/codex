@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { FolderNode } from "../types";
 import { api } from "../services/api";
+import {
+  ChevronDown,
+  ChevronRight,
+  Folder,
+  Loader2,
+  RefreshCw,
+} from "lucide-react";
 import "./FolderTree.css";
 
 interface FolderTreeProps {
@@ -175,7 +182,7 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({
           tabIndex={hasChildren ? 0 : -1}
         >
           <span aria-hidden="true">
-            {hasChildren && (isExpanded ? "▼" : "▶")}
+            {hasChildren && (isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />)}
             {!hasChildren && (
               <span style={{ width: "12px", display: "inline-block" }}></span>
             )}
@@ -197,7 +204,7 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({
           />
         ) : (
           <span className="folder-name">
-            <span aria-hidden="true">{isDeleting ? "⏳" : "📁"}</span>{" "}
+            {isDeleting ? <Loader2 size={14} className="loading-spinner" aria-hidden="true" /> : <Folder size={14} aria-hidden="true" />}{" "}
             {node.name}
             {isCreating && (
               <span
@@ -348,7 +355,7 @@ export const FolderTree: React.FC<
           aria-label="Refresh folders"
           title="Refresh folders"
         >
-          <span aria-hidden="true">↻</span>
+          <RefreshCw size={14} aria-hidden="true" />
         </button>
       </div>
       <FolderTreeItem

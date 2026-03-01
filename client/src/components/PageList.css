@@ -73,7 +73,7 @@
   font-size: 14px;
   font-weight: 600;
   background: var(--accent-color);
-  color: white;
+  color: var(--accent-text);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -117,7 +117,7 @@
 }
 
 .page-item.selected {
-  background: rgba(102, 126, 234, 0.2);
+  background: var(--accent-border);
 }
 
 .page-item.keyboard-selected {
@@ -141,7 +141,7 @@
 .page-rename-input {
   flex: 1;
   padding: 2px 4px;
-  border: 1px solid #007bff;
+  border: 1px solid var(--accent-color);
   border-radius: 2px;
   font-size: 13px;
   outline: none;
@@ -223,8 +223,8 @@
 .empty-state button {
   margin-top: 8px;
   padding: 8px 16px;
-  background: #667eea;
-  color: white;
+  background: var(--accent-color);
+  color: var(--accent-text);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -232,7 +232,7 @@
 }
 
 .empty-state button:hover:not(:disabled) {
-  background: #5a6fd6;
+  background: var(--accent-hover);
 }
 
 .empty-state button:disabled {
@@ -263,7 +263,7 @@
   width: 24px;
   height: 24px;
   border: 3px solid var(--border-color);
-  border-top-color: #667eea;
+  border-top-color: var(--accent-color);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -356,7 +356,7 @@
 
 .folder-option:hover {
   background: var(--bg-tertiary, #e8e8e8);
-  border-color: #667eea;
+  border-color: var(--accent-color);
 }
 
 .cancel-btn {

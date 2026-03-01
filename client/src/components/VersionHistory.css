@@ -109,7 +109,7 @@
 .commit-item.selected {
   border-color: var(--accent-color);
   background: var(--bg-hover);
-  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+  box-shadow: 0 2px 8px var(--shadow);
 }
 
 .commit-header {
@@ -121,7 +121,7 @@
 
 .commit-badge {
   background: var(--accent-color);
-  color: white;
+  color: var(--accent-text);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -169,13 +169,13 @@
 
 .btn-restore {
   background: var(--accent-color);
-  color: white;
+  color: var(--accent-text);
   border-color: var(--accent-color);
 }
 
 .btn-restore:hover {
-  background: #0056b3;
-  border-color: #0056b3;
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
 .version-viewer {

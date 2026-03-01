@@ -8,6 +8,28 @@ import { Search } from "./components/Search";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { api } from "./services/api";
 import { FolderNode } from "./types";
+import {
+  NotebookPen,
+  Monitor,
+  Sun,
+  Moon,
+  Contrast,
+  LogOut,
+  X,
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
+  FolderOpen,
+  Pencil,
+  Eye,
+  Highlighter,
+  Search as SearchIcon,
+  Paperclip,
+  GitBranch,
+  SunMoon,
+  Smartphone,
+  Lock,
+} from "lucide-react";
 import "./App.css";
 
 // Set document title dynamically from package.json
@@ -332,10 +354,10 @@ function App() {
   };
 
   const getThemeIcon = () => {
-    if (theme === "auto") return "🌓";
-    if (theme === "light") return "☀️";
-    if (theme === "dark") return "🌙";
-    return "◐";
+    if (theme === "auto") return <Monitor size={20} />;
+    if (theme === "light") return <Sun size={20} />;
+    if (theme === "dark") return <Moon size={20} />;
+    return <Contrast size={20} />;
   };
 
   const getBreadcrumbs = () => {
@@ -383,7 +405,7 @@ function App() {
       <header className="app-header" role="banner">
         <div className="header-content">
           <div className="header-left">
-            <h1>📝 {__APP_NAME__}</h1>
+            <h1><NotebookPen size={24} /> {__APP_NAME__}</h1>
             <p className="tagline">{__APP_DESCRIPTION__}</p>
           </div>
           <nav className="breadcrumbs" aria-label="Breadcrumb navigation">
@@ -416,7 +438,7 @@ function App() {
               title={`Theme: ${theme} (click to cycle)`}
               aria-label={`Current theme: ${theme}. Click to cycle themes.`}
             >
-              <span aria-hidden="true">{getThemeIcon()}</span>
+              <span aria-hidden="true" style={{ display: 'flex' }}>{getThemeIcon()}</span>
             </button>
             {authEnabled && (
               <button
@@ -425,7 +447,7 @@ function App() {
                 title="Logout"
                 aria-label="Logout of application"
               >
-                <span aria-hidden="true">🚪</span> Logout
+                <LogOut size={16} aria-hidden="true" /> Logout
               </button>
             )}
             <button
@@ -458,9 +480,9 @@ function App() {
               onClick={() => setShowAbout(false)}
               aria-label="Close about dialog"
             >
-              ✕
+              <X size={18} />
             </button>
-            <h2 id="about-title">📝 {__APP_NAME__}</h2>
+            <h2 id="about-title"><NotebookPen size={24} /> {__APP_NAME__}</h2>
             <p className="about-version">
               <a
                 href="https://github.com/bocan/codex/blob/main/CHANGELOG.md"
@@ -478,16 +500,16 @@ function App() {
             </p>
             <h3>Features</h3>
             <ul className="about-features">
-              <li>📁 Hierarchical folder organization</li>
-              <li>✍️ Live markdown editor</li>
-              <li>👁️ Real-time synchronized preview</li>
-              <li>🎨 Syntax highlighting for code blocks (auto-detect or specify language)</li>
-              <li>🔍 Full-text search across all documents</li>
-              <li>📎 File attachments with drag-and-drop</li>
-              <li>📜 Git-powered version history</li>
-              <li>🌗 Light, dark, and high-contrast themes</li>
-              <li>📱 Responsive design for mobile devices</li>
-              <li>🔐 Optional password protection</li>
+              <li><FolderOpen size={14} /> Hierarchical folder organization</li>
+              <li><Pencil size={14} /> Live markdown editor</li>
+              <li><Eye size={14} /> Real-time synchronized preview</li>
+              <li><Highlighter size={14} /> Syntax highlighting for code blocks (auto-detect or specify language)</li>
+              <li><SearchIcon size={14} /> Full-text search across all documents</li>
+              <li><Paperclip size={14} /> File attachments with drag-and-drop</li>
+              <li><GitBranch size={14} /> Git-powered version history</li>
+              <li><SunMoon size={14} /> Light, dark, and high-contrast themes</li>
+              <li><Smartphone size={14} /> Responsive design for mobile devices</li>
+              <li><Lock size={14} /> Optional password protection</li>
             </ul>
           </div>
         </div>
@@ -497,13 +519,13 @@ function App() {
         {/* Error Message */}
         {error && (
           <div className="error-banner" role="alert" aria-live="assertive">
-            <span aria-hidden="true">⚠️</span> {error}
+            <AlertTriangle size={16} aria-hidden="true" /> {error}
             <button
               className="error-dismiss"
               onClick={() => setError(null)}
               aria-label="Dismiss error message"
             >
-              ✕
+              <X size={16} />
             </button>
           </div>
         )}
@@ -541,7 +563,7 @@ function App() {
                   title="Hide sidebar"
                   aria-label="Hide sidebar"
                 >
-                  <span aria-hidden="true">◀</span>
+                  <ChevronLeft size={14} aria-hidden="true" />
                 </button>
               )}
               {!leftPaneCollapsed && folderTree && (
@@ -595,7 +617,7 @@ function App() {
                   title="Show sidebar"
                   aria-label="Show sidebar"
                 >
-                  <span aria-hidden="true">▶</span>
+                  <ChevronRight size={14} aria-hidden="true" />
                 </button>
               )}
               {rightPaneCollapsed && (
@@ -605,7 +627,7 @@ function App() {
                   title="Show preview"
                   aria-label="Show preview"
                 >
-                  <span aria-hidden="true">◀</span>
+                  <ChevronLeft size={14} aria-hidden="true" />
                 </button>
               )}
               <Editor
@@ -630,7 +652,7 @@ function App() {
                   title="Hide preview"
                   aria-label="Hide preview"
                 >
-                  <span aria-hidden="true">▶</span>
+                  <ChevronRight size={14} aria-hidden="true" />
                 </button>
               )}
               {!rightPaneCollapsed && (

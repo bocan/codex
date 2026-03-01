@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "../services/api";
+import { NotebookPen, AlertTriangle } from "lucide-react";
 import "./Login.css";
 
 interface LoginProps {
@@ -39,7 +40,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>📝 {__APP_NAME__}</h1>
+          <h1><NotebookPen size={28} /> {__APP_NAME__}</h1>
           <p>Enter your password to continue</p>
         </div>
 
@@ -69,7 +70,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
 
           {error && (
             <div className="error-message">
-              <span className="error-icon">⚠️</span>
+              <AlertTriangle size={16} className="error-icon" />
               {error}
             </div>
           )}
