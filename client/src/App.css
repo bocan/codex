@@ -65,6 +65,10 @@ svg.lucide { vertical-align: -0.125em; flex-shrink: 0; }
   --radius-md: 6px;
   --radius-lg: 8px;
   --radius-xl: 12px;
+
+  /* Grain texture */
+  --noise-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  --noise-opacity: 0.035;
 }
 
 [data-theme="dark"] {
@@ -92,6 +96,8 @@ svg.lucide { vertical-align: -0.125em; flex-shrink: 0; }
   --editor-bg: #0f0f12;
   --editor-line-number: #3f3f46;
   --selection-bg: #264f78;
+
+  --noise-opacity: 0.055;
 }
 
 [data-theme="high-contrast"] {
@@ -541,6 +547,7 @@ body {
   flex-direction: column;
   overflow: hidden;
   min-width: 0;
+  position: relative;
 }
 
 .pane-content {
@@ -623,6 +630,21 @@ body {
 
 .expand-btn:hover {
   background: var(--bg-tertiary);
+}
+
+/* Grain texture overlay — applied to all three panes for a consistent paper-like surface */
+.left-pane::after,
+.center-pane::after,
+.right-pane::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--noise-texture);
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  opacity: var(--noise-opacity);
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* Resize handles */
