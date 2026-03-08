@@ -351,11 +351,15 @@ export class FileSystemService {
     }
 
     // Ensure the destination parent directory exists — guard immediately before the fs call.
-    if (destParentFullPath !== resolvedDataDir &&
-        !destParentFullPath.startsWith(resolvedDataDir + path.sep)) {
+    if (!destParentFullPath.startsWith(resolvedDataDir + path.sep) &&
+        destParentFullPath !== resolvedDataDir) {
       throw new Error("Invalid path: destination parent is outside data directory");
     }
-    await fs.mkdir(destParentFullPath, { recursive: true });
+    // Append path.sep so that an exact match on resolvedDataDir also satisfies startsWith
+    const safeDestParent = destParentFullPath.startsWith(resolvedDataDir + path.sep)
+      ? destParentFullPath
+      : resolvedDataDir;
+    await fs.mkdir(safeDestParent, { recursive: true });
 
     // Guard both paths immediately before rename.
     if (!sourceFullPath.startsWith(resolvedDataDir + path.sep)) {
