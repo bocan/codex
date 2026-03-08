@@ -87,7 +87,7 @@ function App() {
   const isResizingRight = useRef(false);
   const isResizingFolderTree = useRef(false);
   const leftPaneRef = useRef<HTMLDivElement>(null);
-  const hasAutoCollapsed = useRef(false); // Track if we've auto-collapsed to avoid repeated triggers
+  const lastBreakpointRef = useRef<string | null>(null); // Track breakpoint changes for responsive collapse
 
   // Responsive: auto-collapse panes based on screen size
   useEffect(() => {
@@ -95,15 +95,32 @@ function App() {
       const width = window.innerWidth;
       setIsMobile(width <= MOBILE_BREAKPOINT);
 
-      // Only auto-collapse once on initial load or when crossing breakpoints
-      if (!hasAutoCollapsed.current) {
-        if (width <= MOBILE_BREAKPOINT) {
+      // Determine current breakpoint bucket
+      const breakpoint =
+        width <= MOBILE_BREAKPOINT ? 'mobile' :
+        width <= TABLET_BREAKPOINT ? 'tablet' :
+        'desktop';
+
+      // Only act when crossing a breakpoint boundary (including initial mount)
+      if (breakpoint !== lastBreakpointRef.current) {
+        const prev = lastBreakpointRef.current;
+        lastBreakpointRef.current = breakpoint;
+
+        if (breakpoint === 'mobile') {
           setLeftPaneCollapsed(true);
           setRightPaneCollapsed(true);
-        } else if (width <= TABLET_BREAKPOINT) {
+        } else if (breakpoint === 'tablet') {
           setRightPaneCollapsed(true);
+          if (prev === 'mobile') setLeftPaneCollapsed(false);
+        } else {
+          // Desktop: restore panes that were auto-collapsed
+          if (prev === 'mobile') {
+            setLeftPaneCollapsed(false);
+            setRightPaneCollapsed(false);
+          } else if (prev === 'tablet') {
+            setRightPaneCollapsed(false);
+          }
         }
-        hasAutoCollapsed.current = true;
       }
     };
 

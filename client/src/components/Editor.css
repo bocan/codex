@@ -300,3 +300,43 @@
   background: var(--border-color);
   margin: 0 var(--space-2);
 }
+
+/* =====================================================
+   RESPONSIVE: EDITOR HEADER & TOOLBAR
+   ===================================================== */
+
+/* Tablet and below: allow the header row to wrap so
+   action buttons spill to a second row instead of
+   being pushed off-screen */
+@media (max-width: 900px) {
+  .editor-header {
+    flex-wrap: wrap;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .editor-actions {
+    flex-wrap: wrap;
+    gap: var(--space-1);
+  }
+}
+
+/* Tablet portrait (≤768px): force actions onto their
+   own full-width row below the title */
+@media (max-width: 768px) {
+  .editor-actions {
+    flex: 0 0 100%;
+  }
+}
+
+/* Mobile (≤480px): tighter button padding so more
+   buttons fit per row; hide verbose save status */
+@media (max-width: 480px) {
+  .editor-actions button {
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--text-xs);
+  }
+
+  .save-status {
+    display: none;
+  }
+}
