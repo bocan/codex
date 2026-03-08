@@ -287,6 +287,111 @@ export class FileSystemService {
     this.cache.invalidate(`page:${oldPath}`);
   }
 
+  async moveFolder(sourcePath: string, destinationParentPath: string): Promise<string> {
+    if (!sourcePath || sourcePath === "/" || sourcePath === ".") {
+      throw new Error("Cannot move root folder");
+    }
+
+    const resolvedDataDir = path.resolve(this.dataDir);
+
+    // Validate BOTH user-supplied paths up front — validatePath throws immediately on
+    // any traversal attempt, producing safe absolute paths.
+    const sourceFullPath = this.validatePath(sourcePath);
+    const destParentFullPath = destinationParentPath
+      ? this.validatePath(destinationParentPath)
+      : resolvedDataDir;
+
+    // Verify source exists and is a directory.
+    if (!sourceFullPath.startsWith(resolvedDataDir + path.sep)) {
+      throw new Error("Invalid path: source is outside data directory");
+    }
+    let sourceStat;
+    try {
+      sourceStat = await fs.stat(sourceFullPath);
+    } catch (error: unknown) {
+      if ((error as NodeJS.ErrnoException)?.code === "ENOENT") {
+        throw new Error(`Source folder does not exist: ${sourcePath}`);
+      }
+      throw error;
+    }
+    if (!sourceStat.isDirectory()) {
+      throw new Error(`${sourcePath} is not a folder`);
+    }
+
+    // Derive the folder name from the VALIDATED absolute path (not from the raw
+    // user string).  path.basename is a CodeQL-recognised sanitiser that strips
+    // any remaining directory components.
+    const folderName = path.basename(sourceFullPath);
+
+    // Build the destination absolute path entirely from validated components.
+    // destParentFullPath was validated above; folderName came from path.basename.
+    const newFullPath = path.join(destParentFullPath, folderName);
+
+    // Relative path (for cache keys and return value) — derived from absolute paths.
+    const newRelativePath = path.relative(resolvedDataDir, newFullPath);
+
+    // Prevent moving a folder into itself or a descendant (compare absolute paths).
+    if (newFullPath === sourceFullPath ||
+        newFullPath.startsWith(sourceFullPath + path.sep)) {
+      throw new Error("Cannot move a folder into itself or one of its subfolders");
+    }
+
+    // Check destination doesn't already exist — guard immediately before the fs call.
+    if (!newFullPath.startsWith(resolvedDataDir + path.sep)) {
+      throw new Error("Invalid path: destination is outside data directory");
+    }
+    try {
+      await fs.access(newFullPath);
+      throw new Error(`A folder already exists at: ${newRelativePath}`);
+    } catch (error: unknown) {
+      if ((error as NodeJS.ErrnoException)?.code !== "ENOENT") {
+        throw error;
+      }
+      // ENOENT means destination doesn't exist — that's what we want
+    }
+
+    // Ensure the destination parent directory exists — guard immediately before the fs call.
+    if (!destParentFullPath.startsWith(resolvedDataDir + path.sep) &&
+        destParentFullPath !== resolvedDataDir) {
+      throw new Error("Invalid path: destination parent is outside data directory");
+    }
+    // Append path.sep so that an exact match on resolvedDataDir also satisfies startsWith
+    const safeDestParent = destParentFullPath.startsWith(resolvedDataDir + path.sep)
+      ? destParentFullPath
+      : resolvedDataDir;
+    await fs.mkdir(safeDestParent, { recursive: true });
+
+    // Guard both paths immediately before rename.
+    if (!sourceFullPath.startsWith(resolvedDataDir + path.sep)) {
+      throw new Error("Invalid path: source is outside data directory");
+    }
+    if (!newFullPath.startsWith(resolvedDataDir + path.sep)) {
+      throw new Error("Invalid path: destination is outside data directory");
+    }
+    await fs.rename(sourceFullPath, newFullPath);
+
+    // Invalidate all related caches
+    this.cache.invalidate("folder-tree:");
+    this.cache.invalidate(`pages:${sourcePath}`);
+    this.cache.invalidate(`page:${sourcePath}`);
+    this.cache.invalidate(`pages:${newRelativePath}`);
+
+    // Commit the move — uses add --all because the entire folder tree changes
+    if (this.gitService) {
+      if (process.env.TEST_DATA_DIR) {
+        await this.gitService.commitAllChanges(
+          `Moved folder: ${sourcePath} → ${newRelativePath}`,
+        );
+      } else {
+        this.gitService
+          .commitAllChanges(`Moved folder: ${sourcePath} → ${newRelativePath}`)
+          .catch((err) => console.error("Git commit failed:", err));
+      }
+    }
+
+    return newRelativePath;
+  }
+
   async getPages(folderPath: string = ""): Promise<FileNode[]> {
     // Check cache first
     const cacheKey = `pages:${folderPath}`;

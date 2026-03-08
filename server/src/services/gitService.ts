@@ -116,6 +116,31 @@ export class GitService {
   }
 
   /**
+   * Commit all pending changes in the repository (for folder moves which affect many files)
+   */
+  async commitAllChanges(message: string): Promise<void> {
+    if (process.env.TEST_DATA_DIR) {
+      await this.git.raw(['add', '--all']);
+      await this.git.commit(message);
+      return;
+    }
+
+    const currentQueue = this.commitQueue;
+
+    const newCommit = currentQueue
+      .then(async () => {
+        await this.git.raw(['add', '--all']);
+        await this.git.commit(message);
+      })
+      .catch((err) => {
+        throw err;
+      });
+
+    this.commitQueue = newCommit.catch(() => {});
+    return newCommit;
+  }
+
+  /**
    * Commit multiple files with a message
    */
   async commitFiles(filePaths: string[], message: string): Promise<void> {

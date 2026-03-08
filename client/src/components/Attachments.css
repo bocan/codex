@@ -167,6 +167,7 @@
 .btn-delete {
   background: transparent;
   border: 1px solid var(--border-color);
+  color: var(--text-secondary);
   width: 32px;
   height: 32px;
   border-radius: 4px;
@@ -182,11 +183,13 @@
 .btn-download:hover {
   background: var(--bg-tertiary);
   border-color: var(--accent-color);
+  color: var(--text-primary);
 }
 
 .btn-delete:hover {
-  background: #fee;
-  border-color: #f44;
+  background: rgba(220, 38, 38, 0.12);
+  border-color: var(--error-color);
+  color: var(--error-color);
 }
 
 .spinner {

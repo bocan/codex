@@ -192,3 +192,36 @@ export const renameFolderTool = defineTool({
     }
   },
 });
+
+/**
+ * Move a folder to a different location
+ */
+export const moveFolderTool = defineTool({
+  name: 'move_folder',
+  description: 'Move a folder (and all its contents) to a different location in the folder hierarchy.',
+  inputSchema: z.object({
+    sourcePath: z.string().describe('Path of the folder to move (e.g. "Projects/OldLocation")'),
+    destinationParentPath: z.string().describe('Path of the destination parent folder, or empty string to move to root (e.g. "Archive" or "")'),
+  }),
+  annotations: {
+    destructiveHint: true,
+  },
+  handler: async (args, context) => {
+    if (context.signal?.aborted) {
+      return { content: [{ type: 'text', text: 'Operation cancelled' }], isError: true };
+    }
+
+    try {
+      const newPath = await fileSystemService.moveFolder(args.sourcePath, args.destinationParentPath);
+      return {
+        content: [{ type: 'text', text: `Successfully moved folder from ${args.sourcePath} to ${newPath}` }],
+        structuredContent: { oldPath: args.sourcePath, newPath, moved: true },
+      };
+    } catch (error) {
+      return {
+        content: [{ type: 'text', text: `Failed to move folder: ${(error as Error).message}` }],
+        isError: true,
+      };
+    }
+  },
+});

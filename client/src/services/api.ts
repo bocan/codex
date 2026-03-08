@@ -63,6 +63,11 @@ export const api = {
     await axios.put(`${API_BASE}/folders/rename`, { oldPath, newPath });
   },
 
+  moveFolder: async (sourcePath: string, destinationParentPath: string): Promise<string> => {
+    const response = await axios.put(`${API_BASE}/folders/move`, { sourcePath, destinationParentPath });
+    return response.data.newPath;
+  },
+
   // Page operations
   getPages: async (folder?: string): Promise<FileNode[]> => {
     const response = await axios.get(`${API_BASE}/pages`, {

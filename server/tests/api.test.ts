@@ -86,6 +86,55 @@ describe('API Tests', () => {
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('message');
     });
+
+    it('should move a folder to a different location', async () => {
+      await testFileSystemService.createFolder('source-folder');
+      await testFileSystemService.createFolder('dest-parent');
+      await testFileSystemService.createPage('source-folder/test.md', '# Content');
+
+      const response = await request(app)
+        .put('/api/folders/move')
+        .send({ sourcePath: 'source-folder', destinationParentPath: 'dest-parent' });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('message');
+      expect(response.body).toHaveProperty('newPath', 'dest-parent/source-folder');
+
+      // Verify file was moved
+      const content = await testFileSystemService.getPageContent('dest-parent/source-folder/test.md');
+      expect(content).toBe('# Content');
+    });
+
+    it('should move a folder to root', async () => {
+      await testFileSystemService.createFolder('parent/child');
+      await testFileSystemService.createPage('parent/child/page.md', '# Page');
+
+      const response = await request(app)
+        .put('/api/folders/move')
+        .send({ sourcePath: 'parent/child', destinationParentPath: '' });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('newPath', 'child');
+    });
+
+    it('should return 409 when destination folder already exists', async () => {
+      await testFileSystemService.createFolder('folder-a');
+      await testFileSystemService.createFolder('parent/folder-a');
+
+      const response = await request(app)
+        .put('/api/folders/move')
+        .send({ sourcePath: 'folder-a', destinationParentPath: 'parent' });
+
+      expect(response.status).toBe(409);
+    });
+
+    it('should return 400 when sourcePath is missing', async () => {
+      const response = await request(app)
+        .put('/api/folders/move')
+        .send({ destinationParentPath: 'somewhere' });
+
+      expect(response.status).toBe(400);
+    });
   });
 
   describe('Page Operations', () => {

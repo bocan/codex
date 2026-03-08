@@ -276,8 +276,8 @@ describe('MCP Configuration', () => {
 
 describe('MCP Tool Registry', () => {
   describe('Tool Registration', () => {
-    it('should have 16 registered tools', () => {
-      expect(tools).toHaveLength(16);
+    it('should have 17 registered tools', () => {
+      expect(tools).toHaveLength(17);
     });
 
     it('should register all page tools', () => {
@@ -303,6 +303,7 @@ describe('MCP Tool Registry', () => {
         'create_folder',
         'delete_folder',
         'rename_folder',
+        'move_folder',
       ];
 
       for (const name of folderToolNames) {

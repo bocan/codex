@@ -26,6 +26,7 @@ import {
   createFolderTool,
   deleteFolderTool,
   renameFolderTool,
+  moveFolderTool,
 } from './folders';
 
 import {
@@ -53,6 +54,7 @@ export const tools: RegisteredTool[] = [
   asRegisteredTool(createFolderTool),
   asRegisteredTool(deleteFolderTool),
   asRegisteredTool(renameFolderTool),
+  asRegisteredTool(moveFolderTool),
   // Attachment operations
   asRegisteredTool(listAttachmentsTool),
   asRegisteredTool(uploadAttachmentTool),

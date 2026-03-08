@@ -8,5 +8,6 @@ router.get("/", folderController.getFolderTree);
 router.post("/", fileOperationLimiter, folderController.createFolder);
 router.delete("/*path", fileOperationLimiter, folderController.deleteFolder);
 router.put("/rename", fileOperationLimiter, folderController.renameFolder);
+router.put("/move", fileOperationLimiter, folderController.moveFolder);
 
 export default router;

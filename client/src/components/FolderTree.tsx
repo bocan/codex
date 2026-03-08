@@ -18,6 +18,7 @@ interface FolderTreeProps {
   expandedFolders?: Set<string>;
   keyboardSelectedPath?: string | null;
   onFolderHover?: (path: string) => void;
+  onRequestMove?: (sourcePath: string) => void;
 }
 
 const FolderTreeItem: React.FC<FolderTreeProps> = ({
@@ -28,6 +29,7 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({
   expandedFolders,
   keyboardSelectedPath,
   onFolderHover,
+  onRequestMove,
 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isRenaming, setIsRenaming] = useState(false);
@@ -143,6 +145,11 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({
     }
   };
 
+  const handleMove = () => {
+    setShowContextMenu(false);
+    onRequestMove?.(node.path);
+  };
+
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -244,6 +251,13 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({
                   Rename
                 </button>
                 <button
+                  onClick={handleMove}
+                  role="menuitem"
+                  aria-label={`Move ${node.name}`}
+                >
+                  Move to...
+                </button>
+                <button
                   onClick={handleDelete}
                   disabled={isDeleting}
                   role="menuitem"
@@ -268,6 +282,7 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({
               expandedFolders={expandedFolders}
               keyboardSelectedPath={keyboardSelectedPath}
               onFolderHover={onFolderHover}
+              onRequestMove={onRequestMove}
             />
           ))}
         </div>
@@ -276,12 +291,45 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({
   );
 };
 
+/** Recursive folder picker — excludes the folder being moved and its descendants */
+const renderPickerNodes = (
+  node: FolderNode,
+  excludePath: string,
+  selectedPath: string,
+  onSelect: (path: string) => void,
+  indent: number,
+): React.ReactNode => {
+  return node.children.map((child) => {
+    if (child.path === excludePath || child.path.startsWith(`${excludePath}/`)) {
+      return null;
+    }
+    return (
+      <React.Fragment key={child.path}>
+        <button
+          className={`move-picker-item ${selectedPath === child.path ? "selected" : ""}`}
+          style={{ paddingLeft: `${indent * 16 + 8}px` }}
+          onClick={() => onSelect(child.path)}
+          role="option"
+          aria-selected={selectedPath === child.path}
+        >
+          <Folder size={14} aria-hidden="true" /> {child.name}
+        </button>
+        {renderPickerNodes(child, excludePath, selectedPath, onSelect, indent + 1)}
+      </React.Fragment>
+    );
+  });
+};
+
 export const FolderTree: React.FC<
   Omit<FolderTreeProps, "node"> & { root: FolderNode }
 > = ({ root, onSelectFolder, selectedFolder, onRefresh }) => {
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set([root.path]));
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [keyboardSelectedPath, setKeyboardSelectedPath] = useState<string | null>(root.path);
+  const [moveSource, setMoveSource] = useState<string | null>(null);
+  const [moveDestination, setMoveDestination] = useState<string>("");
+  const [isMoving, setIsMoving] = useState(false);
+  const [moveError, setMoveError] = useState<string | null>(null);
   const treeRef = useRef<HTMLElement>(null);
 
   // Flatten visible folders for keyboard navigation
@@ -339,6 +387,30 @@ export const FolderTree: React.FC<
     }
   };
 
+  const handleRequestMove = (sourcePath: string) => {
+    setMoveSource(sourcePath);
+    setMoveDestination("");
+    setMoveError(null);
+  };
+
+  const handleMoveConfirm = async () => {
+    if (!moveSource) return;
+    setIsMoving(true);
+    setMoveError(null);
+    try {
+      await api.moveFolder(moveSource, moveDestination);
+      setMoveSource(null);
+      onRefresh();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message
+        : (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+        ?? "Failed to move folder";
+      setMoveError(msg);
+    } finally {
+      setIsMoving(false);
+    }
+  };
+
   return (
     <nav
       ref={treeRef}
@@ -366,7 +438,44 @@ export const FolderTree: React.FC<
         expandedFolders={expandedFolders}
         keyboardSelectedPath={keyboardSelectedPath}
         onFolderHover={handleFolderHover}
+        onRequestMove={handleRequestMove}
       />
+      {moveSource && (
+        <div className="move-modal-overlay" role="dialog" aria-modal="true" aria-label="Move folder">
+          <div className="move-modal">
+            <h3 className="move-modal-title">Move "{moveSource.split("/").pop()}"</h3>
+            <p className="move-modal-subtitle">Select destination folder:</p>
+            <div className="move-picker" role="listbox" aria-label="Destination folder">
+              <button
+                className={`move-picker-item move-picker-root ${moveDestination === "" ? "selected" : ""}`}
+                onClick={() => setMoveDestination("")}
+                role="option"
+                aria-selected={moveDestination === ""}
+              >
+                <Folder size={14} aria-hidden="true" /> Root (top level)
+              </button>
+              {renderPickerNodes(root, moveSource, moveDestination, setMoveDestination, 1)}
+            </div>
+            {moveError && <p className="move-modal-error" role="alert">{moveError}</p>}
+            <div className="move-modal-actions">
+              <button
+                className="move-modal-cancel"
+                onClick={() => setMoveSource(null)}
+                disabled={isMoving}
+              >
+                Cancel
+              </button>
+              <button
+                className="move-modal-confirm"
+                onClick={handleMoveConfirm}
+                disabled={isMoving || moveDestination === moveSource}
+              >
+                {isMoving ? "Moving..." : "Move Here"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
