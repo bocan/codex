@@ -219,10 +219,13 @@ export const Attachments: React.FC<AttachmentsProps> = ({
                     <span className="file-icon" aria-hidden="true">
                       {getFileIcon(file.name)}
                     </span>
-                    <div className="file-info">
+                    <div
+                      className="file-info"
+                      title={`${file.name}\nModified: ${new Date(file.modified).toLocaleString()}`}
+                    >
                       <div className="file-name">{file.name}</div>
                       <div className="file-meta">
-                        {formatFileSize(file.size)}
+                        {formatFileSize(file.size)} · {new Date(file.modified).toLocaleDateString()}
                       </div>
                     </div>
                     <div className="file-actions">
