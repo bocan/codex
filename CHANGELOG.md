@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.23.0](https://github.com/bocan/codex/compare/v2.22.0...v2.23.0) (2026-03-08)
+
+
+### Features
+
+* **folders:** enhance folder move functionality with path validation ([bae6d12](https://github.com/bocan/codex/commit/bae6d122aca22ac10f2dfed33f37be36460b2138))
+* **folders:** implement folder move functionality with UI and API support ([015f98f](https://github.com/bocan/codex/commit/015f98fd7751e6c42b847db780b9f2d523ea15f8))
+* **responsive:** enhance editor and app layout for mobile and tablet ([918d843](https://github.com/bocan/codex/commit/918d843bce905e0471ca698a02fa941427b15c57))
+
+
+### Bug Fixes
+
+* **folders:** ensure safe directory creation for folder operations ([b213a45](https://github.com/bocan/codex/commit/b213a45cef206cdf4b4e8dce61698c2f9ad598f8))
+* **folders:** improve path validation for folder move operations ([019d646](https://github.com/bocan/codex/commit/019d64688045b855fbdfe49a8505ead16038170b))
+
+
+### Styles
+
+* adjust button sizes and paddings for improved UI consistency ([2ed13cd](https://github.com/bocan/codex/commit/2ed13cdcbece894723d679bf8a9f53198f1ce333))
+
+
+### Chores
+
+* update dependencies for @types/node, lucide-react, and eslint ([d7214ef](https://github.com/bocan/codex/commit/d7214ef799d50d5d97a23f4aba05741667ed1fd4))
+
 ## [2.22.0](https://github.com/bocan/codex/compare/v2.21.1...v2.22.0) (2026-03-01)
 
 
