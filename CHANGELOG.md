@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.23.1](https://github.com/bocan/codex/compare/v2.23.0...v2.23.1) (2026-03-08)
+
+
+### Chores
+
+* **workflows:** update Docker actions to latest versions ([04125ba](https://github.com/bocan/codex/commit/04125bad6d825b07d2a191125d29fc21251f10b5))
+
 ## [2.23.0](https://github.com/bocan/codex/compare/v2.22.0...v2.23.0) (2026-03-08)
 
 
