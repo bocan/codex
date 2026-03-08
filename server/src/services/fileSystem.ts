@@ -292,9 +292,27 @@ export class FileSystemService {
       throw new Error("Cannot move root folder");
     }
 
-    const sourceFullPath = this.validatePath(sourcePath);
+    const resolvedDataDir = path.resolve(this.dataDir);
 
-    // Verify source exists and is a directory
+    // Validate BOTH user-supplied paths up front — validatePath throws immediately on
+    // any traversal attempt, producing safe absolute paths.
+    const sourceFullPath = this.validatePath(sourcePath);
+    const destParentFullPath = destinationParentPath
+      ? this.validatePath(destinationParentPath)
+      : resolvedDataDir;
+
+    // Explicit startsWith guards — recognised by static analysis as path-traversal
+    // barriers and redundantly confirm both paths are inside the data directory.
+    if (!sourceFullPath.startsWith(resolvedDataDir + path.sep)) {
+      throw new Error("Invalid path: source is outside data directory");
+    }
+    if (destParentFullPath !== resolvedDataDir &&
+        !destParentFullPath.startsWith(resolvedDataDir + path.sep)) {
+      throw new Error("Invalid path: destination is outside data directory");
+    }
+
+    // Verify source exists and is a directory.
+    // sourceFullPath is guarded by the startsWith check above.
     let sourceStat;
     try {
       sourceStat = await fs.stat(sourceFullPath);
@@ -308,19 +326,32 @@ export class FileSystemService {
       throw new Error(`${sourcePath} is not a folder`);
     }
 
-    const folderName = path.basename(sourcePath);
-    const newRelativePath = destinationParentPath
-      ? `${destinationParentPath}/${folderName}`
-      : folderName;
+    // Derive the folder name from the VALIDATED absolute path (not from the raw
+    // user string).  path.basename is a CodeQL-recognised sanitiser that strips
+    // any remaining directory components.
+    const folderName = path.basename(sourceFullPath);
 
-    // Prevent moving a folder into itself or a descendant
-    if (newRelativePath === sourcePath || newRelativePath.startsWith(`${sourcePath}/`)) {
+    // Build the destination absolute path entirely from validated components.
+    // destParentFullPath was validated above; folderName came from path.basename.
+    const newFullPath = path.join(destParentFullPath, folderName);
+
+    // Guard the computed destination path before any filesystem use.
+    if (!newFullPath.startsWith(resolvedDataDir + path.sep) &&
+        newFullPath !== resolvedDataDir) {
+      throw new Error("Invalid path: computed destination is outside data directory");
+    }
+
+    // Relative path (for cache keys and return value) — derived from absolute paths.
+    const newRelativePath = path.relative(resolvedDataDir, newFullPath);
+
+    // Prevent moving a folder into itself or a descendant (compare absolute paths).
+    if (newFullPath === sourceFullPath ||
+        newFullPath.startsWith(sourceFullPath + path.sep)) {
       throw new Error("Cannot move a folder into itself or one of its subfolders");
     }
 
-    const newFullPath = this.validatePath(newRelativePath);
-
-    // Check destination doesn't already exist
+    // Check destination doesn't already exist.
+    // newFullPath is guarded by the startsWith check above.
     try {
       await fs.access(newFullPath);
       throw new Error(`A folder already exists at: ${newRelativePath}`);
@@ -331,12 +362,11 @@ export class FileSystemService {
       // ENOENT means destination doesn't exist — that's what we want
     }
 
-    // Ensure the destination parent directory exists
-    if (destinationParentPath) {
-      const destParentFullPath = this.validatePath(destinationParentPath);
-      await fs.mkdir(destParentFullPath, { recursive: true });
-    }
+    // Ensure the destination parent directory exists.
+    // destParentFullPath is guarded by the startsWith check above.
+    await fs.mkdir(destParentFullPath, { recursive: true });
 
+    // Both paths are guarded by startsWith checks above.
     await fs.rename(sourceFullPath, newFullPath);
 
     // Invalidate all related caches
