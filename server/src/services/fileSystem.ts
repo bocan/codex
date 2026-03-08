@@ -287,6 +287,80 @@ export class FileSystemService {
     this.cache.invalidate(`page:${oldPath}`);
   }
 
+  async moveFolder(sourcePath: string, destinationParentPath: string): Promise<string> {
+    if (!sourcePath || sourcePath === "/" || sourcePath === ".") {
+      throw new Error("Cannot move root folder");
+    }
+
+    const sourceFullPath = this.validatePath(sourcePath);
+
+    // Verify source exists and is a directory
+    let sourceStat;
+    try {
+      sourceStat = await fs.stat(sourceFullPath);
+    } catch (error: unknown) {
+      if ((error as NodeJS.ErrnoException)?.code === "ENOENT") {
+        throw new Error(`Source folder does not exist: ${sourcePath}`);
+      }
+      throw error;
+    }
+    if (!sourceStat.isDirectory()) {
+      throw new Error(`${sourcePath} is not a folder`);
+    }
+
+    const folderName = path.basename(sourcePath);
+    const newRelativePath = destinationParentPath
+      ? `${destinationParentPath}/${folderName}`
+      : folderName;
+
+    // Prevent moving a folder into itself or a descendant
+    if (newRelativePath === sourcePath || newRelativePath.startsWith(`${sourcePath}/`)) {
+      throw new Error("Cannot move a folder into itself or one of its subfolders");
+    }
+
+    const newFullPath = this.validatePath(newRelativePath);
+
+    // Check destination doesn't already exist
+    try {
+      await fs.access(newFullPath);
+      throw new Error(`A folder already exists at: ${newRelativePath}`);
+    } catch (error: unknown) {
+      if ((error as NodeJS.ErrnoException)?.code !== "ENOENT") {
+        throw error;
+      }
+      // ENOENT means destination doesn't exist — that's what we want
+    }
+
+    // Ensure the destination parent directory exists
+    if (destinationParentPath) {
+      const destParentFullPath = this.validatePath(destinationParentPath);
+      await fs.mkdir(destParentFullPath, { recursive: true });
+    }
+
+    await fs.rename(sourceFullPath, newFullPath);
+
+    // Invalidate all related caches
+    this.cache.invalidate("folder-tree:");
+    this.cache.invalidate(`pages:${sourcePath}`);
+    this.cache.invalidate(`page:${sourcePath}`);
+    this.cache.invalidate(`pages:${newRelativePath}`);
+
+    // Commit the move — uses add --all because the entire folder tree changes
+    if (this.gitService) {
+      if (process.env.TEST_DATA_DIR) {
+        await this.gitService.commitAllChanges(
+          `Moved folder: ${sourcePath} → ${newRelativePath}`,
+        );
+      } else {
+        this.gitService
+          .commitAllChanges(`Moved folder: ${sourcePath} → ${newRelativePath}`)
+          .catch((err) => console.error("Git commit failed:", err));
+      }
+    }
+
+    return newRelativePath;
+  }
+
   async getPages(folderPath: string = ""): Promise<FileNode[]> {
     // Check cache first
     const cacheKey = `pages:${folderPath}`;

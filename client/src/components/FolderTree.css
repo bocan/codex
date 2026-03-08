@@ -133,3 +133,136 @@
   color: var(--text-secondary);
   font-style: italic;
 }
+
+/* Move folder modal */
+.move-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.move-modal {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  width: 320px;
+  max-width: 90vw;
+  box-shadow: 0 8px 32px var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.move-modal-title {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.move-modal-subtitle {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.move-picker {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  max-height: 240px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.move-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 8px;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  transition: background var(--transition-fast);
+}
+
+.move-picker-item:last-child {
+  border-bottom: none;
+}
+
+.move-picker-item:hover {
+  background: var(--bg-hover);
+}
+
+.move-picker-item.selected {
+  background: var(--accent-bg);
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.move-picker-root {
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.move-picker-root.selected {
+  color: var(--accent-color);
+}
+
+.move-modal-error {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--error-color);
+}
+
+.move-modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.move-modal-cancel {
+  padding: 6px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  transition: background var(--transition-fast);
+}
+
+.move-modal-cancel:hover:not(:disabled) {
+  background: var(--bg-hover);
+}
+
+.move-modal-confirm {
+  padding: 6px 14px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent-color);
+  color: var(--accent-text);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition: background var(--transition-fast);
+}
+
+.move-modal-confirm:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.move-modal-cancel:disabled,
+.move-modal-confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

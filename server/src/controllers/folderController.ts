@@ -78,3 +78,25 @@ export const renameFolder = async (req: Request, res: Response) => {
       });
   }
 };
+
+export const moveFolder = async (req: Request, res: Response) => {
+  try {
+    const { sourcePath, destinationParentPath } = req.body;
+
+    if (!sourcePath) {
+      return res.status(400).json({ error: "sourcePath is required" });
+    }
+    if (destinationParentPath === undefined) {
+      return res.status(400).json({ error: "destinationParentPath is required (use empty string for root)" });
+    }
+
+    const newPath = await fileSystemService.moveFolder(sourcePath, destinationParentPath);
+    res.json({ message: "Folder moved successfully", oldPath: sourcePath, newPath });
+  } catch (error) {
+    const msg = (error as Error).message;
+    const status = msg.includes("does not exist") ? 404
+      : msg.includes("already exists") || msg.includes("into itself") ? 409
+      : 500;
+    res.status(status).json({ error: "Failed to move folder", message: msg });
+  }
+};
