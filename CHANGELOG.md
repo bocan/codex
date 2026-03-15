@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.23.2](https://github.com/bocan/codex/compare/v2.23.1...v2.23.2) (2026-03-15)
+
+
+### Chores
+
+* **dependencies:** update dependencies for improved stability ([84e00c2](https://github.com/bocan/codex/commit/84e00c25dc7a1cbdeb1b07eeb7aaa345e2853f26))
+* **dependencies:** update jsdom to version 29.0.0 ([c58ea7a](https://github.com/bocan/codex/commit/c58ea7a3587ca974a67a2a574816ed40b2a1ef02))
+
 ## [2.23.1](https://github.com/bocan/codex/compare/v2.23.0...v2.23.1) (2026-03-08)
 
 
