@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.23.3](https://github.com/bocan/codex/compare/v2.23.2...v2.23.3) (2026-03-15)
+
+
+### Chores
+
+* **deps:** bump docker/build-push-action from 6 to 7 ([10e4a90](https://github.com/bocan/codex/commit/10e4a90b85a58a4f19e9b361b904485046d7caba))
+
 ## [2.23.2](https://github.com/bocan/codex/compare/v2.23.1...v2.23.2) (2026-03-15)
 
 
