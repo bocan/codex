@@ -17,7 +17,7 @@
     "github-slugger": "^2.0.0",
     "html-docx-js-typescript": "^0.1.5",
     "lucide-react": "^0.577.0",
-    "mermaid": "^11.4.1",
+    "mermaid": "^11.13.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-markdown": "^10.1.0",
@@ -34,10 +34,10 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/react-syntax-highlighter": "^15.5.13",
-    "@vitejs/plugin-react": "^5.1.4",
-    "jsdom": "^28.1.0",
+    "@vitejs/plugin-react": "^6.0.1",
+    "jsdom": "^29.0.0",
     "typescript": "^5.3.3",
-    "vite": "^7.3.1",
-    "vitest": "^4.0.18"
+    "vite": "8.00",
+    "vitest": "^4.1.0"
   }
 }
