@@ -65,6 +65,7 @@ export const PageList: React.FC<PageListProps> = ({
   const [templatesError, setTemplatesError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [isMoving, setIsMoving] = useState(false);
+  const [moveDestination, setMoveDestination] = useState<string>("");
   const [sortField, setSortField] = useState<SortField>("name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -332,15 +333,16 @@ export const PageList: React.FC<PageListProps> = ({
 
   const handleMovePage = (path: string) => {
     setMovingPage(path);
+    setMoveDestination("");
     setContextMenuPage(null);
   };
 
-  const handleMoveSubmit = async (targetFolder: string) => {
+  const handleMoveSubmit = async () => {
     if (!movingPage) return;
 
     setIsMoving(true);
     try {
-      const result = await api.movePage(movingPage, targetFolder);
+      const result = await api.movePage(movingPage, moveDestination);
       loadPages();
       onRefresh();
       if (selectedPage === movingPage) {
@@ -358,24 +360,25 @@ export const PageList: React.FC<PageListProps> = ({
     }
   };
 
-  const getAllFolders = (
+  /** Recursive folder picker with tree structure and indentation */
+  const renderPickerNodes = (
     node: FolderNode,
-    prefix: string = "",
-  ): Array<{ path: string; display: string }> => {
-    const folders: Array<{ path: string; display: string }> = [];
-    const currentPath = prefix ? `${prefix}/${node.name}` : node.name;
-    const displayPath = currentPath === "" ? "/" : currentPath;
-
-    folders.push({
-      path: node.path === "/" ? "" : node.path,
-      display: displayPath,
-    });
-
-    for (const child of node.children) {
-      folders.push(...getAllFolders(child, currentPath));
-    }
-
-    return folders;
+    indent: number = 0,
+  ): React.ReactNode => {
+    return node.children.map((child) => (
+      <React.Fragment key={child.path}>
+        <button
+          className={`move-picker-item ${moveDestination === child.path ? "selected" : ""}`}
+          style={{ paddingLeft: `${indent * 16 + 8}px` }}
+          onClick={() => setMoveDestination(child.path)}
+          role="option"
+          aria-selected={moveDestination === child.path}
+        >
+          <Folder size={14} aria-hidden="true" /> {child.name}
+        </button>
+        {renderPickerNodes(child, indent + 1)}
+      </React.Fragment>
+    ));
   };
 
   return (
@@ -531,47 +534,51 @@ export const PageList: React.FC<PageListProps> = ({
       {/* Move Page Modal */}
       {movingPage && folderTree && (
         <div
-          className="modal-overlay"
+          className="move-modal-overlay"
           onClick={() => !isMoving && setMovingPage(null)}
           role="dialog"
           aria-modal="true"
           aria-labelledby="move-modal-title"
         >
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3 id="move-modal-title">Move Page</h3>
-            <p>
-              Select destination folder for{" "}
-              <strong>{movingPage.split("/").pop()}</strong>:
-            </p>
+          <div className="move-modal" onClick={(e) => e.stopPropagation()}>
+            <h3 className="move-modal-title" id="move-modal-title">
+              Move "{movingPage.split("/").pop()}"
+            </h3>
+            <p className="move-modal-subtitle">Select destination folder:</p>
             {isMoving ? (
               <div className="modal-loading" role="status" aria-live="polite">
                 <Loader2 size={24} className="loading-spinner" aria-hidden="true" />
                 <span>Moving page...</span>
               </div>
             ) : (
-              <div className="folder-list" role="list">
-                {getAllFolders(folderTree).map((folder) => (
-                  <button
-                    key={folder.path}
-                    className="folder-option"
-                    onClick={() => handleMoveSubmit(folder.path)}
-                    disabled={isMoving}
-                    role="listitem"
-                    aria-label={`Move to ${folder.display}`}
-                  >
-                    <Folder size={14} aria-hidden="true" /> {folder.display}
-                  </button>
-                ))}
+              <div className="move-picker" role="listbox" aria-label="Destination folder">
+                <button
+                  className={`move-picker-item move-picker-root ${moveDestination === "" ? "selected" : ""}`}
+                  onClick={() => setMoveDestination("")}
+                  role="option"
+                  aria-selected={moveDestination === ""}
+                >
+                  <Folder size={14} aria-hidden="true" /> Root (top level)
+                </button>
+                {renderPickerNodes(folderTree, 1)}
               </div>
             )}
-            <button
-              className="cancel-btn"
-              onClick={() => setMovingPage(null)}
-              disabled={isMoving}
-              aria-label="Cancel moving page"
-            >
-              Cancel
-            </button>
+            <div className="move-modal-actions">
+              <button
+                className="move-modal-cancel"
+                onClick={() => setMovingPage(null)}
+                disabled={isMoving}
+              >
+                Cancel
+              </button>
+              <button
+                className="move-modal-confirm"
+                onClick={handleMoveSubmit}
+                disabled={isMoving}
+              >
+                {isMoving ? "Moving..." : "Move Here"}
+              </button>
+            </div>
           </div>
         </div>
       )}
