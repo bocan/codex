@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.23.4](https://github.com/bocan/codex/compare/v2.23.3...v2.23.4) (2026-03-21)
+
+
+### Chores
+
+* update dependencies in package.json ([ac72278](https://github.com/bocan/codex/commit/ac7227873f27d2526e3c3dda3ec9a5b5261b139a))
+
 ## [2.23.3](https://github.com/bocan/codex/compare/v2.23.2...v2.23.3) (2026-03-15)
 
 
