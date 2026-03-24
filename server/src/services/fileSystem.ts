@@ -310,7 +310,7 @@ export class FileSystemService {
       sourceStat = await fs.stat(sourceFullPath);
     } catch (error: unknown) {
       if ((error as NodeJS.ErrnoException)?.code === "ENOENT") {
-        throw new Error(`Source folder does not exist: ${sourcePath}`);
+        throw new Error(`Source folder does not exist: ${sourcePath}`, { cause: error });
       }
       throw error;
     }
