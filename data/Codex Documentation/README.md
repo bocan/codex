@@ -6,7 +6,7 @@
 
 > ⚠️ **Note**: Codex is designed as a **single-user application**. It does not support concurrent multi-user editing or collaboration features. Perfect for personal wikis, note-taking, and documentation.
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb)](https://reactjs.org/)
 [![Express](https://img.shields.io/badge/Express-5.2.1-green)](https://expressjs.com/)
 
@@ -207,7 +207,7 @@ make help             # Show all available commands
 
 1. Make your changes in the appropriate files
 2. Tests run automatically in watch mode (if enabled)
-3. Server auto-reloads on file changes (via ts-node-dev)
+3. Server auto-reloads on file changes (via tsx)
 4. Client hot-reloads on file changes (via Vite HMR)
 5. Run `make test` before committing
 
@@ -1038,27 +1038,27 @@ The TOC appears as a floating widget on the right side of the preview pane when 
 
 ### Backend
 - **[Express](https://expressjs.com/)** `^5.2.1` - Fast, unopinionated web framework
-- **[TypeScript](https://www.typescriptlang.org/)** `^5.3.3` - Type-safe JavaScript
+- **[TypeScript](https://www.typescriptlang.org/)** `^6.0.2` - Type-safe JavaScript
 - **[CORS](https://www.npmjs.com/package/cors)** `^2.8.6` - Cross-origin resource sharing
-- **[ts-node-dev](https://www.npmjs.com/package/ts-node-dev)** `^2.0.0` - Development server with auto-reload
+- **[tsx](https://www.npmjs.com/package/tsx)** `^4.21.0` - Development server with auto-reload
 
 **Testing:**
-- **[Jest](https://jestjs.io/)** `^30.2.0` - Testing framework
+- **[Jest](https://jestjs.io/)** `^30.3.0` - Testing framework
 - **[Supertest](https://www.npmjs.com/package/supertest)** `^7.2.2` - HTTP assertion library
 - **[ts-jest](https://www.npmjs.com/package/ts-jest)** `^29.1.1` - TypeScript preprocessor for Jest
 
 ### Frontend
 - **[React](https://reactjs.org/)** `^19.2.4` - UI library
-- **[TypeScript](https://www.typescriptlang.org/)** `^5.3.3` - Type-safe JavaScript
-- **[Vite](https://vitejs.dev/)** `^7.3.1` - Next-generation frontend tooling
+- **[TypeScript](https://www.typescriptlang.org/)** `^6.0.2` - Type-safe JavaScript
+- **[Vite](https://vitejs.dev/)** `^8.0.0` - Next-generation frontend tooling
 - **[React Markdown](https://www.npmjs.com/package/react-markdown)** `^10.1.0` - Markdown renderer
 - **[remark-gfm](https://www.npmjs.com/package/remark-gfm)** `^4.0.0` - GitHub Flavored Markdown
 - **[Axios](https://axios-http.com/)** `^1.13.4` - HTTP client
 
 **Testing:**
-- **[Vitest](https://vitest.dev/)** `^4.0.18` - Unit test framework
+- **[Vitest](https://vitest.dev/)** `^4.1.1` - Unit test framework
 - **[Testing Library](https://testing-library.com/)** - React testing utilities
-- **[jsdom](https://www.npmjs.com/package/jsdom)** `^28.0.0` - DOM implementation
+- **[jsdom](https://www.npmjs.com/package/jsdom)** `^29.0.1` - DOM implementation
 
 ### Development Tools
 - **[Concurrently](https://www.npmjs.com/package/concurrently)** `^9.2.1` - Run multiple commands
