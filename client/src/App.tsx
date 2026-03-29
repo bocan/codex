@@ -5,9 +5,11 @@ import { Editor } from "./components/Editor";
 import { Preview } from "./components/Preview";
 import { Login } from "./components/Login";
 import { Search } from "./components/Search";
+import { AIChat } from "./components/AIChat";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { api } from "./services/api";
-import { FolderNode } from "./types";
+import { useEditorStore } from "./store/editorStore";
+import { FolderNode, AIAccount, AIAccountType, ChatMessage } from "./types";
 import {
   NotebookPen,
   Monitor,
@@ -29,6 +31,13 @@ import {
   SunMoon,
   Smartphone,
   Lock,
+  Settings,
+  Plus,
+  Trash2,
+  Bot,
+  Server,
+  MessageSquare,
+  ChevronUp,
 } from "lucide-react";
 import "./App.css";
 
@@ -43,6 +52,11 @@ const MAX_PANE_WIDTH = 800;
 const MIN_FOLDER_HEIGHT = 150;
 const MAX_FOLDER_HEIGHT = 800;
 
+// AI Chat pane
+const DEFAULT_CHAT_HEIGHT = 250;
+const MIN_CHAT_HEIGHT = 150;
+const MAX_CHAT_HEIGHT = 500;
+
 // Responsive breakpoints
 const TABLET_BREAKPOINT = 768;
 const MOBILE_BREAKPOINT = 600;
@@ -52,6 +66,9 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null = loading
   const [authEnabled, setAuthEnabled] = useState(false);
 
+  // Get current document content from editor store for AI context
+  const { content } = useEditorStore();
+
   const [folderTree, setFolderTree] = useState<FolderNode | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [selectedPage, setSelectedPage] = useState<string | null>(null);
@@ -60,6 +77,33 @@ function App() {
   const [rightPaneCollapsed, setRightPaneCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false); // Track if we're on mobile for overlay behavior
   const [showAbout, setShowAbout] = useState(false); // About modal visibility
+  const [showSettings, setShowSettings] = useState(false); // Settings modal visibility
+  const [enableAISearch, setEnableAISearch] = useState(() => {
+    const saved = localStorage.getItem('codex-enable-ai-search');
+    // Default to false - user must explicitly enable AI features
+    return saved === 'true' ? true : false;
+  });
+  
+  // AI Accounts state
+  const [aiAccounts, setAiAccounts] = useState<AIAccount[]>(() => {
+    const saved = localStorage.getItem('codex-ai-accounts');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [showAddAccount, setShowAddAccount] = useState(false);
+  const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
+  const [newAccountType, setNewAccountType] = useState<AIAccountType>('anthropic');
+  const [newAccountName, setNewAccountName] = useState('');
+  const [newAccountApiKey, setNewAccountApiKey] = useState('');
+  const [newAccountHost, setNewAccountHost] = useState('localhost');
+  const [newAccountPort, setNewAccountPort] = useState('11434');
+
+  // AI Chat state
+  const [showAIChat, setShowAIChat] = useState(false);
+  const [aiChatMessages, setAiChatMessages] = useState<ChatMessage[]>([]);
+  const [aiChatHeight, setAiChatHeight] = useState(() => {
+    const saved = localStorage.getItem('codex-ai-chat-height');
+    return saved ? parseInt(saved, 10) : DEFAULT_CHAT_HEIGHT;
+  });
 
   // Theme state
   const [theme, setTheme] = useState<
@@ -86,6 +130,7 @@ function App() {
   const isResizingLeft = useRef(false);
   const isResizingRight = useRef(false);
   const isResizingFolderTree = useRef(false);
+  const isResizingChat = useRef(false);
   const leftPaneRef = useRef<HTMLDivElement>(null);
   const lastBreakpointRef = useRef<string | null>(null); // Track breakpoint changes for responsive collapse
 
@@ -154,6 +199,34 @@ function App() {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [showAbout]);
 
+  // Close Settings modal on Escape key
+  useEffect(() => {
+    if (!showSettings) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowSettings(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [showSettings]);
+
+  // Close Add Account modal on Escape key
+  useEffect(() => {
+    if (!showAddAccount) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowAddAccount(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [showAddAccount]);
+
   // Check auth status on mount
   useEffect(() => {
     checkAuth();
@@ -185,6 +258,83 @@ function App() {
     }
   };
 
+  // AI Account handlers
+  const resetAccountForm = () => {
+    setNewAccountName('');
+    setNewAccountApiKey('');
+    setNewAccountHost('localhost');
+    setNewAccountPort('11434');
+    setNewAccountType('anthropic');
+    setEditingAccountId(null);
+  };
+
+  const handleSaveAccount = () => {
+    const id = editingAccountId || crypto.randomUUID();
+    let account: AIAccount;
+    
+    if (newAccountType === 'anthropic') {
+      account = {
+        id,
+        type: 'anthropic',
+        name: newAccountName.trim(),
+        apiKey: newAccountApiKey.trim(),
+      };
+    } else {
+      account = {
+        id,
+        type: 'ollama',
+        name: newAccountName.trim(),
+        host: newAccountHost.trim(),
+        port: parseInt(newAccountPort, 10) || 11434,
+      };
+    }
+    
+    let updated: AIAccount[];
+    if (editingAccountId) {
+      // Update existing
+      updated = aiAccounts.map(acc => acc.id === editingAccountId ? account : acc);
+    } else {
+      // Add new
+      updated = [...aiAccounts, account];
+    }
+    
+    setAiAccounts(updated);
+    localStorage.setItem('codex-ai-accounts', JSON.stringify(updated));
+    
+    // Reset form and close modal
+    resetAccountForm();
+    setShowAddAccount(false);
+  };
+
+  const handleEditAccount = (account: AIAccount) => {
+    setEditingAccountId(account.id);
+    setNewAccountType(account.type);
+    setNewAccountName(account.name);
+    if (account.type === 'anthropic') {
+      setNewAccountApiKey(account.apiKey);
+      setNewAccountHost('localhost');
+      setNewAccountPort('11434');
+    } else {
+      setNewAccountApiKey('');
+      setNewAccountHost(account.host);
+      setNewAccountPort(String(account.port));
+    }
+    setShowAddAccount(true);
+  };
+
+  const handleDeleteAccount = (id: string) => {
+    const updated = aiAccounts.filter(acc => acc.id !== id);
+    setAiAccounts(updated);
+    localStorage.setItem('codex-ai-accounts', JSON.stringify(updated));
+  };
+
+  const isAddAccountValid = () => {
+    if (!newAccountName.trim()) return false;
+    if (newAccountType === 'anthropic' && !newAccountApiKey.trim()) return false;
+    if (newAccountType === 'ollama' && !newAccountHost.trim()) return false;
+    return true;
+  };
+
   // Only load folder tree if authenticated (or auth is disabled)
   useEffect(() => {
     if (isAuthenticated) {
@@ -210,6 +360,13 @@ function App() {
       folderTreeHeight.toString(),
     );
   }, [folderTreeHeight]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      "codex-ai-chat-height",
+      aiChatHeight.toString(),
+    );
+  }, [aiChatHeight]);
 
   // Apply theme to document
   useEffect(() => {
@@ -263,12 +420,20 @@ function App() {
           setFolderTreeHeight(newHeight);
         }
       }
+      if (isResizingChat.current) {
+        // Resize from top edge - calculate height from bottom of viewport
+        const newHeight = window.innerHeight - e.clientY;
+        if (newHeight >= MIN_CHAT_HEIGHT && newHeight <= MAX_CHAT_HEIGHT) {
+          setAiChatHeight(newHeight);
+        }
+      }
     };
 
     const handleMouseUp = () => {
       isResizingLeft.current = false;
       isResizingRight.current = false;
       isResizingFolderTree.current = false;
+      isResizingChat.current = false;
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
     };
@@ -296,6 +461,12 @@ function App() {
 
   const handleFolderTreeResizeStart = () => {
     isResizingFolderTree.current = true;
+    document.body.style.cursor = "row-resize";
+    document.body.style.userSelect = "none";
+  };
+
+  const handleChatResizeStart = () => {
+    isResizingChat.current = true;
     document.body.style.cursor = "row-resize";
     document.body.style.userSelect = "none";
   };
@@ -468,6 +639,14 @@ function App() {
               </button>
             )}
             <button
+              className="settings-button"
+              onClick={() => setShowSettings(true)}
+              title="Settings"
+              aria-label="Open settings"
+            >
+              <Settings size={16} aria-hidden="true" />
+            </button>
+            <button
               className="about-button"
               onClick={() => setShowAbout(true)}
               title="About this app"
@@ -528,6 +707,223 @@ function App() {
               <li><Smartphone size={14} /> Responsive design for mobile devices</li>
               <li><Lock size={14} /> Optional password protection</li>
             </ul>
+          </div>
+        </div>
+      )}
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div
+          className="settings-overlay"
+          onClick={() => setShowSettings(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="settings-title"
+        >
+          <div
+            className="settings-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="settings-close"
+              onClick={() => setShowSettings(false)}
+              aria-label="Close settings"
+            >
+              <X size={18} />
+            </button>
+            <h2 id="settings-title"><Settings size={24} /> Settings</h2>
+            
+            <section className="settings-group">
+              <h3>AI Connectivity</h3>
+              <label className="settings-option">
+                <input
+                  type="checkbox"
+                  checked={enableAISearch}
+                  onChange={(e) => {
+                    setEnableAISearch(e.target.checked);
+                    localStorage.setItem('codex-enable-ai-search', String(e.target.checked));
+                  }}
+                />
+                <span className="settings-option-text">
+                  <span className="settings-option-label">Enable contextual AI searching</span>
+                  <span className="settings-option-description">Use AI to enhance search results with contextual understanding</span>
+                </span>
+              </label>
+
+              <div className={`ai-accounts-section ${!enableAISearch ? 'disabled' : ''}`}>
+                <button
+                  className="add-account-button"
+                  onClick={() => {
+                    resetAccountForm();
+                    setShowAddAccount(true);
+                  }}
+                  disabled={!enableAISearch}
+                >
+                  <Plus size={16} /> Add AI Account
+                </button>
+
+                {aiAccounts.length > 0 && (
+                  <ul className="ai-accounts-list">
+                    {aiAccounts.map((account) => (
+                      <li key={account.id} className="ai-account-item">
+                        <div className="ai-account-info">
+                          {account.type === 'anthropic' ? (
+                            <Bot size={16} className="ai-account-icon anthropic" />
+                          ) : (
+                            <Server size={16} className="ai-account-icon ollama" />
+                          )}
+                          <div className="ai-account-details">
+                            <span className="ai-account-name">{account.name}</span>
+                            <span className="ai-account-type">
+                              {account.type === 'anthropic' 
+                                ? 'Anthropic' 
+                                : `Ollama (${account.host}:${account.port})`}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="ai-account-actions">
+                          <button
+                            className="ai-account-edit"
+                            onClick={() => handleEditAccount(account)}
+                            aria-label={`Edit ${account.name}`}
+                            disabled={!enableAISearch}
+                          >
+                            <Pencil size={14} />
+                          </button>
+                          <button
+                            className="ai-account-delete"
+                            onClick={() => handleDeleteAccount(account.id)}
+                            aria-label={`Delete ${account.name}`}
+                            disabled={!enableAISearch}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </section>
+          </div>
+        </div>
+      )}
+
+      {/* Add/Edit AI Account Modal */}
+      {showAddAccount && (
+        <div
+          className="settings-overlay"
+          onClick={() => {
+            resetAccountForm();
+            setShowAddAccount(false);
+          }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-account-title"
+        >
+          <div
+            className="add-account-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="settings-close"
+              onClick={() => {
+                resetAccountForm();
+                setShowAddAccount(false);
+              }}
+              aria-label="Close add account"
+            >
+              <X size={18} />
+            </button>
+            <h2 id="add-account-title">
+              {newAccountType === 'anthropic' ? <Bot size={24} /> : <Server size={24} />}
+              {editingAccountId ? 'Edit AI Account' : 'Add AI Account'}
+            </h2>
+
+            <div className="account-type-selector">
+              <button
+                className={`account-type-btn ${newAccountType === 'anthropic' ? 'active' : ''}`}
+                onClick={() => setNewAccountType('anthropic')}
+              >
+                <Bot size={20} />
+                Anthropic
+              </button>
+              <button
+                className={`account-type-btn ${newAccountType === 'ollama' ? 'active' : ''}`}
+                onClick={() => setNewAccountType('ollama')}
+              >
+                <Server size={20} />
+                Ollama
+              </button>
+            </div>
+
+            <div className="account-form">
+              <div className="form-field">
+                <label htmlFor="account-name">Account Name</label>
+                <input
+                  id="account-name"
+                  type="text"
+                  value={newAccountName}
+                  onChange={(e) => setNewAccountName(e.target.value)}
+                  placeholder={newAccountType === 'anthropic' ? 'e.g., Personal Key' : 'e.g., Local Server'}
+                />
+              </div>
+
+              {newAccountType === 'anthropic' ? (
+                <div className="form-field">
+                  <label htmlFor="api-key">API Key</label>
+                  <input
+                    id="api-key"
+                    type="password"
+                    value={newAccountApiKey}
+                    onChange={(e) => setNewAccountApiKey(e.target.value)}
+                    placeholder="sk-ant-..."
+                  />
+                </div>
+              ) : (
+                <>
+                  <div className="form-field">
+                    <label htmlFor="ollama-host">Host</label>
+                    <input
+                      id="ollama-host"
+                      type="text"
+                      value={newAccountHost}
+                      onChange={(e) => setNewAccountHost(e.target.value)}
+                      placeholder="localhost"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <label htmlFor="ollama-port">Port</label>
+                    <input
+                      id="ollama-port"
+                      type="text"
+                      value={newAccountPort}
+                      onChange={(e) => setNewAccountPort(e.target.value)}
+                      placeholder="11434"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="account-form-actions">
+              <button
+                className="cancel-btn"
+                onClick={() => {
+                  resetAccountForm();
+                  setShowAddAccount(false);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="save-btn"
+                onClick={handleSaveAccount}
+                disabled={!isAddAccountValid()}
+              >
+                {editingAccountId ? 'Save Changes' : 'Add Account'}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -647,10 +1043,42 @@ function App() {
                   <ChevronLeft size={14} aria-hidden="true" />
                 </button>
               )}
-              <Editor
-                pagePath={selectedPage}
-                onClose={handleCloseEditor}
-              />
+              <div className="editor-container" style={{ flex: showAIChat ? `1 1 calc(100% - ${aiChatHeight}px)` : '1 1 100%' }}>
+                <Editor
+                  pagePath={selectedPage}
+                  onClose={handleCloseEditor}
+                />
+                {!showAIChat && enableAISearch && (
+                  <button
+                    className="expand-btn expand-btn-bottom"
+                    onClick={() => setShowAIChat(true)}
+                    title="Show AI chat"
+                    aria-label="Show AI chat"
+                  >
+                    <MessageSquare size={14} aria-hidden="true" />
+                    <ChevronUp size={10} aria-hidden="true" />
+                  </button>
+                )}
+              </div>
+              {showAIChat && (
+                <div className="ai-chat-container" style={{ height: `${aiChatHeight}px` }}>
+                  <div
+                    className="resize-handle resize-handle-top"
+                    onMouseDown={handleChatResizeStart}
+                    role="separator"
+                    aria-label="Resize AI chat height"
+                    aria-orientation="horizontal"
+                  />
+                  <AIChat
+                    accounts={aiAccounts}
+                    documentContext={content}
+                    enabled={enableAISearch}
+                    messages={aiChatMessages}
+                    onMessagesChange={setAiChatMessages}
+                    onClose={() => setShowAIChat(false)}
+                  />
+                </div>
+              )}
             </section>
 
             {/* Right Pane: Preview */}

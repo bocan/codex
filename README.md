@@ -39,6 +39,7 @@
 - 🚀 **Fast & Lightweight**: Built with Vite for lightning-fast development
 - 🔐 **Password Protection**: Simple password-based authentication to secure your data
 - 🛡️ **Security Features**: Rate limiting, request logging, and security headers
+- 🤖 **AI Chat**: Built-in AI assistant supporting Anthropic Claude and local Ollama models with streaming responses, thinking blocks, and document context
 
 ## 🧩 Smart Templates
 
@@ -64,6 +65,65 @@ graph TD
 - Diagrams render in the live preview and in reading mode (open in new window)
 - You can download rendered diagrams as SVG
 - Export flows (e.g. Word/PDF) include diagrams as images rather than raw Mermaid text
+
+## 🤖 AI Chat
+
+Codex includes an integrated AI chat assistant for asking questions about your documents:
+
+### Supported Providers
+
+- **Anthropic Claude** - Cloud-based AI with optional "thinking" mode for extended reasoning
+- **Ollama** - Run local models like Llama, Mistral, CodeLlama, and more
+
+### Features
+
+- **Streaming Responses** - See AI responses as they're generated in real-time
+- **Document Context** - AI can reference the currently open document for context-aware answers
+- **Thinking Blocks** - Anthropic's extended thinking feature shows the AI's reasoning process (collapsible)
+- **Token Usage** - Track input/output tokens for cost monitoring
+- **Chat History** - Conversation persists while the app is open
+- **Export Chat** - Download conversation history as JSON
+- **Custom System Prompts** - Configure how the AI behaves via settings
+- **Multiple Accounts** - Switch between different AI providers/accounts
+- **Markdown Rendering** - AI responses render with full markdown support including code highlighting
+- **Copy Support** - Copy individual messages or code blocks with one click
+
+### Configuration
+
+AI accounts are configured in Settings (gear icon):
+
+1. Click the settings icon in the header
+2. Navigate to the "AI" section
+3. Add an account:
+   - **Anthropic**: Enter your API key from [console.anthropic.com](https://console.anthropic.com)
+   - **Ollama**: Enter host (default: localhost) and port (default: 11434)
+4. Enable "AI Search" to show the AI chat button
+
+### Usage
+
+1. Click the robot icon (🤖) in the bottom-right corner to open AI chat
+2. Select your AI account from the dropdown
+3. Type your question and press Enter or click Send
+4. Use the thinking toggle (brain icon) for Anthropic's extended reasoning
+5. Click the settings icon to customize the system prompt
+
+### Ollama Setup
+
+To use local AI models with Ollama:
+
+```bash
+# Install Ollama (macOS)
+brew install ollama
+
+# Start Ollama server
+ollama serve
+
+# Pull a model (in another terminal)
+ollama pull llama3.2
+ollama pull codellama  # Great for code questions
+```
+
+Then add an Ollama account in Codex settings with host `localhost` and port `11434`.
 
 ## 🔐 Security & Logging
 
@@ -351,6 +411,7 @@ codex/
 - [Installation](#-installation)
 - [Usage](#-usage)
 - [Project Structure](#-project-structure)
+- [AI Chat](#-ai-chat)
 - [MCP Server (AI Agent Access)](#-mcp-server-ai-agent-access)
 - [API Documentation](#-api-documentation)
 - [Testing](#-testing)
@@ -912,6 +973,74 @@ Content-Type: application/json
 curl -X PUT http://localhost:3001/api/pages/move \
   -H "Content-Type: application/json" \
   -d '{"oldPath": "My Notes/hello.md", "newFolderPath": "Projects"}'
+```
+
+### AI Endpoints
+
+#### Stream Chat (SSE)
+
+```bash
+POST /api/ai/chat
+Content-Type: application/json
+
+{
+  "config": {
+    "type": "anthropic",
+    "apiKey": "sk-ant-..."
+  },
+  "messages": [
+    { "role": "user", "content": "What is this document about?" }
+  ],
+  "documentContext": "# My Document\n\nContent here...",
+  "systemPrompt": "You are a helpful assistant."
+}
+```
+
+**Response:** Server-Sent Events stream with events:
+- `{ "type": "text", "content": "..." }` - Text chunks
+- `{ "type": "thinking", "content": "..." }` - Thinking block content (Anthropic)
+- `{ "type": "thinking_done" }` - Thinking block complete
+- `{ "type": "usage", "inputTokens": 100, "outputTokens": 50 }` - Token usage
+- `{ "type": "done" }` - Stream complete
+- `{ "type": "error", "error": "..." }` - Error occurred
+
+**Config for Ollama:**
+```json
+{
+  "config": {
+    "type": "ollama",
+    "host": "localhost",
+    "port": 11434,
+    "model": "llama3.2"
+  },
+  "messages": [...]
+}
+```
+
+#### List Ollama Models
+
+```bash
+GET /api/ai/ollama/models?host=localhost&port=11434
+```
+
+**Response:**
+```json
+{
+  "models": ["llama3.2", "codellama", "mistral"]
+}
+```
+
+#### Test Ollama Connection
+
+```bash
+GET /api/ai/ollama/test?host=localhost&port=11434
+```
+
+**Response:**
+```json
+{
+  "success": true
+}
 ```
 
 ## 🧪 Testing

@@ -61,6 +61,12 @@ graph TD
 ```
 ````
 
+Which would create:
+```mermaid
+graph TD
+  A --> B
+```
+
 - Diagrams render in the live preview and in reading mode (open in new window)
 - You can download rendered diagrams as SVG
 - Export flows (e.g. Word/PDF) include diagrams as images rather than raw Mermaid text

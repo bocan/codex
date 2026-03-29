@@ -7,6 +7,8 @@ import {
   VersionContent,
   SearchResult,
   TemplateDefinition,
+  ChatMessage,
+  AIConfig,
 } from "../types";
 
 const API_BASE = "/api";
@@ -173,5 +175,131 @@ export const api = {
   getAttachmentUrl: (folderPath: string, filename: string): string => {
     const params = new URLSearchParams({ folder: folderPath });
     return `${API_BASE}/attachments/${encodeURIComponent(filename)}?${params}`;
+  },
+
+  // AI Chat operations
+  streamChat: async (
+    config: AIConfig,
+    messages: ChatMessage[],
+    documentContext: string | undefined,
+    onText: (text: string) => void,
+    onError: (error: string) => void,
+    onDone: () => void,
+    signal?: AbortSignal,
+    onThinking?: (text: string) => void,
+    onThinkingDone?: () => void,
+    onUsage?: (inputTokens: number, outputTokens: number) => void,
+    systemPrompt?: string
+  ): Promise<void> => {
+    let doneHandled = false;
+    
+    const handleDone = () => {
+      if (!doneHandled) {
+        doneHandled = true;
+        onDone();
+      }
+    };
+    
+    try {
+      const response = await fetch(`${API_BASE}/ai/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ config, messages, documentContext, systemPrompt }),
+        credentials: 'include',
+        signal,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        onError(errorText || 'Failed to connect to AI');
+        return;
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) {
+        onError('No response body');
+        return;
+      }
+
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              
+              switch (data.type) {
+                case 'text':
+                  onText(data.content);
+                  break;
+                case 'thinking':
+                  onThinking?.(data.content);
+                  break;
+                case 'thinking_done':
+                  onThinkingDone?.();
+                  break;
+                case 'usage':
+                  onUsage?.(data.inputTokens, data.outputTokens);
+                  break;
+                case 'done':
+                  handleDone();
+                  return;
+                case 'error':
+                  onError(data.error);
+                  return;
+                default:
+                  // Legacy format support
+                  if (data.error) {
+                    onError(data.error);
+                    return;
+                  }
+                  if (data.done) {
+                    handleDone();
+                    return;
+                  }
+                  if (data.text) {
+                    onText(data.text);
+                  }
+              }
+            } catch {
+              // Ignore JSON parse errors for incomplete chunks
+            }
+          }
+        }
+      }
+
+      handleDone();
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        handleDone();
+      } else {
+        onError(error instanceof Error ? error.message : 'Unknown error');
+      }
+    }
+  },
+
+  getOllamaModels: async (host: string, port: number): Promise<string[]> => {
+    const response = await axios.get(`${API_BASE}/ai/ollama/models`, {
+      params: { host, port },
+    });
+    return response.data.models || [];
+  },
+
+  testOllamaConnection: async (host: string, port: number): Promise<boolean> => {
+    const response = await axios.get(`${API_BASE}/ai/ollama/test`, {
+      params: { host, port },
+    });
+    return response.data.success;
   },
 };
