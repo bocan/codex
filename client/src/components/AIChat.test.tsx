@@ -269,8 +269,7 @@ describe('AIChat', () => {
       });
     });
 
-    it('allows enabling thinking mode for Anthropic', async () => {
-      const user = userEvent.setup();
+    it('allows enabling thinking mode for Anthropic', () => {
       render(<AIChat accounts={[mockAnthropicAccount]} />);
 
       // Thinking toggle button is visible in header
