@@ -12,7 +12,7 @@ import attachmentRoutes from "./routes/attachments";
 import templatesRoutes from "./routes/templates";
 import aiRoutes from "./routes/ai";
 import { requireAuth } from "./middleware/auth";
-import { healthCheckLimiter, staticFileLimiter } from "./middleware/rateLimiters";
+import { healthCheckLimiter, staticFileLimiter, aiLimiter } from "./middleware/rateLimiters";
 import { GitService } from "./services/gitService";
 import { DATA_DIR as DEFAULT_DATA_DIR, FileSystemService } from "./services/fileSystem";
 
@@ -258,7 +258,7 @@ app.use("/api/pages", requireAuth, pageRoutes); // Protected
 app.use("/api/templates", requireAuth, templatesRoutes); // Protected
 app.use("/api/search", requireAuth, searchRoutes); // Protected
 app.use("/api/attachments", requireAuth, attachmentRoutes); // Protected
-app.use("/api/ai", requireAuth, aiRoutes); // Protected - AI chat
+app.use("/api/ai", requireAuth, aiLimiter, aiRoutes); // Protected - AI chat
 
 // Health check
 app.get("/api/health", healthCheckLimiter, (req: Request, res: Response) => {

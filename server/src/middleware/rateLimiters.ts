@@ -77,3 +77,16 @@ export const searchLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+/**
+ * Rate limiter for AI chat operations
+ * AI calls are expensive (API costs and server resources)
+ * Limit: 20 requests per minute per IP
+ */
+export const aiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 20,
+  message: { error: "Too many AI requests, please slow down" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
