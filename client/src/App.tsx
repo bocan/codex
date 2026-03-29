@@ -59,16 +59,20 @@ const decodeApiKey = (encoded: string): string => {
 };
 
 const encodeAccounts = (accounts: AIAccount[]): AIAccount[] =>
-  accounts.map(acc => ({
-    ...acc,
-    apiKey: acc.apiKey ? encodeApiKey(acc.apiKey) : undefined,
-  }));
+  accounts.map(acc => {
+    if (acc.type === 'anthropic') {
+      return { ...acc, apiKey: encodeApiKey(acc.apiKey) };
+    }
+    return acc;
+  });
 
 const decodeAccounts = (accounts: AIAccount[]): AIAccount[] =>
-  accounts.map(acc => ({
-    ...acc,
-    apiKey: acc.apiKey ? decodeApiKey(acc.apiKey) : undefined,
-  }));
+  accounts.map(acc => {
+    if (acc.type === 'anthropic') {
+      return { ...acc, apiKey: decodeApiKey(acc.apiKey) };
+    }
+    return acc;
+  });
 
 // Set document title dynamically from package.json
 document.title = `${__APP_NAME__} - ${__APP_DESCRIPTION__}`;
