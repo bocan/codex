@@ -14,7 +14,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.26.0",
+    "@modelcontextprotocol/sdk": "^1.28.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "multer": "^2.0.2",
