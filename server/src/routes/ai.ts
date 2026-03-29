@@ -52,7 +52,7 @@ router.post('/chat', async (req: Request, res: Response) => {
     res.end();
   } catch (error) {
     console.error('AI chat error:', error);
-    
+
     // Send error as SSE
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     res.write(`data: ${JSON.stringify({ type: 'error', error: errorMessage })}\n\n`);

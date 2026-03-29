@@ -83,7 +83,7 @@ function App() {
     // Default to false - user must explicitly enable AI features
     return saved === 'true' ? true : false;
   });
-  
+
   // AI Accounts state
   const [aiAccounts, setAiAccounts] = useState<AIAccount[]>(() => {
     const saved = localStorage.getItem('codex-ai-accounts');
@@ -271,7 +271,7 @@ function App() {
   const handleSaveAccount = () => {
     const id = editingAccountId || crypto.randomUUID();
     let account: AIAccount;
-    
+
     if (newAccountType === 'anthropic') {
       account = {
         id,
@@ -288,7 +288,7 @@ function App() {
         port: parseInt(newAccountPort, 10) || 11434,
       };
     }
-    
+
     let updated: AIAccount[];
     if (editingAccountId) {
       // Update existing
@@ -297,10 +297,10 @@ function App() {
       // Add new
       updated = [...aiAccounts, account];
     }
-    
+
     setAiAccounts(updated);
     localStorage.setItem('codex-ai-accounts', JSON.stringify(updated));
-    
+
     // Reset form and close modal
     resetAccountForm();
     setShowAddAccount(false);
@@ -732,7 +732,7 @@ function App() {
               <X size={18} />
             </button>
             <h2 id="settings-title"><Settings size={24} /> Settings</h2>
-            
+
             <section className="settings-group">
               <h3>AI Connectivity</h3>
               <label className="settings-option">
@@ -775,8 +775,8 @@ function App() {
                           <div className="ai-account-details">
                             <span className="ai-account-name">{account.name}</span>
                             <span className="ai-account-type">
-                              {account.type === 'anthropic' 
-                                ? 'Anthropic' 
+                              {account.type === 'anthropic'
+                                ? 'Anthropic'
                                 : `Ollama (${account.host}:${account.port})`}
                             </span>
                           </div>

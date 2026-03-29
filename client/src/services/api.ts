@@ -192,14 +192,14 @@ export const api = {
     systemPrompt?: string
   ): Promise<void> => {
     let doneHandled = false;
-    
+
     const handleDone = () => {
       if (!doneHandled) {
         doneHandled = true;
         onDone();
       }
     };
-    
+
     try {
       const response = await fetch(`${API_BASE}/ai/chat`, {
         method: 'POST',
@@ -238,7 +238,7 @@ export const api = {
           if (line.startsWith('data: ')) {
             try {
               const data = JSON.parse(line.slice(6));
-              
+
               switch (data.type) {
                 case 'text':
                   onText(data.content);

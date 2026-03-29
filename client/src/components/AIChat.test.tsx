@@ -49,32 +49,32 @@ describe('AIChat', () => {
   describe('Rendering', () => {
     it('shows empty state when no accounts are configured', () => {
       render(<AIChat accounts={[]} />);
-      
+
       expect(screen.getByText(/no ai accounts configured/i)).toBeInTheDocument();
     });
 
     it('shows disabled state when enabled is false', () => {
       render(<AIChat accounts={[mockAnthropicAccount]} enabled={false} />);
-      
+
       expect(screen.getByText(/ai features are disabled/i)).toBeInTheDocument();
     });
 
     it('renders chat interface when accounts are configured', () => {
       render(<AIChat accounts={[mockAnthropicAccount]} />);
-      
+
       expect(screen.getByPlaceholderText(/ask about your document/i)).toBeInTheDocument();
     });
 
     it('auto-selects first account when accounts are available', () => {
       render(<AIChat accounts={[mockAnthropicAccount, mockOllamaAccount]} />);
-      
+
       expect(screen.getByText('Test Anthropic')).toBeInTheDocument();
     });
 
     it('displays close button when onClose is provided', () => {
       const onClose = vi.fn();
       render(<AIChat accounts={[mockAnthropicAccount]} onClose={onClose} />);
-      
+
       // Close button should exist in header
       const closeButtons = screen.getAllByRole('button');
       expect(closeButtons.length).toBeGreaterThan(0);
@@ -85,9 +85,9 @@ describe('AIChat', () => {
     it('shows account dropdown when clicking account selector', async () => {
       const user = userEvent.setup();
       render(<AIChat accounts={[mockAnthropicAccount, mockOllamaAccount]} />);
-      
+
       await user.click(screen.getByText('Test Anthropic'));
-      
+
       await waitFor(() => {
         expect(screen.getByText('Test Ollama')).toBeInTheDocument();
       });
@@ -96,10 +96,10 @@ describe('AIChat', () => {
     it('fetches Ollama models when Ollama account is selected', async () => {
       const user = userEvent.setup();
       render(<AIChat accounts={[mockAnthropicAccount, mockOllamaAccount]} />);
-      
+
       await user.click(screen.getByText('Test Anthropic'));
       await user.click(screen.getByText('Test Ollama'));
-      
+
       await waitFor(() => {
         expect(api.getOllamaModels).toHaveBeenCalledWith('localhost', 11434);
       });
@@ -107,9 +107,9 @@ describe('AIChat', () => {
 
     it('shows error when Ollama models fail to load', async () => {
       vi.mocked(api.getOllamaModels).mockRejectedValue(new Error('Connection failed'));
-      
+
       render(<AIChat accounts={[mockOllamaAccount]} />);
-      
+
       await waitFor(() => {
         expect(screen.getByText(/failed to fetch ollama models/i)).toBeInTheDocument();
       });
@@ -120,10 +120,10 @@ describe('AIChat', () => {
     it('enables send button when input has text', async () => {
       const user = userEvent.setup();
       render(<AIChat accounts={[mockAnthropicAccount]} />);
-      
+
       const input = screen.getByPlaceholderText(/ask about your document/i);
       await user.type(input, 'Hello');
-      
+
       // Send button should be enabled (not disabled)
       const sendButton = screen.getByTitle(/send/i);
       expect(sendButton).not.toBeDisabled();
@@ -135,13 +135,13 @@ describe('AIChat', () => {
       ) => {
         setTimeout(() => onDone(), 10);
       });
-      
+
       const user = userEvent.setup();
       render(<AIChat accounts={[mockAnthropicAccount]} />);
-      
+
       const input = screen.getByPlaceholderText(/ask about your document/i);
       await user.type(input, 'Hello{enter}');
-      
+
       await waitFor(() => {
         expect(api.streamChat).toHaveBeenCalled();
       });
@@ -150,10 +150,10 @@ describe('AIChat', () => {
     it('does not submit on Shift+Enter', async () => {
       const user = userEvent.setup();
       render(<AIChat accounts={[mockAnthropicAccount]} />);
-      
+
       const input = screen.getByPlaceholderText(/ask about your document/i);
       await user.type(input, 'Hello{Shift>}{enter}{/Shift}');
-      
+
       expect(api.streamChat).not.toHaveBeenCalled();
     });
   });
@@ -172,10 +172,10 @@ describe('AIChat', () => {
 
       const user = userEvent.setup();
       render(<AIChat accounts={[mockAnthropicAccount]} />);
-      
+
       const input = screen.getByPlaceholderText(/ask about your document/i);
       await user.type(input, 'Test{enter}');
-      
+
       await waitFor(() => {
         expect(screen.getByText(/hello world/i)).toBeInTheDocument();
       }, { timeout: 3000 });
@@ -188,10 +188,10 @@ describe('AIChat', () => {
 
       const user = userEvent.setup();
       render(<AIChat accounts={[mockAnthropicAccount]} />);
-      
+
       const input = screen.getByPlaceholderText(/ask about your document/i);
       await user.type(input, 'Test{enter}');
-      
+
       await waitFor(() => {
         expect(screen.getByTitle(/stop/i)).toBeInTheDocument();
       });
@@ -210,10 +210,10 @@ describe('AIChat', () => {
 
       const user = userEvent.setup();
       render(<AIChat accounts={[mockAnthropicAccount]} />);
-      
+
       const input = screen.getByPlaceholderText(/ask about your document/i);
       await user.type(input, 'Test{enter}');
-      
+
       await waitFor(() => {
         expect(screen.getByText(/100/)).toBeInTheDocument();
       }, { timeout: 3000 });
@@ -227,19 +227,19 @@ describe('AIChat', () => {
         { role: 'user', content: 'Hello' },
         { role: 'assistant', content: 'Hi there!' },
       ];
-      
+
       const user = userEvent.setup();
       render(
-        <AIChat 
-          accounts={[mockAnthropicAccount]} 
+        <AIChat
+          accounts={[mockAnthropicAccount]}
           messages={messages}
           onMessagesChange={onMessagesChange}
         />
       );
-      
+
       const clearButton = screen.getByTitle(/clear chat/i);
       await user.click(clearButton);
-      
+
       expect(onMessagesChange).toHaveBeenCalledWith([]);
     });
 
@@ -247,9 +247,9 @@ describe('AIChat', () => {
       const messages: ChatMessage[] = [
         { role: 'assistant', content: 'Copy this text' },
       ];
-      
+
       render(<AIChat accounts={[mockAnthropicAccount]} messages={messages} />);
-      
+
       // Should have a copy button for the message
       const copyButtons = screen.getAllByTitle(/copy/i);
       expect(copyButtons.length).toBeGreaterThan(0);
@@ -260,10 +260,10 @@ describe('AIChat', () => {
     it('shows settings panel when settings button is clicked', async () => {
       const user = userEvent.setup();
       render(<AIChat accounts={[mockAnthropicAccount]} />);
-      
+
       const settingsButton = screen.getByTitle(/chat settings/i);
       await user.click(settingsButton);
-      
+
       await waitFor(() => {
         expect(screen.getByText(/system prompt/i)).toBeInTheDocument();
       });
@@ -272,7 +272,7 @@ describe('AIChat', () => {
     it('allows enabling thinking mode for Anthropic', async () => {
       const user = userEvent.setup();
       render(<AIChat accounts={[mockAnthropicAccount]} />);
-      
+
       // Thinking toggle button is visible in header
       const thinkingButton = screen.getByTitle(/thinking/i);
       expect(thinkingButton).toBeInTheDocument();
@@ -284,15 +284,15 @@ describe('AIChat', () => {
       const messages: ChatMessage[] = [
         { role: 'user', content: 'External message' },
       ];
-      
+
       render(<AIChat accounts={[mockAnthropicAccount]} messages={messages} />);
-      
+
       expect(screen.getByText('External message')).toBeInTheDocument();
     });
 
     it('calls onMessagesChange when adding messages', async () => {
       const onMessagesChange = vi.fn();
-      
+
       vi.mocked(api.streamChat).mockImplementation(async (
         _config, _messages, _documentContext, onText, _onError, onDone
       ) => {
@@ -301,19 +301,19 @@ describe('AIChat', () => {
           onDone();
         }, 10);
       });
-      
+
       const user = userEvent.setup();
       render(
-        <AIChat 
-          accounts={[mockAnthropicAccount]} 
+        <AIChat
+          accounts={[mockAnthropicAccount]}
           messages={[]}
           onMessagesChange={onMessagesChange}
         />
       );
-      
+
       const input = screen.getByPlaceholderText(/ask about your document/i);
       await user.type(input, 'Hello{enter}');
-      
+
       await waitFor(() => {
         expect(onMessagesChange).toHaveBeenCalled();
       });

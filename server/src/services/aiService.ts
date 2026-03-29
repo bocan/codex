@@ -25,7 +25,7 @@ export interface OllamaConfig {
 export type AIConfig = AnthropicConfig | OllamaConfig;
 
 // Stream event types
-export type StreamEvent = 
+export type StreamEvent =
   | { type: 'text'; content: string }
   | { type: 'thinking'; content: string }
   | { type: 'thinking_done' }
@@ -52,7 +52,7 @@ const DEFAULT_SYSTEM_PROMPT = `You are a helpful assistant for markdown document
  */
 export async function* streamChat(request: ChatRequest): AsyncGenerator<StreamEvent> {
   const systemPrompt = request.systemPrompt || DEFAULT_SYSTEM_PROMPT;
-  
+
   // Build context-aware system prompt
   let fullSystemPrompt = systemPrompt;
   if (request.documentContext) {

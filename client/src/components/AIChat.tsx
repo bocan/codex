@@ -73,13 +73,13 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
   // Use external messages if provided, otherwise use internal state
   const [internalMessages, setInternalMessages] = useState<ChatMessage[]>([]);
   const messages = externalMessages ?? internalMessages;
-  
+
   // Wrapper to handle both external and internal message updates
   const updateMessages = useCallback((updater: ChatMessage[] | ((prev: ChatMessage[]) => ChatMessage[])) => {
     if (onMessagesChange) {
       // External state: resolve the updater and pass the result
-      const newMessages = typeof updater === 'function' 
-        ? updater(externalMessages ?? []) 
+      const newMessages = typeof updater === 'function'
+        ? updater(externalMessages ?? [])
         : updater;
       onMessagesChange(newMessages);
     } else {
@@ -87,7 +87,7 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
       setInternalMessages(updater);
     }
   }, [onMessagesChange, externalMessages]);
-  
+
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
@@ -104,7 +104,7 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
   const [systemPrompt, setSystemPrompt] = useState('');
   const [enableThinking, setEnableThinking] = useState(false);
   const [copiedMessageIdx, setCopiedMessageIdx] = useState<number | null>(null);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -243,7 +243,7 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
     setIsStreaming(true);
     setStreamingContent('');
     setStreamingThinking('');
-    
+
     // Reset refs
     streamingContentRef.current = '';
     streamingThinkingRef.current = '';
@@ -270,18 +270,18 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
           // Capture values BEFORE clearing
           const finalContent = streamingContentRef.current;
           const finalThinking = streamingThinkingRef.current;
-          
+
           // Clear streaming state first
           setStreamingContent('');
           setStreamingThinking('');
           streamingContentRef.current = '';
           streamingThinkingRef.current = '';
           setIsStreaming(false);
-          
+
           // Add the message using captured values
           if (finalContent) {
-            updateMessages(msgs => [...msgs, { 
-              role: 'assistant', 
+            updateMessages(msgs => [...msgs, {
+              role: 'assistant',
               content: finalContent,
               thinking: finalThinking || undefined,
             }]);
@@ -317,16 +317,16 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
     // Capture values before clearing
     const finalContent = streamingContentRef.current;
     const finalThinking = streamingThinkingRef.current;
-    
+
     setStreamingContent('');
     setStreamingThinking('');
     streamingContentRef.current = '';
     streamingThinkingRef.current = '';
     setIsStreaming(false);
-    
+
     if (finalContent) {
-      updateMessages(prev => [...prev, { 
-        role: 'assistant', 
+      updateMessages(prev => [...prev, {
+        role: 'assistant',
         content: finalContent,
         thinking: finalThinking || undefined,
       }]);
@@ -378,7 +378,7 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
           <Bot size={16} />
           <span>AI Assistant</span>
         </div>
-        
+
         <div className="ai-chat-actions">
           {/* Account Selector */}
           <div className="account-selector" ref={dropdownRef}>
@@ -399,7 +399,7 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
               )}
               <ChevronDown size={14} />
             </button>
-            
+
             {showAccountDropdown && (
               <div className="account-dropdown">
                 {accounts.map(account => (
@@ -443,7 +443,7 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
                 )}
                 <ChevronDown size={14} />
               </button>
-              
+
               {showModelDropdown && availableModels.length > 0 && (
                 <div className="model-dropdown">
                   {availableModels.map(model => (
@@ -484,7 +484,7 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
             >
               <Settings2 size={14} />
             </button>
-            
+
             {showSettings && (
               <div className="ai-settings-dropdown">
                 <div className="ai-settings-section">
@@ -558,7 +558,7 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
                 <div className="ai-thinking-content">{msg.thinking}</div>
               </details>
             )}
-            
+
             <div className="ai-message-content">
               {msg.role === 'assistant' ? (
                 <ReactMarkdown
@@ -581,7 +581,7 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
                 msg.content
               )}
             </div>
-            
+
             {/* Copy button */}
             <button
               className="ai-message-copy"
@@ -657,7 +657,7 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
           disabled={isStreaming}
           rows={1}
         />
-        
+
         {isStreaming ? (
           <button className="ai-chat-stop" onClick={handleStop} title="Stop">
             <StopCircle size={18} />
