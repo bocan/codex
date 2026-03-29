@@ -12,11 +12,11 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
-    "axios": "^1.13.4",
+    "axios": "^1.14.0",
     "diff": "^8.0.4",
     "github-slugger": "^2.0.0",
     "html-docx-js-typescript": "^0.1.5",
-    "lucide-react": "^1.0.1",
+    "lucide-react": "^1.7.0",
     "mermaid": "^11.13.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -37,7 +37,7 @@
     "@vitejs/plugin-react": "^6.0.1",
     "jsdom": "^29.0.1",
     "typescript": "^6.0.2",
-    "vite": "8.00",
-    "vitest": "^4.1.1"
+    "vite": "8.0",
+    "vitest": "^4.1.2"
   }
 }
