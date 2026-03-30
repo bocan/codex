@@ -90,3 +90,16 @@ export const aiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+/**
+ * Rate limiter for authentication operations
+ * Prevents brute force attacks on login
+ * Limit: 10 requests per minute per IP
+ */
+export const authLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10,
+  message: { error: "Too many login attempts, please try again later" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
