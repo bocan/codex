@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.1](https://github.com/bocan/codex/compare/v2.24.0...v2.24.1) (2026-03-30)
+
+
+### Styles
+
+* **editor:** adjust spacing in editor actions and save status ([4d61d36](https://github.com/bocan/codex/commit/4d61d363b878e73b13c32abc723291cb47e63d7b))
+* **editor:** improve layout and spacing for responsive design ([c8b3a27](https://github.com/bocan/codex/commit/c8b3a27484827528246aba57604cabe8dbe52c28))
+
 ## [2.24.0](https://github.com/bocan/codex/compare/v2.23.5...v2.24.0) (2026-03-30)
 
 
