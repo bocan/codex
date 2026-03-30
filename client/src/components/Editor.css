@@ -319,7 +319,7 @@
   .editor-actions {
     gap: var(--space-1);
   }
-  
+
   .editor-actions button {
     padding: var(--space-1) var(--space-2);
   }
@@ -346,7 +346,7 @@
     flex: 0 0 100%;
     justify-content: flex-start;
   }
-  
+
   .save-status {
     order: 10;
     flex-basis: 100%;
@@ -360,7 +360,7 @@
   .editor-actions button {
     padding: var(--space-2);
   }
-  
+
   /* Hide button text labels, keep icons */
   .editor-actions .btn-label {
     display: none;
