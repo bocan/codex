@@ -1,5 +1,8 @@
 import rateLimit from "express-rate-limit";
 
+// Skip rate limiting in test environment
+const isTestEnv = process.env.NODE_ENV === "test";
+
 /**
  * Rate limiter for read operations (get pages, list folders, view history)
  * These read from the file system but don't modify it
@@ -11,6 +14,7 @@ export const readLimiter = rateLimit({
   message: { error: "Too many read requests, please slow down" },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => isTestEnv,
 });
 
 /**
@@ -24,6 +28,7 @@ export const staticFileLimiter = rateLimit({
   message: { error: "Too many requests, please slow down" },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => isTestEnv,
 });
 
 /**
@@ -37,6 +42,7 @@ export const healthCheckLimiter = rateLimit({
   message: { error: "Too many health check requests" },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => isTestEnv,
 });
 
 /**
@@ -50,6 +56,7 @@ export const fileOperationLimiter = rateLimit({
   message: { error: "Too many file operations, please slow down" },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => isTestEnv,
 });
 
 /**
@@ -63,6 +70,7 @@ export const fileTransferLimiter = rateLimit({
   message: { error: "Too many file transfers, please slow down" },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => isTestEnv,
 });
 
 /**
@@ -76,6 +84,7 @@ export const searchLimiter = rateLimit({
   message: { error: "Too many search requests, please slow down" },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => isTestEnv,
 });
 
 /**
@@ -89,6 +98,7 @@ export const aiLimiter = rateLimit({
   message: { error: "Too many AI requests, please slow down" },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => isTestEnv,
 });
 
 /**
@@ -102,4 +112,5 @@ export const authLimiter = rateLimit({
   message: { error: "Too many login attempts, please try again later" },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => isTestEnv,
 });
