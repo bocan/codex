@@ -522,8 +522,8 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
             }
             aria-pressed={isListening}
           >
-            <Mic size={14} aria-hidden="true" />{" "}
-            {isListening ? "Stop" : "Dictate"}
+            <Mic size={14} aria-hidden="true" />
+            <span className="btn-label">{isListening ? "Stop" : "Dictate"}</span>
           </button>
           <button
             onClick={() => setShowAttachments(true)}
@@ -531,7 +531,8 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
             title="Manage attachments"
             aria-label="Manage attachments"
           >
-            <Paperclip size={14} aria-hidden="true" /> Attachments
+            <Paperclip size={14} aria-hidden="true" />
+            <span className="btn-label">Attachments</span>
           </button>
           <button
             onClick={() => setShowHistory(true)}
@@ -539,7 +540,8 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
             title="View version history"
             aria-label="View version history"
           >
-            <History size={14} aria-hidden="true" /> History
+            <History size={14} aria-hidden="true" />
+            <span className="btn-label">History</span>
           </button>
           <button
             onClick={handleSave}
@@ -547,10 +549,12 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
             title="Save page"
             aria-label="Save page"
           >
-            <Save size={14} aria-hidden="true" /> {isSaving ? "Saving..." : "Save"}
+            <Save size={14} aria-hidden="true" />
+            <span className="btn-label">{isSaving ? "Saving..." : "Save"}</span>
           </button>
           <button onClick={onClose} title="Close editor" aria-label="Close editor">
-            <X size={14} aria-hidden="true" /> Close
+            <X size={14} aria-hidden="true" />
+            <span className="btn-label">Close</span>
           </button>
         </div>
       </div>

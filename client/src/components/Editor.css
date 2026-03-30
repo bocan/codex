@@ -71,16 +71,20 @@
 .editor-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--border-color);
   background: var(--bg-secondary);
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  min-height: fit-content;
 }
 
 .editor-title-row {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  flex-shrink: 0;
 }
 
 .editor-header h3 {
@@ -118,8 +122,13 @@
 
 .editor-actions {
   display: flex;
-  gap: var(--space-2);
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
   align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  flex: 1;
+  max-width: 100%;
 }
 
 .save-status {
@@ -305,18 +314,28 @@
    RESPONSIVE: EDITOR HEADER & TOOLBAR
    ===================================================== */
 
+/* Large screens: compact button spacing */
+@media (max-width: 1200px) {
+  .editor-actions {
+    gap: var(--space-1);
+  }
+  
+  .editor-actions button {
+    padding: var(--space-1) var(--space-2);
+  }
+}
+
 /* Tablet and below: allow the header row to wrap so
    action buttons spill to a second row instead of
    being pushed off-screen */
 @media (max-width: 900px) {
   .editor-header {
-    flex-wrap: wrap;
     padding: var(--space-2) var(--space-3);
   }
 
-  .editor-actions {
-    flex-wrap: wrap;
-    gap: var(--space-1);
+  .editor-actions button {
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--text-xs);
   }
 }
 
@@ -325,18 +344,30 @@
 @media (max-width: 768px) {
   .editor-actions {
     flex: 0 0 100%;
+    justify-content: flex-start;
+  }
+  
+  .save-status {
+    order: 10;
+    flex-basis: 100%;
+    text-align: left;
+    margin-top: var(--space-1);
   }
 }
 
-/* Mobile (≤480px): tighter button padding so more
-   buttons fit per row; hide verbose save status */
-@media (max-width: 480px) {
+/* Mobile (≤600px): icon-only buttons */
+@media (max-width: 600px) {
   .editor-actions button {
-    padding: var(--space-1) var(--space-2);
-    font-size: var(--text-xs);
+    padding: var(--space-2);
+  }
+  
+  /* Hide button text labels, keep icons */
+  .editor-actions .btn-label {
+    display: none;
   }
 
-  .save-status {
+  .save-status,
+  .save-error span {
     display: none;
   }
 }
