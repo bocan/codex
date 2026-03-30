@@ -524,22 +524,13 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({
           const filename = src.replace(".attachments/", "");
           const fullUrl = api.getAttachmentUrl(folderPath, filename);
 
-          // Wrap in figure with caption if alt text exists
+          // Wrap in span-based figure if alt text exists (avoids <figure> in <p> hydration error)
           if (alt) {
             return (
-              <figure style={{ margin: "16px 0", textAlign: "center" }}>
+              <span className="image-figure" role="figure" aria-label={alt}>
                 <img {...props} src={fullUrl} alt={alt} />
-                <figcaption
-                  style={{
-                    marginTop: "8px",
-                    fontSize: "0.9em",
-                    color: "var(--text-secondary)",
-                    fontStyle: "italic",
-                  }}
-                >
-                  {alt}
-                </figcaption>
-              </figure>
+                <span className="image-caption">{alt}</span>
+              </span>
             );
           }
           return <img {...props} src={fullUrl} alt={filename} />;
@@ -548,19 +539,10 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({
         // For non-attachment images, still show caption if alt text exists
         if (alt) {
           return (
-            <figure style={{ margin: "16px 0", textAlign: "center" }}>
+            <span className="image-figure" role="figure" aria-label={alt}>
               <img {...props} />
-              <figcaption
-                style={{
-                  marginTop: "8px",
-                  fontSize: "0.9em",
-                  color: "var(--text-secondary)",
-                  fontStyle: "italic",
-                }}
-              >
-                {alt}
-              </figcaption>
-            </figure>
+              <span className="image-caption">{alt}</span>
+            </span>
           );
         }
 

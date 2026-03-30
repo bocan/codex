@@ -386,6 +386,21 @@
   font-style: italic;
 }
 
+/* Span-based image figure (avoids <figure> in <p> hydration errors) */
+.preview-content .image-figure {
+  display: block;
+  margin: var(--space-4) 0;
+  text-align: center;
+}
+
+.preview-content .image-caption {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 .preview-content hr {
   border: none;
   height: 1px;
