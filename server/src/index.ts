@@ -10,8 +10,18 @@ import authRoutes from "./routes/auth";
 import searchRoutes from "./routes/search";
 import attachmentRoutes from "./routes/attachments";
 import templatesRoutes from "./routes/templates";
+import aiRoutes from "./routes/ai";
 import { requireAuth } from "./middleware/auth";
-import { healthCheckLimiter, staticFileLimiter } from "./middleware/rateLimiters";
+import {
+  healthCheckLimiter,
+  staticFileLimiter,
+  aiLimiter,
+  readLimiter,
+  fileOperationLimiter,
+  searchLimiter,
+  fileTransferLimiter,
+  authLimiter,
+} from "./middleware/rateLimiters";
 import { GitService } from "./services/gitService";
 import { DATA_DIR as DEFAULT_DATA_DIR, FileSystemService } from "./services/fileSystem";
 
@@ -251,12 +261,13 @@ app.get("/api", (req: Request, res: Response) => {
 });
 
 // Routes
-app.use("/api/auth", authRoutes); // Auth routes (public)
-app.use("/api/folders", requireAuth, folderRoutes); // Protected
-app.use("/api/pages", requireAuth, pageRoutes); // Protected
-app.use("/api/templates", requireAuth, templatesRoutes); // Protected
-app.use("/api/search", requireAuth, searchRoutes); // Protected
-app.use("/api/attachments", requireAuth, attachmentRoutes); // Protected
+app.use("/api/auth", authLimiter, authRoutes); // Auth routes (public, rate limited)
+app.use("/api/folders", fileOperationLimiter, requireAuth, folderRoutes); // Protected
+app.use("/api/pages", fileOperationLimiter, requireAuth, pageRoutes); // Protected
+app.use("/api/templates", readLimiter, requireAuth, templatesRoutes); // Protected
+app.use("/api/search", searchLimiter, requireAuth, searchRoutes); // Protected
+app.use("/api/attachments", fileTransferLimiter, requireAuth, attachmentRoutes); // Protected
+app.use("/api/ai", aiLimiter, requireAuth, aiRoutes); // Protected - AI chat
 
 // Health check
 app.get("/api/health", healthCheckLimiter, (req: Request, res: Response) => {
