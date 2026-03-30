@@ -262,12 +262,12 @@ app.get("/api", (req: Request, res: Response) => {
 
 // Routes
 app.use("/api/auth", authLimiter, authRoutes); // Auth routes (public, rate limited)
-app.use("/api/folders", requireAuth, fileOperationLimiter, folderRoutes); // Protected
-app.use("/api/pages", requireAuth, fileOperationLimiter, pageRoutes); // Protected
-app.use("/api/templates", requireAuth, readLimiter, templatesRoutes); // Protected
-app.use("/api/search", requireAuth, searchLimiter, searchRoutes); // Protected
-app.use("/api/attachments", requireAuth, fileTransferLimiter, attachmentRoutes); // Protected
-app.use("/api/ai", requireAuth, aiLimiter, aiRoutes); // Protected - AI chat
+app.use("/api/folders", fileOperationLimiter, requireAuth, folderRoutes); // Protected
+app.use("/api/pages", fileOperationLimiter, requireAuth, pageRoutes); // Protected
+app.use("/api/templates", readLimiter, requireAuth, templatesRoutes); // Protected
+app.use("/api/search", searchLimiter, requireAuth, searchRoutes); // Protected
+app.use("/api/attachments", fileTransferLimiter, requireAuth, attachmentRoutes); // Protected
+app.use("/api/ai", aiLimiter, requireAuth, aiRoutes); // Protected - AI chat
 
 // Health check
 app.get("/api/health", healthCheckLimiter, (req: Request, res: Response) => {

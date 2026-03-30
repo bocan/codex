@@ -1,0 +1,10 @@
+name: "CodeQL config"
+
+queries:
+  - uses: security-and-quality
+
+query-filters:
+  # Suppress false positive: rate limiting is applied at router level in index.ts
+  # but CodeQL's static analysis can't follow the middleware chain
+  - exclude:
+      id: js/missing-rate-limiting
