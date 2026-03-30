@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.0](https://github.com/bocan/codex/compare/v2.23.5...v2.24.0) (2026-03-30)
+
+
+### Features
+
+* **accounts:** encode and decode API keys for anthropic accounts ([1e58358](https://github.com/bocan/codex/commit/1e5835802bb8621a9b06ea0d824f96297b98dcc5))
+* **ai:** add rate limiter for AI chat operations ([e4ff9f8](https://github.com/bocan/codex/commit/e4ff9f84b844bac3e5506361e02e61c12367d3df))
+* **api:** implement encoding and decoding for API keys in accounts ([4d3f3a2](https://github.com/bocan/codex/commit/4d3f3a2e3e695d0638b0a7182e2713b2d2e8674f))
+* **chat:** implement AI chat component with streaming support ([cac7f93](https://github.com/bocan/codex/commit/cac7f931b8d71ae756a0d1b6c430d2995e96b4a8))
+* **codeql:** add CodeQL analysis workflow and configuration ([9b8f531](https://github.com/bocan/codex/commit/9b8f531b0c3920267daeed7dbb8cd426201c9249))
+* **rateLimiters:** add multiple rate limiters for enhanced security ([42452fd](https://github.com/bocan/codex/commit/42452fd7b07a79d6bb057fbc49f649c924fa2872))
+* **rateLimiters:** add skip functionality for test environment ([d7fb274](https://github.com/bocan/codex/commit/d7fb274a24d6fc244288ffb6b78634dcd51bbca1))
+
+
+### Styles
+
+* clean up whitespace and formatting in multiple files ([8e42ff6](https://github.com/bocan/codex/commit/8e42ff6b24ca74f84a79f3797ce677fc81a2e2e2))
+* **codeql:** standardize quotes in CodeQL workflow configuration ([305e3d5](https://github.com/bocan/codex/commit/305e3d59725d460eaf7cf3de0347ad189a1f9bbe))
+
+
+### Chores
+
+* **deps:** update axios and lucide-react in client package ([0ef0a19](https://github.com/bocan/codex/commit/0ef0a19123503b7fca96b602a364d8478ea7ef1b))
+
 ## [2.23.5](https://github.com/bocan/codex/compare/v2.23.4...v2.23.5) (2026-03-24)
 
 
