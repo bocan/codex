@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.2](https://github.com/bocan/codex/compare/v2.24.1...v2.24.2) (2026-04-01)
+
+
+### Chores
+
+* **deps:** bump @anthropic-ai/sdk from 0.80.0 to 0.81.0 ([615c52c](https://github.com/bocan/codex/commit/615c52c26251fd26455715f7f70832ad3a726bff))
+
 ## [2.24.1](https://github.com/bocan/codex/compare/v2.24.0...v2.24.1) (2026-03-30)
 
 
