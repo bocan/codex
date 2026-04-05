@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.5](https://github.com/bocan/codex/compare/v2.24.4...v2.24.5) (2026-04-05)
+
+
+### Chores
+
+* **deps:** bump github/codeql-action from 3 to 4 ([4f66d00](https://github.com/bocan/codex/commit/4f66d00df36f9ddd9ea5b8766fad9fbb87d9e271))
+
 ## [2.24.4](https://github.com/bocan/codex/compare/v2.24.3...v2.24.4) (2026-04-05)
 
 
