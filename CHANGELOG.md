@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.4](https://github.com/bocan/codex/compare/v2.24.3...v2.24.4) (2026-04-05)
+
+
+### Chores
+
+* **deps:** bump actions/checkout from 4 to 6 ([e65d656](https://github.com/bocan/codex/commit/e65d656aa482f13c57f2c7b0f46224be6cd5e82a))
+
 ## [2.24.3](https://github.com/bocan/codex/compare/v2.24.2...v2.24.3) (2026-04-05)
 
 
