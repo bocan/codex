@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.7](https://github.com/bocan/codex/compare/v2.24.6...v2.24.7) (2026-04-06)
+
+
+### Chores
+
+* **deps-dev:** bump vite from 8.0.3 to 8.0.5 ([f656585](https://github.com/bocan/codex/commit/f656585d1246f86a4d357f3739e5b360a28bb699))
+
 ## [2.24.6](https://github.com/bocan/codex/compare/v2.24.5...v2.24.6) (2026-04-05)
 
 
