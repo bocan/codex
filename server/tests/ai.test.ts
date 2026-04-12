@@ -1,7 +1,29 @@
 import request from 'supertest';
 import app from '../src/index';
 
+// Mock @anthropic-ai/sdk to prevent real network calls during tests
+jest.mock('@anthropic-ai/sdk', () => {
+  const mockStream = {
+    [Symbol.asyncIterator]: async function* () {
+      throw Object.assign(
+        new Error('401 {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"}}'),
+        { status: 401 }
+      );
+    },
+  };
+  const MockAnthropic = jest.fn().mockImplementation(() => ({
+    messages: {
+      stream: jest.fn().mockResolvedValue(mockStream),
+    },
+  }));
+  return { __esModule: true, default: MockAnthropic };
+});
+
 describe('AI Routes', () => {
+  // Suppress expected error logs from the AI route's catch block during tests
+  beforeAll(() => jest.spyOn(console, 'error').mockImplementation(() => {}));
+  afterAll(() => jest.restoreAllMocks());
+
   describe('POST /api/ai/chat', () => {
     it('returns 400 when config is missing', async () => {
       const response = await request(app)

@@ -18,8 +18,8 @@
     "html-docx-js-typescript": "^0.1.5",
     "lucide-react": "^1.0.1",
     "mermaid": "^11.13.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^16.1.1",
     "rehype-autolink-headings": "^7.1.0",
@@ -35,9 +35,9 @@
     "@types/react-dom": "^19.2.3",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@vitejs/plugin-react": "^6.0.1",
-    "jsdom": "^29.0.1",
+    "jsdom": "^29.0.2",
     "typescript": "^6.0.2",
     "vite": "8.0",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.4"
   }
 }
