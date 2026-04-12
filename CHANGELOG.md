@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.9](https://github.com/bocan/codex/compare/v2.24.8...v2.24.9) (2026-04-12)
+
+
+### Chores
+
+* **deps:** bump softprops/action-gh-release from 2 to 3 ([df9fbca](https://github.com/bocan/codex/commit/df9fbca00dc244723765e701ac39d3329533ded9))
+
 ## [2.24.8](https://github.com/bocan/codex/compare/v2.24.7...v2.24.8) (2026-04-12)
 
 
