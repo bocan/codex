@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.8](https://github.com/bocan/codex/compare/v2.24.7...v2.24.8) (2026-04-12)
+
+
+### Chores
+
+* **deps:** correct vite version format in package.json ([9833ff2](https://github.com/bocan/codex/commit/9833ff2a30e87e158d788af5414cbf75622dd28a))
+* **deps:** update dependencies and devDependencies in package.json files ([05999e7](https://github.com/bocan/codex/commit/05999e7d2a3fa847c72983f0e5e71a7e88674a3e))
+* **release:** bump version to 2.24.7 and update changelog ([645d657](https://github.com/bocan/codex/commit/645d6571a89c1703c87b195f90b9496d87529057))
+
 ## [2.24.7](https://github.com/bocan/codex/compare/v2.24.6...v2.24.7) (2026-04-06)
 
 
