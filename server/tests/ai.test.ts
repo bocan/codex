@@ -4,11 +4,15 @@ import app from '../src/index';
 // Mock @anthropic-ai/sdk to prevent real network calls during tests
 jest.mock('@anthropic-ai/sdk', () => {
   const mockStream = {
-    [Symbol.asyncIterator]: async function* () {
-      throw Object.assign(
-        new Error('401 {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"}}'),
-        { status: 401 }
-      );
+    [Symbol.asyncIterator]() {
+      return {
+        async next() {
+          throw Object.assign(
+            new Error('401 {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"}}'),
+            { status: 401 }
+          );
+        },
+      };
     },
   };
   const MockAnthropic = jest.fn().mockImplementation(() => ({
