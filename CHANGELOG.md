@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.11](https://github.com/bocan/codex/compare/v2.24.10...v2.24.11) (2026-04-17)
+
+
+### Bug Fixes
+
+* **auth:** regenerate session on successful login to prevent fixation ([de9ec56](https://github.com/bocan/codex/commit/de9ec56b08dfba7dad1f2aab75b31595c81651f6))
+
 ## [2.24.10](https://github.com/bocan/codex/compare/v2.24.9...v2.24.10) (2026-04-17)
 
 
