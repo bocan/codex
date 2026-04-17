@@ -708,11 +708,7 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
       )}
       {showAttachments && (
         <Attachments
-          folderPath={
-            pagePath
-              ? pagePath.substring(0, pagePath.lastIndexOf("/")) || ""
-              : ""
-          }
+          folderPath={pagePath.substring(0, pagePath.lastIndexOf("/")) || ""}
           onClose={() => setShowAttachments(false)}
           onInsert={handleInsertAttachment}
         />

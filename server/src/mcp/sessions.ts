@@ -96,7 +96,9 @@ export class SessionStore {
   delete(sessionId: string): boolean {
     const deleted = this.sessions.delete(sessionId);
     if (deleted && config.debug) {
-      console.log(`[MCP] Session deleted: ${sessionId}`);
+      // Sanitize sessionId before logging to prevent log injection (CWE-117)
+      const safeId = sessionId.replace(/[\r\n\t\x00-\x1f\x7f]/g, '_');
+      console.log(`[MCP] Session deleted: ${safeId}`);
     }
     return deleted;
   }

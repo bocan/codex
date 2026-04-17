@@ -36,9 +36,16 @@ router.post("/login", loginLimiter, async (req: Request, res: Response) => {
   const isValid = await authConfig.verifyPassword(password);
 
   if (isValid) {
-    req.session.authenticated = true;
-    console.log(`[${timestamp}] ✓ Successful login from ${ip}`);
-    res.json({ success: true, message: "Login successful" });
+    // Regenerate session to prevent session fixation attacks (CWE-384)
+    req.session.regenerate((err) => {
+      if (err) {
+        res.status(500).json({ error: "Session error" });
+        return;
+      }
+      req.session.authenticated = true;
+      console.log(`[${timestamp}] ✓ Successful login from ${ip}`);
+      res.json({ success: true, message: "Login successful" });
+    });
   } else {
     console.warn(`[${timestamp}] ✗ Failed login attempt from ${ip}`);
     res.status(401).json({ error: "Invalid password" });
