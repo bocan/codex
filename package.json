@@ -25,12 +25,12 @@
   "dependencies": {
     "@types/node": "^25.6.0",
     "@types/supertest": "^7.2.0",
-    "axios": "^1.14.0",
+    "axios": "^1.15.2",
     "bcrypt": "^6.0.0",
-    "express-rate-limit": "^8.3.2",
+    "express-rate-limit": "^8.4.1",
     "express-session": "^1.19.0",
     "helmet": "^8.1.0",
-    "lucide-react": "^1.8.0",
+    "lucide-react": "^1.11.0",
     "morgan": "^1.10.1",
     "simple-git": "^3.36.0",
     "zustand": "^5.0.12"
@@ -41,11 +41,11 @@
     "@types/bcrypt": "^6.0.0",
     "@types/express-session": "^1.19.0",
     "@types/morgan": "^1.9.10",
-    "@typescript-eslint/eslint-plugin": "^8.58.2",
+    "@typescript-eslint/eslint-plugin": "^8.59.0",
     "@typescript-eslint/parser": "^8.58.2",
     "commit-and-tag-version": "^12.7.1",
     "concurrently": "^9.2.1",
-    "eslint": "^10.2.0",
+    "eslint": "^10.2.1",
     "globals": "^17.5.0"
   }
 }
