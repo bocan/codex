@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.12](https://github.com/bocan/codex/compare/v2.24.11...v2.24.12) (2026-05-01)
+
+
+### Bug Fixes
+
+* **sessions:** sanitize sessionId before logging to prevent injection ([02ab59a](https://github.com/bocan/codex/commit/02ab59ace4f54f79524a01927cda4d528e562c80))
+
+
+### Chores
+
+* **deps-dev:** bump fast-xml-parser from 5.5.10 to 5.7.1 ([162d0af](https://github.com/bocan/codex/commit/162d0af87fd13513505e3558981709bec3976b2e))
+* **deps:** bump @anthropic-ai/sdk from 0.88.0 to 0.91.1 ([7ebfd1a](https://github.com/bocan/codex/commit/7ebfd1a7e55e6ee7abcde3d68ea3b8099c46091a))
+* **deps:** bump the minor-and-patch group across 1 directory with 11 updates ([6f11b44](https://github.com/bocan/codex/commit/6f11b44ffd4452bee81b85402339e05e5416ed1c))
+
 ## [2.24.11](https://github.com/bocan/codex/compare/v2.24.10...v2.24.11) (2026-04-17)
 
 
