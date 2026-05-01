@@ -97,6 +97,7 @@ export class SessionStore {
     const deleted = this.sessions.delete(sessionId);
     if (deleted && config.debug) {
       // Sanitize sessionId before logging to prevent log injection (CWE-117)
+      // eslint-disable-next-line no-control-regex
       const safeId = sessionId.replace(/[\r\n\t\x00-\x1f\x7f]/g, '_');
       console.log(`[MCP] Session deleted: ${safeId}`);
     }
