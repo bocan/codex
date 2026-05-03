@@ -25,7 +25,7 @@
   "dependencies": {
     "@types/node": "^25.6.0",
     "@types/supertest": "^7.2.0",
-    "axios": "^1.15.2",
+    "axios": "^1.16.0",
     "bcrypt": "^6.0.0",
     "express-rate-limit": "^8.4.1",
     "express-session": "^1.19.0",
@@ -45,7 +45,7 @@
     "@typescript-eslint/parser": "^8.58.2",
     "commit-and-tag-version": "^12.7.1",
     "concurrently": "^9.2.1",
-    "eslint": "^10.2.1",
-    "globals": "^17.5.0"
+    "eslint": "^10.3.0",
+    "globals": "^17.6.0"
   }
 }
