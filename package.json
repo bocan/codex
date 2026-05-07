@@ -27,7 +27,7 @@
     "@types/supertest": "^7.2.0",
     "axios": "^1.15.2",
     "bcrypt": "^6.0.0",
-    "express-rate-limit": "^8.4.1",
+    "express-rate-limit": "^8.5.1",
     "express-session": "^1.19.0",
     "helmet": "^8.1.0",
     "lucide-react": "^1.14.0",
