@@ -18,8 +18,8 @@
     "html-docx-js-typescript": "^0.1.5",
     "lucide-react": "^1.14.0",
     "mermaid": "^11.13.0",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^16.1.1",
     "rehype-autolink-headings": "^7.1.0",
@@ -37,7 +37,7 @@
     "@vitejs/plugin-react": "^6.0.1",
     "jsdom": "^29.1.1",
     "typescript": "^6.0.3",
-    "vite": "^8.0.10",
+    "vite": "^8.0.11",
     "vitest": "^4.1.5"
   }
 }

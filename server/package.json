@@ -20,7 +20,7 @@
     "express": "^5.2.1",
     "multer": "^2.0.2",
     "ollama": "^0.6.3",
-    "zod": "^4.4.1"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -29,7 +29,7 @@
     "@types/multer": "^2.1.0",
     "@types/node": "^25.3.2",
     "@types/supertest": "^7.2.0",
-    "jest": "^30.3.0",
+    "jest": "^30.4.1",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.9",
     "tsx": "^4.21.0",
