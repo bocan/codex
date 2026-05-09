@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.14](https://github.com/bocan/codex/compare/v2.24.13...v2.24.14) (2026-05-09)
+
+
+### Chores
+
+* **deps:** bump the minor-and-patch group across 1 directory with 2 updates ([621c750](https://github.com/bocan/codex/commit/621c7507ce6cee993507604cea069d7a14464d92))
+
 ## [2.24.13](https://github.com/bocan/codex/compare/v2.24.12...v2.24.13) (2026-05-09)
 
 
