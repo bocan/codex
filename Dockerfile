@@ -1,6 +1,6 @@
 # Multi-stage Dockerfile for Codex
 # Stage 1: Build
-FROM node:25-alpine AS builder
+FROM node:26-alpine AS builder
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ COPY client/ ./client/
 RUN npm run build
 
 # Stage 2: Production
-FROM node:25-alpine AS production
+FROM node:26-alpine AS production
 
 WORKDIR /app
 
