@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.16](https://github.com/bocan/codex/compare/v2.24.15...v2.24.16) (2026-05-26)
+
+
+### Chores
+
+* **deps:** bump hono from 4.12.16 to 4.12.23 ([10a8910](https://github.com/bocan/codex/commit/10a89104c71a5055f2ea8aab076033a8a57b3e93))
+* **deps:** bump node from 25-alpine to 26-alpine ([113998f](https://github.com/bocan/codex/commit/113998f641cb0c7f84757868e9a60474ee20a023))
+* **deps:** bump qs from 6.15.1 to 6.15.2 ([ac02f99](https://github.com/bocan/codex/commit/ac02f998953c9811f1b3e52c8ae771c518dd90ff))
+
 ## [2.24.15](https://github.com/bocan/codex/compare/v2.24.14...v2.24.15) (2026-05-26)
 
 
