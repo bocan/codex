@@ -163,9 +163,9 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
   const startListening = () => {
     interface WindowWithSpeech extends Window {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      SpeechRecognition?: { new(): any };
+      SpeechRecognition?: { new (): any };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      webkitSpeechRecognition?: { new(): any };
+      webkitSpeechRecognition?: { new (): any };
     }
     const SpeechRecognition =
       (window as unknown as WindowWithSpeech).SpeechRecognition ||
@@ -187,13 +187,12 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
     recognition.onresult = (event: unknown) => {
       const typedEvent = event as {
         resultIndex: number;
-        results: { isFinal: boolean; [index: number]: { transcript: string } }[];
+        results: {
+          isFinal: boolean;
+          [index: number]: { transcript: string };
+        }[];
       };
-      for (
-        let i = typedEvent.resultIndex;
-        i < typedEvent.results.length;
-        i++
-      ) {
+      for (let i = typedEvent.resultIndex; i < typedEvent.results.length; i++) {
         const transcript = typedEvent.results[i][0].transcript;
         if (typedEvent.results[i].isFinal) {
           finalTranscript += transcript + " ";
@@ -276,7 +275,8 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
       // Fallback for browsers that don't support execCommand
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
-      const newContent = content.substring(0, start) + text + content.substring(end);
+      const newContent =
+        content.substring(0, start) + text + content.substring(end);
       setContent(newContent);
       // Store update is debounced via useEffect
     }
@@ -286,7 +286,7 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
   const insertFormatting = (
     prefix: string,
     suffix: string = "",
-    placeholder: string = ""
+    placeholder: string = "",
   ) => {
     if (!textareaRef.current) return;
 
@@ -307,13 +307,13 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
         // Select the wrapped text
         textarea.setSelectionRange(
           start + prefix.length,
-          start + prefix.length + textToWrap.length
+          start + prefix.length + textToWrap.length,
         );
       } else {
         // Position cursor at placeholder for typing
         textarea.setSelectionRange(
           start + prefix.length,
-          start + prefix.length + placeholder.length
+          start + prefix.length + placeholder.length,
         );
       }
     }, 0);
@@ -481,8 +481,16 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
           <button
             onClick={() => setShowFormatToolbar(!showFormatToolbar)}
             className={`format-toggle-btn ${showFormatToolbar ? "active" : ""}`}
-            title={showFormatToolbar ? "Hide formatting toolbar" : "Show formatting toolbar"}
-            aria-label={showFormatToolbar ? "Hide formatting toolbar" : "Show formatting toolbar"}
+            title={
+              showFormatToolbar
+                ? "Hide formatting toolbar"
+                : "Show formatting toolbar"
+            }
+            aria-label={
+              showFormatToolbar
+                ? "Hide formatting toolbar"
+                : "Show formatting toolbar"
+            }
             aria-pressed={showFormatToolbar}
           >
             <Pilcrow size={14} aria-hidden="true" />
@@ -523,7 +531,9 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
             aria-pressed={isListening}
           >
             <Mic size={14} aria-hidden="true" />
-            <span className="btn-label">{isListening ? "Stop" : "Dictate"}</span>
+            <span className="btn-label">
+              {isListening ? "Stop" : "Dictate"}
+            </span>
           </button>
           <button
             onClick={() => setShowAttachments(true)}
@@ -552,14 +562,22 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
             <Save size={14} aria-hidden="true" />
             <span className="btn-label">{isSaving ? "Saving..." : "Save"}</span>
           </button>
-          <button onClick={onClose} title="Close editor" aria-label="Close editor">
+          <button
+            onClick={onClose}
+            title="Close editor"
+            aria-label="Close editor"
+          >
             <X size={14} aria-hidden="true" />
             <span className="btn-label">Close</span>
           </button>
         </div>
       </div>
       {showFormatToolbar && (
-        <div className="format-toolbar" role="toolbar" aria-label="Text formatting">
+        <div
+          className="format-toolbar"
+          role="toolbar"
+          aria-label="Text formatting"
+        >
           <div className="format-group">
             <button
               onClick={() => insertLinePrefix("# ")}
@@ -669,7 +687,9 @@ export const Editor: React.FC<EditorProps> = ({ pagePath, onClose }) => {
               <Image size={14} />
             </button>
             <button
-              onClick={() => insertFormatting("\n```\n", "\n```\n", "code block")}
+              onClick={() =>
+                insertFormatting("\n```\n", "\n```\n", "code block")
+              }
               title="Code block"
               aria-label="Insert code block"
             >

@@ -38,6 +38,8 @@ describe("PageList", () => {
     expect(
       screen.getByRole("dialog", { name: /create page from template/i }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /blank page/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /blank page/i }),
+    ).toBeInTheDocument();
   });
 });

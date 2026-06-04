@@ -1,14 +1,14 @@
-import Anthropic from '@anthropic-ai/sdk';
-import { Ollama } from 'ollama';
+import Anthropic from "@anthropic-ai/sdk";
+import { Ollama } from "ollama";
 
 // Types for AI chat
 export interface ChatMessage {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
 }
 
 export interface AnthropicConfig {
-  type: 'anthropic';
+  type: "anthropic";
   apiKey: string;
   model?: string;
   enableThinking?: boolean;
@@ -16,7 +16,7 @@ export interface AnthropicConfig {
 }
 
 export interface OllamaConfig {
-  type: 'ollama';
+  type: "ollama";
   host: string;
   port: number;
   model?: string;
@@ -26,11 +26,11 @@ export type AIConfig = AnthropicConfig | OllamaConfig;
 
 // Stream event types
 export type StreamEvent =
-  | { type: 'text'; content: string }
-  | { type: 'thinking'; content: string }
-  | { type: 'thinking_done' }
-  | { type: 'usage'; inputTokens: number; outputTokens: number }
-  | { type: 'done' };
+  | { type: "text"; content: string }
+  | { type: "thinking"; content: string }
+  | { type: "thinking_done" }
+  | { type: "usage"; inputTokens: number; outputTokens: number }
+  | { type: "done" };
 
 export interface ChatRequest {
   config: AIConfig;
@@ -40,8 +40,8 @@ export interface ChatRequest {
 }
 
 // Default models
-const DEFAULT_ANTHROPIC_MODEL = 'claude-sonnet-4-20250514';
-const DEFAULT_OLLAMA_MODEL = 'llama3.2';
+const DEFAULT_ANTHROPIC_MODEL = "claude-sonnet-4-20250514";
+const DEFAULT_OLLAMA_MODEL = "llama3.2";
 
 // Default system prompt for documentation assistant
 const DEFAULT_SYSTEM_PROMPT = `You are a helpful assistant for markdown documentation. You help users write, edit, and improve their documentation. Be concise and practical. When suggesting changes, provide markdown that can be directly used.`;
@@ -50,7 +50,9 @@ const DEFAULT_SYSTEM_PROMPT = `You are a helpful assistant for markdown document
  * Stream a chat response from either Anthropic or Ollama
  * Yields StreamEvent objects as they arrive
  */
-export async function* streamChat(request: ChatRequest): AsyncGenerator<StreamEvent> {
+export async function* streamChat(
+  request: ChatRequest,
+): AsyncGenerator<StreamEvent> {
   const systemPrompt = request.systemPrompt || DEFAULT_SYSTEM_PROMPT;
 
   // Build context-aware system prompt
@@ -59,8 +61,12 @@ export async function* streamChat(request: ChatRequest): AsyncGenerator<StreamEv
     fullSystemPrompt += `\n\nThe user is currently working on this document:\n\`\`\`markdown\n${request.documentContext}\n\`\`\``;
   }
 
-  if (request.config.type === 'anthropic') {
-    yield* streamAnthropicChat(request.config, request.messages, fullSystemPrompt);
+  if (request.config.type === "anthropic") {
+    yield* streamAnthropicChat(
+      request.config,
+      request.messages,
+      fullSystemPrompt,
+    );
   } else {
     yield* streamOllamaChat(request.config, request.messages, fullSystemPrompt);
   }
@@ -69,7 +75,7 @@ export async function* streamChat(request: ChatRequest): AsyncGenerator<StreamEv
 async function* streamAnthropicChat(
   config: AnthropicConfig,
   messages: ChatMessage[],
-  systemPrompt: string
+  systemPrompt: string,
 ): AsyncGenerator<StreamEvent> {
   const client = new Anthropic({
     apiKey: config.apiKey,
@@ -97,7 +103,7 @@ async function* streamAnthropicChat(
   // Add thinking configuration for supported models
   if (enableThinking) {
     (requestOptions as unknown as Record<string, unknown>).thinking = {
-      type: 'enabled',
+      type: "enabled",
       budget_tokens: thinkingBudget,
     };
   }
@@ -109,32 +115,32 @@ async function* streamAnthropicChat(
   let outputTokens = 0;
 
   for await (const event of stream) {
-    if (event.type === 'content_block_start') {
+    if (event.type === "content_block_start") {
       // Check if this is a thinking block
-      if ('content_block' in event && event.content_block.type === 'thinking') {
+      if ("content_block" in event && event.content_block.type === "thinking") {
         isThinking = true;
       } else {
         isThinking = false;
       }
-    } else if (event.type === 'content_block_delta') {
-      if (event.delta.type === 'thinking_delta') {
+    } else if (event.type === "content_block_delta") {
+      if (event.delta.type === "thinking_delta") {
         // Thinking content
-        yield { type: 'thinking', content: event.delta.thinking };
-      } else if (event.delta.type === 'text_delta') {
+        yield { type: "thinking", content: event.delta.thinking };
+      } else if (event.delta.type === "text_delta") {
         // Regular text content
-        yield { type: 'text', content: event.delta.text };
+        yield { type: "text", content: event.delta.text };
       }
-    } else if (event.type === 'content_block_stop' && isThinking) {
-      yield { type: 'thinking_done' };
+    } else if (event.type === "content_block_stop" && isThinking) {
+      yield { type: "thinking_done" };
       isThinking = false;
-    } else if (event.type === 'message_delta') {
+    } else if (event.type === "message_delta") {
       // Capture usage information
-      if ('usage' in event && event.usage) {
+      if ("usage" in event && event.usage) {
         outputTokens = event.usage.output_tokens || 0;
       }
-    } else if (event.type === 'message_start') {
+    } else if (event.type === "message_start") {
       // Capture input tokens
-      if ('message' in event && event.message.usage) {
+      if ("message" in event && event.message.usage) {
         inputTokens = event.message.usage.input_tokens || 0;
       }
     }
@@ -142,16 +148,16 @@ async function* streamAnthropicChat(
 
   // Send usage info at the end
   if (inputTokens > 0 || outputTokens > 0) {
-    yield { type: 'usage', inputTokens, outputTokens };
+    yield { type: "usage", inputTokens, outputTokens };
   }
 
-  yield { type: 'done' };
+  yield { type: "done" };
 }
 
 async function* streamOllamaChat(
   config: OllamaConfig,
   messages: ChatMessage[],
-  systemPrompt: string
+  systemPrompt: string,
 ): AsyncGenerator<StreamEvent> {
   const client = new Ollama({
     host: `http://${config.host}:${config.port}`,
@@ -161,9 +167,9 @@ async function* streamOllamaChat(
 
   // Build messages array with system prompt first
   const ollamaMessages = [
-    { role: 'system' as const, content: systemPrompt },
+    { role: "system" as const, content: systemPrompt },
     ...messages.map((msg) => ({
-      role: msg.role as 'user' | 'assistant',
+      role: msg.role as "user" | "assistant",
       content: msg.content,
     })),
   ];
@@ -179,7 +185,7 @@ async function* streamOllamaChat(
 
   for await (const chunk of response) {
     if (chunk.message?.content) {
-      yield { type: 'text', content: chunk.message.content };
+      yield { type: "text", content: chunk.message.content };
     }
     // Ollama provides token counts in the final chunk
     if (chunk.done && chunk.eval_count !== undefined) {
@@ -190,16 +196,23 @@ async function* streamOllamaChat(
 
   // Send usage info
   if (totalTokens > 0 || promptTokens > 0) {
-    yield { type: 'usage', inputTokens: promptTokens, outputTokens: totalTokens };
+    yield {
+      type: "usage",
+      inputTokens: promptTokens,
+      outputTokens: totalTokens,
+    };
   }
 
-  yield { type: 'done' };
+  yield { type: "done" };
 }
 
 /**
  * List available models for Ollama
  */
-export async function listOllamaModels(host: string, port: number): Promise<string[]> {
+export async function listOllamaModels(
+  host: string,
+  port: number,
+): Promise<string[]> {
   try {
     const client = new Ollama({
       host: `http://${host}:${port}`,
@@ -214,7 +227,10 @@ export async function listOllamaModels(host: string, port: number): Promise<stri
 /**
  * Test connection to Ollama
  */
-export async function testOllamaConnection(host: string, port: number): Promise<boolean> {
+export async function testOllamaConnection(
+  host: string,
+  port: number,
+): Promise<boolean> {
   try {
     const client = new Ollama({
       host: `http://${host}:${port}`,
@@ -236,7 +252,7 @@ export async function testAnthropicKey(apiKey: string): Promise<boolean> {
     await client.messages.create({
       model: DEFAULT_ANTHROPIC_MODEL,
       max_tokens: 1,
-      messages: [{ role: 'user', content: 'test' }],
+      messages: [{ role: "user", content: "test" }],
     });
     return true;
   } catch {

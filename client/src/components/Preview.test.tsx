@@ -60,14 +60,19 @@ describe("Preview", () => {
   });
 
   it("shows Export to PDF in export menu", async () => {
-    vi.mocked(api.getPage).mockResolvedValueOnce({ path: "test.md", content: "Hello" });
+    vi.mocked(api.getPage).mockResolvedValueOnce({
+      path: "test.md",
+      content: "Hello",
+    });
     render(<Preview pagePath="test.md" />);
 
     await waitFor(() => expect(api.getPage).toHaveBeenCalledWith("test.md"));
 
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: /export options/i }));
-    expect(screen.getByRole("menuitem", { name: /export to pdf/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("menuitem", { name: /export to pdf/i }),
+    ).toBeInTheDocument();
   });
 
   it("renders Mermaid code fences and avoids rerender when code is unchanged", async () => {
@@ -75,31 +80,39 @@ describe("Preview", () => {
       svg: '<svg data-testid="mmd"><g><text>OK</text></g></svg>',
       bindFunctions: undefined,
       diagramType: "flowchart",
-    } as unknown as { svg: string; bindFunctions?: (element: Element) => void; diagramType: string });
+    } as unknown as {
+      svg: string;
+      bindFunctions?: (element: Element) => void;
+      diagramType: string;
+    });
 
     document.documentElement.setAttribute("data-theme", "dark");
 
-    const markdown = [
-      "```mermaid",
-      "flowchart LR",
-      "  A --> B",
-      "```",
-    ].join("\n");
+    const markdown = ["```mermaid", "flowchart LR", "  A --> B", "```"].join(
+      "\n",
+    );
 
     // Prevent the async API load from overwriting the live editor content during the test.
-    vi.mocked(api.getPage).mockResolvedValueOnce({ path: "test.md", content: markdown });
+    vi.mocked(api.getPage).mockResolvedValueOnce({
+      path: "test.md",
+      content: markdown,
+    });
 
     useEditorStore.setState({ content: markdown });
 
     const { rerender } = render(<Preview pagePath="test.md" />);
 
-    await waitFor(() => expect(vi.mocked(mermaid.render)).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(vi.mocked(mermaid.render)).toHaveBeenCalledTimes(1),
+    );
     expect(
       await screen.findByRole("button", { name: /download diagram as svg/i }),
     ).toBeInTheDocument();
 
     // Rerender parent with same content: Mermaid should not redraw.
     rerender(<Preview pagePath="test.md" />);
-    await waitFor(() => expect(vi.mocked(mermaid.render)).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(vi.mocked(mermaid.render)).toHaveBeenCalledTimes(1),
+    );
   });
 });

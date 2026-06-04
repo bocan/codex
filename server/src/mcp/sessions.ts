@@ -3,7 +3,7 @@
  * In-memory session management with TTL and per-key limits.
  */
 
-import { config } from './config';
+import { config } from "./config";
 
 interface Session {
   id: string;
@@ -34,7 +34,9 @@ export class SessionStore {
     const keySessions = this.getSessionsByApiKey(apiKey);
     if (keySessions.length >= config.maxSessionsPerKey) {
       // Remove oldest session for this API key (LRU)
-      const oldest = keySessions.sort((a, b) => a.lastAccessedAt - b.lastAccessedAt)[0];
+      const oldest = keySessions.sort(
+        (a, b) => a.lastAccessedAt - b.lastAccessedAt,
+      )[0];
       if (oldest) {
         this.delete(oldest.id);
       }
@@ -98,7 +100,7 @@ export class SessionStore {
     if (deleted && config.debug) {
       // Sanitize sessionId before logging to prevent log injection (CWE-117)
       // eslint-disable-next-line no-control-regex
-      const safeId = sessionId.replace(/[\r\n\t\x00-\x1f\x7f]/g, '_');
+      const safeId = sessionId.replace(/[\r\n\t\x00-\x1f\x7f]/g, "_");
       console.log(`[MCP] Session deleted: ${safeId}`);
     }
     return deleted;
@@ -115,7 +117,9 @@ export class SessionStore {
    * Get all sessions for an API key
    */
   private getSessionsByApiKey(apiKey: string): Session[] {
-    return Array.from(this.sessions.values()).filter(s => s.apiKey === apiKey);
+    return Array.from(this.sessions.values()).filter(
+      (s) => s.apiKey === apiKey,
+    );
   }
 
   /**

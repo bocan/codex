@@ -65,8 +65,14 @@ export const api = {
     await axios.put(`${API_BASE}/folders/rename`, { oldPath, newPath });
   },
 
-  moveFolder: async (sourcePath: string, destinationParentPath: string): Promise<string> => {
-    const response = await axios.put(`${API_BASE}/folders/move`, { sourcePath, destinationParentPath });
+  moveFolder: async (
+    sourcePath: string,
+    destinationParentPath: string,
+  ): Promise<string> => {
+    const response = await axios.put(`${API_BASE}/folders/move`, {
+      sourcePath,
+      destinationParentPath,
+    });
     return response.data.newPath;
   },
 
@@ -189,7 +195,7 @@ export const api = {
     onThinking?: (text: string) => void,
     onThinkingDone?: () => void,
     onUsage?: (inputTokens: number, outputTokens: number) => void,
-    systemPrompt?: string
+    systemPrompt?: string,
   ): Promise<void> => {
     let doneHandled = false;
 
@@ -202,60 +208,65 @@ export const api = {
 
     try {
       const response = await fetch(`${API_BASE}/ai/chat`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ config, messages, documentContext, systemPrompt }),
-        credentials: 'include',
+        body: JSON.stringify({
+          config,
+          messages,
+          documentContext,
+          systemPrompt,
+        }),
+        credentials: "include",
         signal,
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        onError(errorText || 'Failed to connect to AI');
+        onError(errorText || "Failed to connect to AI");
         return;
       }
 
       const reader = response.body?.getReader();
       if (!reader) {
-        onError('No response body');
+        onError("No response body");
         return;
       }
 
       const decoder = new TextDecoder();
-      let buffer = '';
+      let buffer = "";
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
 
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
+          if (line.startsWith("data: ")) {
             try {
               const data = JSON.parse(line.slice(6));
 
               switch (data.type) {
-                case 'text':
+                case "text":
                   onText(data.content);
                   break;
-                case 'thinking':
+                case "thinking":
                   onThinking?.(data.content);
                   break;
-                case 'thinking_done':
+                case "thinking_done":
                   onThinkingDone?.();
                   break;
-                case 'usage':
+                case "usage":
                   onUsage?.(data.inputTokens, data.outputTokens);
                   break;
-                case 'done':
+                case "done":
                   handleDone();
                   return;
-                case 'error':
+                case "error":
                   onError(data.error);
                   return;
                 default:
@@ -281,10 +292,10 @@ export const api = {
 
       handleDone();
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
+      if (error instanceof Error && error.name === "AbortError") {
         handleDone();
       } else {
-        onError(error instanceof Error ? error.message : 'Unknown error');
+        onError(error instanceof Error ? error.message : "Unknown error");
       }
     }
   },
@@ -296,7 +307,10 @@ export const api = {
     return response.data.models || [];
   },
 
-  testOllamaConnection: async (host: string, port: number): Promise<boolean> => {
+  testOllamaConnection: async (
+    host: string,
+    port: number,
+  ): Promise<boolean> => {
     const response = await axios.get(`${API_BASE}/ai/ollama/test`, {
       params: { host, port },
     });

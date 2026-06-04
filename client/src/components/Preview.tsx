@@ -1,9 +1,18 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark, oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
+import {
+  oneDark,
+  oneLight,
+} from "react-syntax-highlighter/dist/esm/styles/prism";
 import { asBlob } from "html-docx-js-typescript";
 import mermaid from "mermaid";
 import { api } from "../services/api";
@@ -13,7 +22,10 @@ import { Check, Copy, ArrowUp, ChevronDown } from "lucide-react";
 import "./Preview.css";
 
 // CodeBlock component with copy functionality
-const CodeBlock: React.FC<{ language?: string; children: string }> = ({ language, children }) => {
+const CodeBlock: React.FC<{ language?: string; children: string }> = ({
+  language,
+  children,
+}) => {
   const [copied, setCopied] = useState(false);
   const [isDark, setIsDark] = useState(true); // Default to dark to prevent white flash
 
@@ -35,7 +47,10 @@ const CodeBlock: React.FC<{ language?: string; children: string }> = ({ language
 
     // Listen for theme changes
     const observer = new MutationObserver(updateTheme);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
 
     // Listen for system preference changes
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
@@ -67,7 +82,15 @@ const CodeBlock: React.FC<{ language?: string; children: string }> = ({ language
           title={copied ? "Copied!" : "Copy code"}
           aria-label={copied ? "Copied to clipboard" : "Copy code to clipboard"}
         >
-          {copied ? <><Check size={12} /> Copied</> : <><Copy size={12} /> Copy</>}
+          {copied ? (
+            <>
+              <Check size={12} /> Copied
+            </>
+          ) : (
+            <>
+              <Copy size={12} /> Copy
+            </>
+          )}
         </button>
       </div>
       <SyntaxHighlighter
@@ -94,7 +117,10 @@ type MermaidTheme = "default" | "dark";
 let initializedMermaidTheme: MermaidTheme | null = null;
 
 const MAX_MERMAID_CACHE_ENTRIES = 100;
-const mermaidSvgCache = new Map<string, { svg: string; bindFunctions?: (element: Element) => void }>();
+const mermaidSvgCache = new Map<
+  string,
+  { svg: string; bindFunctions?: (element: Element) => void }
+>();
 const mermaidSvgInFlight = new Map<
   string,
   Promise<{ svg: string; bindFunctions?: (element: Element) => void }>
@@ -114,7 +140,9 @@ const ensureMermaidInitialized = (theme: MermaidTheme) => {
 
 const getCssVar = (name: string, fallback: string) => {
   try {
-    const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    const value = getComputedStyle(document.documentElement)
+      .getPropertyValue(name)
+      .trim();
     return value || fallback;
   } catch {
     return fallback;
@@ -138,7 +166,10 @@ const addSvgBackground = (rawSvg: string, background: string) => {
       })
     : svgTag.replace(/>$/, ` style="background:${background}">`);
 
-  const withBg = rawSvg.replace(svgTag, `${nextSvgTag}<rect x="0" y="0" width="100%" height="100%" fill="${background}" />`);
+  const withBg = rawSvg.replace(
+    svgTag,
+    `${nextSvgTag}<rect x="0" y="0" width="100%" height="100%" fill="${background}" />`,
+  );
   return withBg;
 };
 
@@ -147,7 +178,9 @@ const MermaidBlock: React.FC<{ code: string }> = ({ code }) => {
   const [isHighContrast, setIsHighContrast] = useState(false);
   const [svg, setSvg] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const bindFunctionsRef = useRef<((element: Element) => void) | undefined>(undefined);
+  const bindFunctionsRef = useRef<((element: Element) => void) | undefined>(
+    undefined,
+  );
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Detect theme (including auto/system preference)
@@ -169,7 +202,10 @@ const MermaidBlock: React.FC<{ code: string }> = ({ code }) => {
     updateTheme();
 
     const observer = new MutationObserver(updateTheme);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     mediaQuery.addEventListener("change", updateTheme);
@@ -214,7 +250,10 @@ const MermaidBlock: React.FC<{ code: string }> = ({ code }) => {
 
         const promise = mermaid
           .render(renderId, code)
-          .then((result) => ({ svg: result.svg, bindFunctions: result.bindFunctions }));
+          .then((result) => ({
+            svg: result.svg,
+            bindFunctions: result.bindFunctions,
+          }));
 
         mermaidSvgInFlight.set(cacheKey, promise);
         const result = await promise;
@@ -224,7 +263,9 @@ const MermaidBlock: React.FC<{ code: string }> = ({ code }) => {
         bindFunctionsRef.current = result.bindFunctions;
         mermaidSvgCache.set(cacheKey, result);
         if (mermaidSvgCache.size > MAX_MERMAID_CACHE_ENTRIES) {
-          const oldestKey = mermaidSvgCache.keys().next().value as string | undefined;
+          const oldestKey = mermaidSvgCache.keys().next().value as
+            | string
+            | undefined;
           if (oldestKey) mermaidSvgCache.delete(oldestKey);
         }
         setError(null);
@@ -262,18 +303,54 @@ const MermaidBlock: React.FC<{ code: string }> = ({ code }) => {
 
     // Keep the preview's look unchanged, but export an SVG styled for the *current* app mode.
     // This avoids the "all black boxes" look in dark/high-contrast when exported into a white canvas.
-    const exportMode = isHighContrast ? "high-contrast" : isDark ? "dark" : "light";
+    const exportMode = isHighContrast
+      ? "high-contrast"
+      : isDark
+        ? "dark"
+        : "light";
 
-    const bgPrimary = getCssVar("--bg-primary", exportMode === "light" ? "#ffffff" : "#111111");
-    const bgSecondary = getCssVar("--bg-secondary", exportMode === "light" ? "#f5f5f5" : "#1f1f1f");
-    const bgTertiary = getCssVar("--bg-tertiary", exportMode === "light" ? "#eeeeee" : "#2a2a2a");
-    const textPrimary = getCssVar("--text-primary", exportMode === "light" ? "#111111" : "#f5f5f5");
-    const textSecondary = getCssVar("--text-secondary", exportMode === "light" ? "#444444" : "#cccccc");
-    const borderColor = getCssVar("--border-color", exportMode === "light" ? "#d0d0d0" : "#444444");
-    const accentColor = getCssVar("--accent-color", exportMode === "light" ? "#4f46e5" : "#818cf8");
-    const fontBody = getCssVar("--font-body", "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif");
+    const bgPrimary = getCssVar(
+      "--bg-primary",
+      exportMode === "light" ? "#ffffff" : "#111111",
+    );
+    const bgSecondary = getCssVar(
+      "--bg-secondary",
+      exportMode === "light" ? "#f5f5f5" : "#1f1f1f",
+    );
+    const bgTertiary = getCssVar(
+      "--bg-tertiary",
+      exportMode === "light" ? "#eeeeee" : "#2a2a2a",
+    );
+    const textPrimary = getCssVar(
+      "--text-primary",
+      exportMode === "light" ? "#111111" : "#f5f5f5",
+    );
+    const textSecondary = getCssVar(
+      "--text-secondary",
+      exportMode === "light" ? "#444444" : "#cccccc",
+    );
+    const borderColor = getCssVar(
+      "--border-color",
+      exportMode === "light" ? "#d0d0d0" : "#444444",
+    );
+    const accentColor = getCssVar(
+      "--accent-color",
+      exportMode === "light" ? "#4f46e5" : "#818cf8",
+    );
+    const fontBody = getCssVar(
+      "--font-body",
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    );
 
-    const exportKey = [exportMode, bgPrimary, bgSecondary, bgTertiary, textPrimary, borderColor, accentColor].join("|");
+    const exportKey = [
+      exportMode,
+      bgPrimary,
+      bgSecondary,
+      bgTertiary,
+      textPrimary,
+      borderColor,
+      accentColor,
+    ].join("|");
     const exportCacheKey = `export:${exportKey}::${code}`;
 
     try {
@@ -291,7 +368,8 @@ const MermaidBlock: React.FC<{ code: string }> = ({ code }) => {
 
             primaryColor: bgSecondary,
             primaryTextColor: textPrimary,
-            primaryBorderColor: exportMode === "high-contrast" ? textPrimary : borderColor,
+            primaryBorderColor:
+              exportMode === "high-contrast" ? textPrimary : borderColor,
 
             secondaryColor: bgTertiary,
             tertiaryColor: bgPrimary,
@@ -303,12 +381,14 @@ const MermaidBlock: React.FC<{ code: string }> = ({ code }) => {
             // Notes / callouts
             noteBkgColor: bgTertiary,
             noteTextColor: textPrimary,
-            noteBorderColor: exportMode === "high-contrast" ? textPrimary : borderColor,
+            noteBorderColor:
+              exportMode === "high-contrast" ? textPrimary : borderColor,
 
             // Some diagram types use these
             actorTextColor: textPrimary,
             actorBkg: bgSecondary,
-            actorBorder: exportMode === "high-contrast" ? textPrimary : borderColor,
+            actorBorder:
+              exportMode === "high-contrast" ? textPrimary : borderColor,
 
             // Accents (ignored if unsupported by current Mermaid version)
             linkColor: accentColor,
@@ -318,9 +398,14 @@ const MermaidBlock: React.FC<{ code: string }> = ({ code }) => {
         const renderId = `mmd-export-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
         const result = await mermaid.render(renderId, code);
         exportSvg = addSvgBackground(result.svg, bgPrimary);
-        mermaidSvgCache.set(exportCacheKey, { svg: exportSvg, bindFunctions: result.bindFunctions });
+        mermaidSvgCache.set(exportCacheKey, {
+          svg: exportSvg,
+          bindFunctions: result.bindFunctions,
+        });
         if (mermaidSvgCache.size > MAX_MERMAID_CACHE_ENTRIES) {
-          const oldestKey = mermaidSvgCache.keys().next().value as string | undefined;
+          const oldestKey = mermaidSvgCache.keys().next().value as
+            | string
+            | undefined;
           if (oldestKey) mermaidSvgCache.delete(oldestKey);
         }
 
@@ -328,7 +413,9 @@ const MermaidBlock: React.FC<{ code: string }> = ({ code }) => {
         ensureMermaidInitialized(previewTheme);
       }
 
-      const blob = new Blob([exportSvg], { type: "image/svg+xml;charset=utf-8" });
+      const blob = new Blob([exportSvg], {
+        type: "image/svg+xml;charset=utf-8",
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -343,7 +430,11 @@ const MermaidBlock: React.FC<{ code: string }> = ({ code }) => {
   }, [code, isDark, isHighContrast, previewTheme]);
 
   return (
-    <div className="mermaid-diagram-wrapper" role="group" aria-label="Mermaid diagram">
+    <div
+      className="mermaid-diagram-wrapper"
+      role="group"
+      aria-label="Mermaid diagram"
+    >
       <button
         className="mermaid-download-btn"
         type="button"
@@ -376,9 +467,7 @@ interface PreviewProps {
 
 const PreviewScrollSync: React.FC<{
   contentRef: React.RefObject<HTMLDivElement | null>;
-}> = ({
-  contentRef,
-}) => {
+}> = ({ contentRef }) => {
   const scrollSource = useEditorStore((state) => state.scrollSource);
   const editorScrollPercent = useEditorStore(
     (state) => state.editorScrollPercent,
@@ -401,168 +490,184 @@ const PreviewScrollSync: React.FC<{
   return null;
 };
 
-const MarkdownRenderer = React.memo(function MarkdownRenderer({
-  content,
-  pagePath,
-  onNavigate,
-}: {
-  content: string;
-  pagePath: string | null;
-  onNavigate?: (path: string) => void;
-}) {
-  const remarkPlugins = useMemo(() => [remarkGfm], []);
-  const rehypePlugins = useMemo(() => [rehypeSlug], []);
+const MarkdownRenderer = React.memo(
+  function MarkdownRenderer({
+    content,
+    pagePath,
+    onNavigate,
+  }: {
+    content: string;
+    pagePath: string | null;
+    onNavigate?: (path: string) => void;
+  }) {
+    const remarkPlugins = useMemo(() => [remarkGfm], []);
+    const rehypePlugins = useMemo(() => [rehypeSlug], []);
 
-  const handleLinkClick = useCallback(
-    (event: React.MouseEvent<HTMLAnchorElement>) => {
-      const href = event.currentTarget.getAttribute("href");
-      if (!href) return;
+    const handleLinkClick = useCallback(
+      (event: React.MouseEvent<HTMLAnchorElement>) => {
+        const href = event.currentTarget.getAttribute("href");
+        if (!href) return;
 
-      // Handle anchor links (same document)
-      if (href.startsWith("#")) {
-        event.preventDefault();
-        const targetId = href.substring(1);
-        const previewContent = event.currentTarget.closest(".preview-content");
-        if (previewContent) {
-          const element = previewContent.querySelector(`#${targetId}`);
-          if (element) {
-            element.scrollIntoView({ behavior: "smooth", block: "start" });
+        // Handle anchor links (same document)
+        if (href.startsWith("#")) {
+          event.preventDefault();
+          const targetId = href.substring(1);
+          const previewContent =
+            event.currentTarget.closest(".preview-content");
+          if (previewContent) {
+            const element = previewContent.querySelector(`#${targetId}`);
+            if (element) {
+              element.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+          }
+          return;
+        }
+
+        // Handle internal markdown links
+        if (
+          href.endsWith(".md") &&
+          !href.startsWith("http://") &&
+          !href.startsWith("https://")
+        ) {
+          event.preventDefault();
+
+          let targetPath = href;
+          if (pagePath && !href.startsWith("/")) {
+            const currentDir = pagePath.substring(0, pagePath.lastIndexOf("/"));
+            targetPath = currentDir ? `${currentDir}/${href}` : href;
+          } else if (href.startsWith("/")) {
+            targetPath = href.substring(1);
+          }
+
+          if (onNavigate) {
+            onNavigate(targetPath);
           }
         }
-        return;
-      }
-
-      // Handle internal markdown links
-      if (
-        href.endsWith(".md") &&
-        !href.startsWith("http://") &&
-        !href.startsWith("https://")
-      ) {
-        event.preventDefault();
-
-        let targetPath = href;
-        if (pagePath && !href.startsWith("/")) {
-          const currentDir = pagePath.substring(0, pagePath.lastIndexOf("/"));
-          targetPath = currentDir ? `${currentDir}/${href}` : href;
-        } else if (href.startsWith("/")) {
-          targetPath = href.substring(1);
-        }
-
-        if (onNavigate) {
-          onNavigate(targetPath);
-        }
-      }
-    },
-    [onNavigate, pagePath],
-  );
-
-  const components = useMemo(
-    () => ({
-      // Override pre to be a transparent wrapper - our CodeBlock handles all styling
-      pre: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
-      code: ({
-        node: _node,
-        className,
-        children,
-        ...props
-      }: {
-        node?: unknown;
-        className?: string;
-        children?: React.ReactNode;
-      } & React.HTMLAttributes<HTMLElement>) => {
-        const match = /language-(\w+)/.exec(className || "");
-        const language = match ? match[1] : undefined;
-        const codeString = String(children).replace(/\n$/, "");
-
-        const isCodeBlock = match || codeString.includes("\n");
-
-        if (isCodeBlock) {
-          if (language === "mermaid") {
-            return <MermaidBlock code={codeString} />;
-          }
-          return <CodeBlock language={language}>{codeString}</CodeBlock>;
-        }
-
-        return (
-          <code className={className} {...props}>
-            {children}
-          </code>
-        );
       },
-      a: ({ node: _node, ...props }: { node?: unknown } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
-        const href = props.href || "";
+      [onNavigate, pagePath],
+    );
 
-        // Handle attachment links
-        if (href.startsWith(".attachments/")) {
-          const folderPath = pagePath
-            ? pagePath.substring(0, pagePath.lastIndexOf("/")) || ""
-            : "";
-          const filename = href.replace(".attachments/", "");
-          const fullUrl = api.getAttachmentUrl(folderPath, filename);
+    const components = useMemo(
+      () => ({
+        // Override pre to be a transparent wrapper - our CodeBlock handles all styling
+        pre: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+        code: ({
+          node: _node,
+          className,
+          children,
+          ...props
+        }: {
+          node?: unknown;
+          className?: string;
+          children?: React.ReactNode;
+        } & React.HTMLAttributes<HTMLElement>) => {
+          const match = /language-(\w+)/.exec(className || "");
+          const language = match ? match[1] : undefined;
+          const codeString = String(children).replace(/\n$/, "");
+
+          const isCodeBlock = match || codeString.includes("\n");
+
+          if (isCodeBlock) {
+            if (language === "mermaid") {
+              return <MermaidBlock code={codeString} />;
+            }
+            return <CodeBlock language={language}>{codeString}</CodeBlock>;
+          }
+
           return (
-            <a
-              {...props}
-              href={fullUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              download
-            />
+            <code className={className} {...props}>
+              {children}
+            </code>
           );
-        }
+        },
+        a: ({
+          node: _node,
+          ...props
+        }: {
+          node?: unknown;
+        } & React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+          const href = props.href || "";
 
-        return <a {...props} onClick={handleLinkClick} />;
-      },
-      img: ({ node: _node, ...props }: { node?: unknown } & React.ImgHTMLAttributes<HTMLImageElement>) => {
-        const src = props.src || "";
-        const alt = props.alt || "";
+          // Handle attachment links
+          if (href.startsWith(".attachments/")) {
+            const folderPath = pagePath
+              ? pagePath.substring(0, pagePath.lastIndexOf("/")) || ""
+              : "";
+            const filename = href.replace(".attachments/", "");
+            const fullUrl = api.getAttachmentUrl(folderPath, filename);
+            return (
+              <a
+                {...props}
+                href={fullUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+              />
+            );
+          }
 
-        // Handle attachment images
-        if (src.startsWith(".attachments/")) {
-          const folderPath = pagePath
-            ? pagePath.substring(0, pagePath.lastIndexOf("/")) || ""
-            : "";
-          const filename = src.replace(".attachments/", "");
-          const fullUrl = api.getAttachmentUrl(folderPath, filename);
+          return <a {...props} onClick={handleLinkClick} />;
+        },
+        img: ({
+          node: _node,
+          ...props
+        }: { node?: unknown } & React.ImgHTMLAttributes<HTMLImageElement>) => {
+          const src = props.src || "";
+          const alt = props.alt || "";
 
-          // Wrap in span-based figure if alt text exists (avoids <figure> in <p> hydration error)
+          // Handle attachment images
+          if (src.startsWith(".attachments/")) {
+            const folderPath = pagePath
+              ? pagePath.substring(0, pagePath.lastIndexOf("/")) || ""
+              : "";
+            const filename = src.replace(".attachments/", "");
+            const fullUrl = api.getAttachmentUrl(folderPath, filename);
+
+            // Wrap in span-based figure if alt text exists (avoids <figure> in <p> hydration error)
+            if (alt) {
+              return (
+                <span className="image-figure" role="figure" aria-label={alt}>
+                  <img {...props} src={fullUrl} alt={alt} />
+                  <span className="image-caption">{alt}</span>
+                </span>
+              );
+            }
+            return <img {...props} src={fullUrl} alt={filename} />;
+          }
+
+          // For non-attachment images, still show caption if alt text exists
           if (alt) {
             return (
               <span className="image-figure" role="figure" aria-label={alt}>
-                <img {...props} src={fullUrl} alt={alt} />
+                <img {...props} />
                 <span className="image-caption">{alt}</span>
               </span>
             );
           }
-          return <img {...props} src={fullUrl} alt={filename} />;
-        }
 
-        // For non-attachment images, still show caption if alt text exists
-        if (alt) {
-          return (
-            <span className="image-figure" role="figure" aria-label={alt}>
-              <img {...props} />
-              <span className="image-caption">{alt}</span>
-            </span>
-          );
-        }
+          return <img {...props} />;
+        },
+      }),
+      [handleLinkClick, pagePath],
+    );
 
-        return <img {...props} />;
-      },
-    }),
-    [handleLinkClick, pagePath],
-  );
+    return (
+      <ReactMarkdown
+        remarkPlugins={remarkPlugins}
+        rehypePlugins={rehypePlugins}
+        components={components}
+      >
+        {content}
+      </ReactMarkdown>
+    );
+  },
+  (prev, next) =>
+    prev.content === next.content &&
+    prev.pagePath === next.pagePath &&
+    prev.onNavigate === next.onNavigate,
+);
 
-  return (
-    <ReactMarkdown remarkPlugins={remarkPlugins} rehypePlugins={rehypePlugins} components={components}>
-      {content}
-    </ReactMarkdown>
-  );
-}, (prev, next) => prev.content === next.content && prev.pagePath === next.pagePath && prev.onNavigate === next.onNavigate);
-
-export const Preview: React.FC<PreviewProps> = ({
-  pagePath,
-  onNavigate,
-}) => {
+export const Preview: React.FC<PreviewProps> = ({ pagePath, onNavigate }) => {
   const liveContent = useEditorStore((state) => state.content);
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
@@ -1139,11 +1244,15 @@ export const Preview: React.FC<PreviewProps> = ({
 
     const prepareExportClone = async (exportClone: HTMLElement) => {
       // Remove UI-only controls from export output
-      exportClone.querySelectorAll('.mermaid-download-btn').forEach((btn) => btn.remove());
+      exportClone
+        .querySelectorAll(".mermaid-download-btn")
+        .forEach((btn) => btn.remove());
 
       // Convert attachment images to base64 for embedding (docx + stable PDF rendering)
       // Note: Images already have full API URLs from ReactMarkdown component
-      const images = exportClone.querySelectorAll('img[src*="/api/attachments/"]');
+      const images = exportClone.querySelectorAll(
+        'img[src*="/api/attachments/"]',
+      );
 
       for (const img of Array.from(images)) {
         const src = img.getAttribute("src");
@@ -1192,27 +1301,35 @@ export const Preview: React.FC<PreviewProps> = ({
       }
 
       // Convert Mermaid SVG diagrams into PNG images for export.
-      const mermaidWrappers = Array.from(exportClone.querySelectorAll('.mermaid-diagram-wrapper'));
+      const mermaidWrappers = Array.from(
+        exportClone.querySelectorAll(".mermaid-diagram-wrapper"),
+      );
       if (mermaidWrappers.length > 0) {
         const exportMode = (() => {
-          const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-          if (currentTheme === 'high-contrast') return 'high-contrast';
-          if (currentTheme === 'dark') return 'dark';
-          if (currentTheme === 'auto' || !currentTheme) {
-            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          const currentTheme =
+            document.documentElement.getAttribute("data-theme") || "light";
+          if (currentTheme === "high-contrast") return "high-contrast";
+          if (currentTheme === "dark") return "dark";
+          if (currentTheme === "auto" || !currentTheme) {
+            return window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
           }
-          return 'light';
+          return "light";
         })();
 
-        const background = getCssVar('--bg-primary', exportMode === 'light' ? '#ffffff' : '#111111');
+        const background = getCssVar(
+          "--bg-primary",
+          exportMode === "light" ? "#ffffff" : "#111111",
+        );
 
         const parseSvgSize = (svgEl: SVGElement) => {
-          const widthAttr = svgEl.getAttribute('width') || '';
-          const heightAttr = svgEl.getAttribute('height') || '';
-          const viewBoxAttr = svgEl.getAttribute('viewBox') || '';
+          const widthAttr = svgEl.getAttribute("width") || "";
+          const heightAttr = svgEl.getAttribute("height") || "";
+          const viewBoxAttr = svgEl.getAttribute("viewBox") || "";
 
           const parseNum = (value: string) => {
-            const n = Number.parseFloat(value.replace('px', '').trim());
+            const n = Number.parseFloat(value.replace("px", "").trim());
             return Number.isFinite(n) ? n : null;
           };
 
@@ -1232,11 +1349,13 @@ export const Preview: React.FC<PreviewProps> = ({
 
         const svgToPngDataUrl = async (svgText: string, bg: string) => {
           const svgWithBg = addSvgBackground(svgText, bg);
-          const blob = new Blob([svgWithBg], { type: 'image/svg+xml;charset=utf-8' });
+          const blob = new Blob([svgWithBg], {
+            type: "image/svg+xml;charset=utf-8",
+          });
           const url = URL.createObjectURL(blob);
           try {
             const image = new Image();
-            image.decoding = 'async';
+            image.decoding = "async";
 
             await new Promise<void>((resolve, reject) => {
               image.onload = () => resolve();
@@ -1253,11 +1372,11 @@ export const Preview: React.FC<PreviewProps> = ({
               width = maxWidth;
             }
 
-            const canvas = document.createElement('canvas');
+            const canvas = document.createElement("canvas");
             canvas.width = Math.max(1, Math.floor(width));
             canvas.height = Math.max(1, Math.floor(height));
 
-            const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext("2d");
             if (!ctx) {
               return null;
             }
@@ -1266,7 +1385,7 @@ export const Preview: React.FC<PreviewProps> = ({
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-            return canvas.toDataURL('image/png', 0.92);
+            return canvas.toDataURL("image/png", 0.92);
           } finally {
             URL.revokeObjectURL(url);
           }
@@ -1274,7 +1393,7 @@ export const Preview: React.FC<PreviewProps> = ({
 
         for (const wrapper of mermaidWrappers) {
           try {
-            const svgEl = wrapper.querySelector('svg') as SVGElement | null;
+            const svgEl = wrapper.querySelector("svg") as SVGElement | null;
             if (!svgEl) continue;
 
             const { width: svgW, height: svgH } = parseSvgSize(svgEl);
@@ -1284,28 +1403,40 @@ export const Preview: React.FC<PreviewProps> = ({
             const targetH = svgH * scale;
 
             const svgText = svgEl.outerHTML
-              .replace(/\swidth="[^"]*"/i, ` width="${Math.max(1, Math.floor(targetW))}"`)
-              .replace(/\sheight="[^"]*"/i, ` height="${Math.max(1, Math.floor(targetH))}"`);
+              .replace(
+                /\swidth="[^"]*"/i,
+                ` width="${Math.max(1, Math.floor(targetW))}"`,
+              )
+              .replace(
+                /\sheight="[^"]*"/i,
+                ` height="${Math.max(1, Math.floor(targetH))}"`,
+              );
 
             const pngDataUrl = await svgToPngDataUrl(svgText, background);
             if (!pngDataUrl) continue;
 
-            const img = document.createElement('img');
-            img.setAttribute('src', pngDataUrl);
-            img.setAttribute('alt', 'Mermaid diagram');
+            const img = document.createElement("img");
+            img.setAttribute("src", pngDataUrl);
+            img.setAttribute("alt", "Mermaid diagram");
 
             wrapper.replaceWith(img);
           } catch (e) {
-            console.error('Failed to embed Mermaid diagram for export:', e);
+            console.error("Failed to embed Mermaid diagram for export:", e);
           }
         }
       }
 
       // Ensure all attachment links have absolute URLs with full origin
-      const links = exportClone.querySelectorAll('a[href*="/api/attachments/"]');
+      const links = exportClone.querySelectorAll(
+        'a[href*="/api/attachments/"]',
+      );
       for (const link of Array.from(links)) {
         const href = link.getAttribute("href");
-        if (href && !href.startsWith("http://") && !href.startsWith("https://")) {
+        if (
+          href &&
+          !href.startsWith("http://") &&
+          !href.startsWith("https://")
+        ) {
           const absoluteUrl = `${window.location.origin}${href}`;
           link.setAttribute("href", absoluteUrl);
         } else if (href && !href.includes(window.location.origin)) {
@@ -1433,7 +1564,7 @@ ${htmlContent}
     const blob =
       docxBlob instanceof Blob
         ? docxBlob
-        : new Blob([new Uint8Array((docxBlob as unknown) as ArrayBuffer)], {
+        : new Blob([new Uint8Array(docxBlob as unknown as ArrayBuffer)], {
             type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           });
 
@@ -1461,9 +1592,13 @@ ${htmlContent}
 
     // Reuse the same export preparation as Word (images + mermaid diagrams)
     const prepareExportClone = async (exportClone: HTMLElement) => {
-      exportClone.querySelectorAll('.mermaid-download-btn').forEach((btn) => btn.remove());
+      exportClone
+        .querySelectorAll(".mermaid-download-btn")
+        .forEach((btn) => btn.remove());
 
-      const images = exportClone.querySelectorAll('img[src*="/api/attachments/"]');
+      const images = exportClone.querySelectorAll(
+        'img[src*="/api/attachments/"]',
+      );
       for (const img of Array.from(images)) {
         const src = img.getAttribute("src");
         if (src) {
@@ -1504,26 +1639,36 @@ ${htmlContent}
         }
       }
 
-      const mermaidWrappers = Array.from(exportClone.querySelectorAll('.mermaid-diagram-wrapper'));
+      const mermaidWrappers = Array.from(
+        exportClone.querySelectorAll(".mermaid-diagram-wrapper"),
+      );
       if (mermaidWrappers.length > 0) {
         const exportMode = (() => {
-          const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-          if (currentTheme === 'high-contrast') return 'high-contrast';
-          if (currentTheme === 'dark') return 'dark';
-          if (currentTheme === 'auto' || !currentTheme) {
-            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          const currentTheme =
+            document.documentElement.getAttribute("data-theme") || "light";
+          if (currentTheme === "high-contrast") return "high-contrast";
+          if (currentTheme === "dark") return "dark";
+          if (currentTheme === "auto" || !currentTheme) {
+            return window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light";
           }
-          return 'light';
+          return "light";
         })();
-        const background = getCssVar('--bg-primary', exportMode === 'light' ? '#ffffff' : '#111111');
+        const background = getCssVar(
+          "--bg-primary",
+          exportMode === "light" ? "#ffffff" : "#111111",
+        );
 
         const svgToPngDataUrl = async (svgText: string, bg: string) => {
           const svgWithBg = addSvgBackground(svgText, bg);
-          const blob = new Blob([svgWithBg], { type: 'image/svg+xml;charset=utf-8' });
+          const blob = new Blob([svgWithBg], {
+            type: "image/svg+xml;charset=utf-8",
+          });
           const url = URL.createObjectURL(blob);
           try {
             const image = new Image();
-            image.decoding = 'async';
+            image.decoding = "async";
             await new Promise<void>((resolve, reject) => {
               image.onload = () => resolve();
               image.onerror = reject;
@@ -1536,28 +1681,28 @@ ${htmlContent}
               height = (height * maxWidth) / width;
               width = maxWidth;
             }
-            const canvas = document.createElement('canvas');
+            const canvas = document.createElement("canvas");
             canvas.width = Math.max(1, Math.floor(width));
             canvas.height = Math.max(1, Math.floor(height));
-            const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext("2d");
             if (!ctx) return null;
             ctx.fillStyle = bg;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-            return canvas.toDataURL('image/png', 0.92);
+            return canvas.toDataURL("image/png", 0.92);
           } finally {
             URL.revokeObjectURL(url);
           }
         };
 
         for (const wrapper of mermaidWrappers) {
-          const svgEl = wrapper.querySelector('svg') as SVGElement | null;
+          const svgEl = wrapper.querySelector("svg") as SVGElement | null;
           if (!svgEl) continue;
           const pngDataUrl = await svgToPngDataUrl(svgEl.outerHTML, background);
           if (!pngDataUrl) continue;
-          const img = document.createElement('img');
-          img.setAttribute('src', pngDataUrl);
-          img.setAttribute('alt', 'Mermaid diagram');
+          const img = document.createElement("img");
+          img.setAttribute("src", pngDataUrl);
+          img.setAttribute("alt", "Mermaid diagram");
           wrapper.replaceWith(img);
         }
       }
@@ -1565,7 +1710,8 @@ ${htmlContent}
 
     await prepareExportClone(clone);
 
-    const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+    const currentTheme =
+      document.documentElement.getAttribute("data-theme") || "light";
     const dark = currentTheme === "dark" || currentTheme === "high-contrast";
 
     const htmlContent = clone.innerHTML;
@@ -1788,7 +1934,11 @@ ${htmlContent}
         aria-label="Rendered markdown content"
       >
         <PreviewScrollSync contentRef={contentRef} />
-        <MarkdownRenderer content={content} pagePath={pagePath} onNavigate={onNavigate} />
+        <MarkdownRenderer
+          content={content}
+          pagePath={pagePath}
+          onNavigate={onNavigate}
+        />
       </div>
     </article>
   );

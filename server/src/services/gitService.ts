@@ -120,7 +120,7 @@ export class GitService {
    */
   async commitAllChanges(message: string): Promise<void> {
     if (process.env.TEST_DATA_DIR) {
-      await this.git.raw(['add', '--all']);
+      await this.git.raw(["add", "--all"]);
       await this.git.commit(message);
       return;
     }
@@ -129,7 +129,7 @@ export class GitService {
 
     const newCommit = currentQueue
       .then(async () => {
-        await this.git.raw(['add', '--all']);
+        await this.git.raw(["add", "--all"]);
         await this.git.commit(message);
       })
       .catch((err) => {

@@ -16,7 +16,12 @@ export const movePage = async (req: Request, res: Response) => {
     res.json({ success: true, newPath });
   } catch (error: unknown) {
     console.error("Move page error:", error);
-    res.status(500).json({ error: (error as { message?: string })?.message || "Failed to move page" });
+    res
+      .status(500)
+      .json({
+        error:
+          (error as { message?: string })?.message || "Failed to move page",
+      });
   }
 };
 
@@ -26,12 +31,10 @@ export const getPages = async (req: Request, res: Response) => {
     const pages = await fileSystemService.getPages(folderPath);
     res.json(pages);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Failed to get pages",
-        message: (error as Error).message,
-      });
+    res.status(500).json({
+      error: "Failed to get pages",
+      message: (error as Error).message,
+    });
   }
 };
 
@@ -64,12 +67,10 @@ export const createPage = async (req: Request, res: Response) => {
     await fileSystemService.createPage(path, content || "");
     res.status(201).json({ message: "Page created successfully", path });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Failed to create page",
-        message: (error as Error).message,
-      });
+    res.status(500).json({
+      error: "Failed to create page",
+      message: (error as Error).message,
+    });
   }
 };
 
@@ -90,12 +91,10 @@ export const updatePage = async (req: Request, res: Response) => {
     await fileSystemService.updatePage(path, content);
     res.json({ message: "Page updated successfully", path });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Failed to update page",
-        message: (error as Error).message,
-      });
+    res.status(500).json({
+      error: "Failed to update page",
+      message: (error as Error).message,
+    });
   }
 };
 
@@ -111,12 +110,10 @@ export const deletePage = async (req: Request, res: Response) => {
     await fileSystemService.deletePage(path);
     res.json({ message: "Page deleted successfully", path });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Failed to delete page",
-        message: (error as Error).message,
-      });
+    res.status(500).json({
+      error: "Failed to delete page",
+      message: (error as Error).message,
+    });
   }
 };
 
@@ -133,12 +130,10 @@ export const renamePage = async (req: Request, res: Response) => {
     await fileSystemService.renamePage(oldPath, newPath);
     res.json({ message: "Page renamed successfully", oldPath, newPath });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Failed to rename page",
-        message: (error as Error).message,
-      });
+    res.status(500).json({
+      error: "Failed to rename page",
+      message: (error as Error).message,
+    });
   }
 };
 
@@ -154,12 +149,10 @@ export const getPageHistory = async (req: Request, res: Response) => {
     const history = await gitService.getFileHistory(path);
     res.json(history);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Failed to get page history",
-        message: (error as Error).message,
-      });
+    res.status(500).json({
+      error: "Failed to get page history",
+      message: (error as Error).message,
+    });
   }
 };
 
@@ -182,12 +175,10 @@ export const getPageVersion = async (req: Request, res: Response) => {
 
     res.json(version);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Failed to get page version",
-        message: (error as Error).message,
-      });
+    res.status(500).json({
+      error: "Failed to get page version",
+      message: (error as Error).message,
+    });
   }
 };
 
@@ -212,11 +203,9 @@ export const restorePageVersion = async (req: Request, res: Response) => {
 
     res.json({ message: "Page restored successfully", path, hash });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Failed to restore page version",
-        message: (error as Error).message,
-      });
+    res.status(500).json({
+      error: "Failed to restore page version",
+      message: (error as Error).message,
+    });
   }
 };

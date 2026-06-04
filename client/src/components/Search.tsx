@@ -130,7 +130,11 @@ export const Search: React.FC<SearchProps> = ({ onSelectPage }) => {
         >
           <div className="search-modal" ref={modalRef}>
             <div className="search-input-container">
-              <SearchIcon size={20} className="search-input-icon" aria-hidden="true" />
+              <SearchIcon
+                size={20}
+                className="search-input-icon"
+                aria-hidden="true"
+              />
               <input
                 ref={inputRef}
                 type="text"

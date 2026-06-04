@@ -145,7 +145,9 @@ export const Attachments: React.FC<AttachmentsProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
-          <h3 id="attachments-title"><Paperclip size={18} /> Attachments</h3>
+          <h3 id="attachments-title">
+            <Paperclip size={18} /> Attachments
+          </h3>
           <button
             className="modal-close"
             onClick={onClose}
@@ -225,7 +227,8 @@ export const Attachments: React.FC<AttachmentsProps> = ({
                     >
                       <div className="file-name">{file.name}</div>
                       <div className="file-meta">
-                        {formatFileSize(file.size)} · {new Date(file.modified).toLocaleDateString()}
+                        {formatFileSize(file.size)} ·{" "}
+                        {new Date(file.modified).toLocaleDateString()}
                       </div>
                     </div>
                     <div className="file-actions">

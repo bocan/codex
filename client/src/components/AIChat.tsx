@@ -1,32 +1,54 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { Send, Trash2, StopCircle, Bot, Server, ChevronDown, X, Copy, Check, Download, Settings2, Brain } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { api } from '../services/api';
-import { AIAccount, ChatMessage, AIConfig, TokenUsage } from '../types';
-import './AIChat.css';
+import { useState, useRef, useEffect, useCallback } from "react";
+import {
+  Send,
+  Trash2,
+  StopCircle,
+  Bot,
+  Server,
+  ChevronDown,
+  X,
+  Copy,
+  Check,
+  Download,
+  Settings2,
+  Brain,
+} from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import {
+  oneDark,
+  oneLight,
+} from "react-syntax-highlighter/dist/esm/styles/prism";
+import { api } from "../services/api";
+import { AIAccount, ChatMessage, AIConfig, TokenUsage } from "../types";
+import "./AIChat.css";
 
 // Code block with copy button for markdown rendering
-const CodeBlock: React.FC<{ language?: string; children: string }> = ({ language, children }) => {
+const CodeBlock: React.FC<{ language?: string; children: string }> = ({
+  language,
+  children,
+}) => {
   const [copied, setCopied] = useState(false);
   const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
     const updateTheme = () => {
-      const theme = document.documentElement.getAttribute('data-theme');
-      if (theme === 'dark' || theme === 'high-contrast') {
+      const theme = document.documentElement.getAttribute("data-theme");
+      if (theme === "dark" || theme === "high-contrast") {
         setIsDark(true);
-      } else if (theme === 'auto' || !theme) {
-        setIsDark(window.matchMedia('(prefers-color-scheme: dark)').matches);
+      } else if (theme === "auto" || !theme) {
+        setIsDark(window.matchMedia("(prefers-color-scheme: dark)").matches);
       } else {
         setIsDark(false);
       }
     };
     updateTheme();
     const observer = new MutationObserver(updateTheme);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
     return () => observer.disconnect();
   }, []);
 
@@ -36,15 +58,19 @@ const CodeBlock: React.FC<{ language?: string; children: string }> = ({ language
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      console.error("Failed to copy:", err);
     }
   }, [children]);
 
   return (
-    <div className={`ai-code-block ${isDark ? 'dark' : 'light'}`}>
+    <div className={`ai-code-block ${isDark ? "dark" : "light"}`}>
       <div className="ai-code-header">
-        <span className="ai-code-lang">{language || 'code'}</span>
-        <button className="ai-code-copy" onClick={handleCopy} title={copied ? 'Copied!' : 'Copy'}>
+        <span className="ai-code-lang">{language || "code"}</span>
+        <button
+          className="ai-code-copy"
+          onClick={handleCopy}
+          title={copied ? "Copied!" : "Copy"}
+        >
           {copied ? <Check size={12} /> : <Copy size={12} />}
         </button>
       </div>
@@ -52,7 +78,12 @@ const CodeBlock: React.FC<{ language?: string; children: string }> = ({ language
         style={isDark ? oneDark : oneLight}
         language={language}
         PreTag="div"
-        customStyle={{ margin: 0, borderRadius: 0, fontSize: '13px', border: 'none' }}
+        customStyle={{
+          margin: 0,
+          borderRadius: 0,
+          fontSize: "13px",
+          border: "none",
+        }}
       >
         {children}
       </SyntaxHighlighter>
@@ -69,31 +100,42 @@ interface AIChatProps {
   onClose?: () => void;
 }
 
-export function AIChat({ accounts, documentContext, enabled = true, messages: externalMessages, onMessagesChange, onClose }: AIChatProps) {
+export function AIChat({
+  accounts,
+  documentContext,
+  enabled = true,
+  messages: externalMessages,
+  onMessagesChange,
+  onClose,
+}: AIChatProps) {
   // Use external messages if provided, otherwise use internal state
   const [internalMessages, setInternalMessages] = useState<ChatMessage[]>([]);
   const messages = externalMessages ?? internalMessages;
 
   // Wrapper to handle both external and internal message updates
-  const updateMessages = useCallback((updater: ChatMessage[] | ((prev: ChatMessage[]) => ChatMessage[])) => {
-    if (onMessagesChange) {
-      // External state: resolve the updater and pass the result
-      const newMessages = typeof updater === 'function'
-        ? updater(externalMessages ?? [])
-        : updater;
-      onMessagesChange(newMessages);
-    } else {
-      // Internal state: pass directly to setState
-      setInternalMessages(updater);
-    }
-  }, [onMessagesChange, externalMessages]);
+  const updateMessages = useCallback(
+    (updater: ChatMessage[] | ((prev: ChatMessage[]) => ChatMessage[])) => {
+      if (onMessagesChange) {
+        // External state: resolve the updater and pass the result
+        const newMessages =
+          typeof updater === "function"
+            ? updater(externalMessages ?? [])
+            : updater;
+        onMessagesChange(newMessages);
+      } else {
+        // Internal state: pass directly to setState
+        setInternalMessages(updater);
+      }
+    },
+    [onMessagesChange, externalMessages],
+  );
 
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
-  const [streamingContent, setStreamingContent] = useState('');
-  const [streamingThinking, setStreamingThinking] = useState('');
-  const [selectedAccountId, setSelectedAccountId] = useState<string>('');
-  const [selectedModel, setSelectedModel] = useState<string>('');
+  const [streamingContent, setStreamingContent] = useState("");
+  const [streamingThinking, setStreamingThinking] = useState("");
+  const [selectedAccountId, setSelectedAccountId] = useState<string>("");
+  const [selectedModel, setSelectedModel] = useState<string>("");
   const [availableModels, setAvailableModels] = useState<string[]>([]);
   const [loadingModels, setLoadingModels] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -101,7 +143,7 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
   const [showModelDropdown, setShowModelDropdown] = useState(false);
   const [tokenUsage, setTokenUsage] = useState<TokenUsage | null>(null);
   const [showSettings, setShowSettings] = useState(false);
-  const [systemPrompt, setSystemPrompt] = useState('');
+  const [systemPrompt, setSystemPrompt] = useState("");
   const [enableThinking, setEnableThinking] = useState(false);
   const [copiedMessageIdx, setCopiedMessageIdx] = useState<number | null>(null);
 
@@ -111,8 +153,8 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
   const dropdownRef = useRef<HTMLDivElement>(null);
   const modelDropdownRef = useRef<HTMLDivElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
-  const streamingContentRef = useRef('');
-  const streamingThinkingRef = useRef('');
+  const streamingContentRef = useRef("");
+  const streamingThinkingRef = useRef("");
 
   // Auto-select first account if none selected
   useEffect(() => {
@@ -121,16 +163,17 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
     }
   }, [accounts, selectedAccountId]);
 
-  const selectedAccount = accounts.find(a => a.id === selectedAccountId);
+  const selectedAccount = accounts.find((a) => a.id === selectedAccountId);
 
   // Fetch available models when Ollama account is selected
   useEffect(() => {
-    if (selectedAccount?.type === 'ollama') {
+    if (selectedAccount?.type === "ollama") {
       setLoadingModels(true);
       setAvailableModels([]);
-      setSelectedModel('');
-      api.getOllamaModels(selectedAccount.host, selectedAccount.port)
-        .then(models => {
+      setSelectedModel("");
+      api
+        .getOllamaModels(selectedAccount.host, selectedAccount.port)
+        .then((models) => {
           setAvailableModels(models);
           if (models.length > 0) {
             setSelectedModel(models[0]);
@@ -140,54 +183,66 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
         .catch(() => {
           setAvailableModels([]);
           setLoadingModels(false);
-          setError('Failed to fetch Ollama models. Is Ollama running?');
+          setError("Failed to fetch Ollama models. Is Ollama running?");
         });
-    } else if (selectedAccount?.type === 'anthropic') {
+    } else if (selectedAccount?.type === "anthropic") {
       // Reset model state for Anthropic (uses default)
       setAvailableModels([]);
-      setSelectedModel('');
+      setSelectedModel("");
     }
   }, [selectedAccount]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, streamingContent]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setShowAccountDropdown(false);
       }
-      if (modelDropdownRef.current && !modelDropdownRef.current.contains(e.target as Node)) {
+      if (
+        modelDropdownRef.current &&
+        !modelDropdownRef.current.contains(e.target as Node)
+      ) {
         setShowModelDropdown(false);
       }
-      if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
+      if (
+        settingsRef.current &&
+        !settingsRef.current.contains(e.target as Node)
+      ) {
         setShowSettings(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const buildConfig = useCallback((account: AIAccount): AIConfig => {
-    if (account.type === 'anthropic') {
-      return {
-        type: 'anthropic',
-        apiKey: account.apiKey,
-        enableThinking,
-        thinkingBudget: enableThinking ? 10000 : undefined,
-      };
-    } else {
-      return {
-        type: 'ollama',
-        host: account.host,
-        port: account.port,
-        model: selectedModel || undefined,
-      };
-    }
-  }, [selectedModel, enableThinking]);
+  const buildConfig = useCallback(
+    (account: AIAccount): AIConfig => {
+      if (account.type === "anthropic") {
+        return {
+          type: "anthropic",
+          apiKey: account.apiKey,
+          enableThinking,
+          thinkingBudget: enableThinking ? 10000 : undefined,
+        };
+      } else {
+        return {
+          type: "ollama",
+          host: account.host,
+          port: account.port,
+          model: selectedModel || undefined,
+        };
+      }
+    },
+    [selectedModel, enableThinking],
+  );
 
   const copyMessage = useCallback(async (content: string, idx: number) => {
     try {
@@ -195,7 +250,7 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
       setCopiedMessageIdx(idx);
       setTimeout(() => setCopiedMessageIdx(null), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      console.error("Failed to copy:", err);
     }
   }, []);
 
@@ -203,18 +258,23 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
     const exportData = {
       exportedAt: new Date().toISOString(),
       account: selectedAccount?.name,
-      model: selectedAccount?.type === 'ollama' ? selectedModel : 'claude-sonnet-4-20250514',
+      model:
+        selectedAccount?.type === "ollama"
+          ? selectedModel
+          : "claude-sonnet-4-20250514",
       systemPrompt: systemPrompt || undefined,
       tokenUsage,
-      messages: messages.map(m => ({
+      messages: messages.map((m) => ({
         role: m.role,
         content: m.content,
         thinking: m.thinking,
       })),
     };
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: "application/json",
+    });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = `chat-export-${new Date().toISOString().slice(0, 10)}.json`;
     document.body.appendChild(a);
@@ -227,26 +287,26 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
     if (!input.trim() || isStreaming || !selectedAccount || !enabled) return;
 
     // For Ollama, ensure a model is selected
-    if (selectedAccount.type === 'ollama' && !selectedModel) {
-      setError('Please select a model first');
+    if (selectedAccount.type === "ollama" && !selectedModel) {
+      setError("Please select a model first");
       return;
     }
 
     const userMessage: ChatMessage = {
-      role: 'user',
+      role: "user",
       content: input.trim(),
     };
 
-    updateMessages(prev => [...prev, userMessage]);
-    setInput('');
+    updateMessages((prev) => [...prev, userMessage]);
+    setInput("");
     setError(null);
     setIsStreaming(true);
-    setStreamingContent('');
-    setStreamingThinking('');
+    setStreamingContent("");
+    setStreamingThinking("");
 
     // Reset refs
-    streamingContentRef.current = '';
-    streamingThinkingRef.current = '';
+    streamingContentRef.current = "";
+    streamingThinkingRef.current = "";
 
     const allMessages = [...messages, userMessage];
     const config = buildConfig(selectedAccount);
@@ -272,19 +332,22 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
           const finalThinking = streamingThinkingRef.current;
 
           // Clear streaming state first
-          setStreamingContent('');
-          setStreamingThinking('');
-          streamingContentRef.current = '';
-          streamingThinkingRef.current = '';
+          setStreamingContent("");
+          setStreamingThinking("");
+          streamingContentRef.current = "";
+          streamingThinkingRef.current = "";
           setIsStreaming(false);
 
           // Add the message using captured values
           if (finalContent) {
-            updateMessages(msgs => [...msgs, {
-              role: 'assistant',
-              content: finalContent,
-              thinking: finalThinking || undefined,
-            }]);
+            updateMessages((msgs) => [
+              ...msgs,
+              {
+                role: "assistant",
+                content: finalContent,
+                thinking: finalThinking || undefined,
+              },
+            ]);
           }
         },
         abortControllerRef.current.signal,
@@ -302,7 +365,7 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
           setTokenUsage({ inputTokens, outputTokens });
         },
         // systemPrompt
-        systemPrompt || undefined
+        systemPrompt || undefined,
       );
     } catch {
       setIsStreaming(false);
@@ -318,31 +381,34 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
     const finalContent = streamingContentRef.current;
     const finalThinking = streamingThinkingRef.current;
 
-    setStreamingContent('');
-    setStreamingThinking('');
-    streamingContentRef.current = '';
-    streamingThinkingRef.current = '';
+    setStreamingContent("");
+    setStreamingThinking("");
+    streamingContentRef.current = "";
+    streamingThinkingRef.current = "";
     setIsStreaming(false);
 
     if (finalContent) {
-      updateMessages(prev => [...prev, {
-        role: 'assistant',
-        content: finalContent,
-        thinking: finalThinking || undefined,
-      }]);
+      updateMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: finalContent,
+          thinking: finalThinking || undefined,
+        },
+      ]);
     }
   };
 
   const handleClear = () => {
     updateMessages([]);
-    setStreamingContent('');
-    setStreamingThinking('');
+    setStreamingContent("");
+    setStreamingThinking("");
     setTokenUsage(null);
     setError(null);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
@@ -389,7 +455,7 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
             >
               {selectedAccount && (
                 <>
-                  {selectedAccount.type === 'anthropic' ? (
+                  {selectedAccount.type === "anthropic" ? (
                     <Bot size={14} className="account-icon anthropic" />
                   ) : (
                     <Server size={14} className="account-icon ollama" />
@@ -402,23 +468,23 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
 
             {showAccountDropdown && (
               <div className="account-dropdown">
-                {accounts.map(account => (
+                {accounts.map((account) => (
                   <button
                     key={account.id}
-                    className={`account-option ${account.id === selectedAccountId ? 'active' : ''}`}
+                    className={`account-option ${account.id === selectedAccountId ? "active" : ""}`}
                     onClick={() => {
                       setSelectedAccountId(account.id);
                       setShowAccountDropdown(false);
                     }}
                   >
-                    {account.type === 'anthropic' ? (
+                    {account.type === "anthropic" ? (
                       <Bot size={14} className="account-icon anthropic" />
                     ) : (
                       <Server size={14} className="account-icon ollama" />
                     )}
                     <span>{account.name}</span>
                     <span className="account-type-label">
-                      {account.type === 'anthropic' ? 'Anthropic' : 'Ollama'}
+                      {account.type === "anthropic" ? "Anthropic" : "Ollama"}
                     </span>
                   </button>
                 ))}
@@ -427,7 +493,7 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
           </div>
 
           {/* Model Selector for Ollama */}
-          {selectedAccount?.type === 'ollama' && (
+          {selectedAccount?.type === "ollama" && (
             <div className="model-selector" ref={modelDropdownRef}>
               <button
                 className="model-selector-button"
@@ -446,10 +512,10 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
 
               {showModelDropdown && availableModels.length > 0 && (
                 <div className="model-dropdown">
-                  {availableModels.map(model => (
+                  {availableModels.map((model) => (
                     <button
                       key={model}
-                      className={`model-option ${model === selectedModel ? 'active' : ''}`}
+                      className={`model-option ${model === selectedModel ? "active" : ""}`}
                       onClick={() => {
                         setSelectedModel(model);
                         setShowModelDropdown(false);
@@ -464,12 +530,12 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
           )}
 
           {/* Thinking Toggle for Anthropic */}
-          {selectedAccount?.type === 'anthropic' && (
+          {selectedAccount?.type === "anthropic" && (
             <button
-              className={`ai-chat-thinking-toggle ${enableThinking ? 'active' : ''}`}
+              className={`ai-chat-thinking-toggle ${enableThinking ? "active" : ""}`}
               onClick={() => setEnableThinking(!enableThinking)}
               disabled={isStreaming}
-              title={enableThinking ? 'Thinking enabled' : 'Enable thinking'}
+              title={enableThinking ? "Thinking enabled" : "Enable thinking"}
             >
               <Brain size={14} />
             </button>
@@ -549,7 +615,7 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
         {messages.map((msg, idx) => (
           <div key={idx} className={`ai-message ai-message-${msg.role}`}>
             {/* Thinking block (collapsible) for assistant messages */}
-            {msg.role === 'assistant' && msg.thinking && (
+            {msg.role === "assistant" && msg.thinking && (
               <details className="ai-thinking-block">
                 <summary className="ai-thinking-summary">
                   <Brain size={12} />
@@ -560,18 +626,26 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
             )}
 
             <div className="ai-message-content">
-              {msg.role === 'assistant' ? (
+              {msg.role === "assistant" ? (
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
                     code: ({ className, children, ...props }) => {
-                      const match = /language-(\w+)/.exec(className || '');
-                      const codeString = String(children).replace(/\n$/, '');
+                      const match = /language-(\w+)/.exec(className || "");
+                      const codeString = String(children).replace(/\n$/, "");
                       // Check if it's a code block (has newlines) vs inline code
-                      if (codeString.includes('\n') || match) {
-                        return <CodeBlock language={match?.[1]}>{codeString}</CodeBlock>;
+                      if (codeString.includes("\n") || match) {
+                        return (
+                          <CodeBlock language={match?.[1]}>
+                            {codeString}
+                          </CodeBlock>
+                        );
                       }
-                      return <code className={className} {...props}>{children}</code>;
+                      return (
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      );
                     },
                   }}
                 >
@@ -586,9 +660,13 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
             <button
               className="ai-message-copy"
               onClick={() => copyMessage(msg.content, idx)}
-              title={copiedMessageIdx === idx ? 'Copied!' : 'Copy message'}
+              title={copiedMessageIdx === idx ? "Copied!" : "Copy message"}
             >
-              {copiedMessageIdx === idx ? <Check size={12} /> : <Copy size={12} />}
+              {copiedMessageIdx === idx ? (
+                <Check size={12} />
+              ) : (
+                <Copy size={12} />
+              )}
             </button>
           </div>
         ))}
@@ -614,12 +692,20 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
                 remarkPlugins={[remarkGfm]}
                 components={{
                   code: ({ className, children, ...props }) => {
-                    const match = /language-(\w+)/.exec(className || '');
-                    const codeString = String(children).replace(/\n$/, '');
-                    if (codeString.includes('\n') || match) {
-                      return <CodeBlock language={match?.[1]}>{codeString}</CodeBlock>;
+                    const match = /language-(\w+)/.exec(className || "");
+                    const codeString = String(children).replace(/\n$/, "");
+                    if (codeString.includes("\n") || match) {
+                      return (
+                        <CodeBlock language={match?.[1]}>
+                          {codeString}
+                        </CodeBlock>
+                      );
                     }
-                    return <code className={className} {...props}>{children}</code>;
+                    return (
+                      <code className={className} {...props}>
+                        {children}
+                      </code>
+                    );
                   },
                 }}
               >
@@ -641,7 +727,9 @@ export function AIChat({ accounts, documentContext, enabled = true, messages: ex
       {/* Token Usage Footer */}
       {tokenUsage && (
         <div className="ai-chat-usage">
-          <span>Tokens: {tokenUsage.inputTokens} in / {tokenUsage.outputTokens} out</span>
+          <span>
+            Tokens: {tokenUsage.inputTokens} in / {tokenUsage.outputTokens} out
+          </span>
         </div>
       )}
 

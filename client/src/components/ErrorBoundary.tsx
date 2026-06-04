@@ -36,7 +36,9 @@ class ErrorBoundary extends Component<Props, State> {
             margin: "20px",
           }}
         >
-          <h2><AlertTriangle size={24} /> Something went wrong</h2>
+          <h2>
+            <AlertTriangle size={24} /> Something went wrong
+          </h2>
           <details style={{ whiteSpace: "pre-wrap", marginTop: "10px" }}>
             <summary>Error details</summary>
             {this.state.error?.toString()}

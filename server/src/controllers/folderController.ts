@@ -6,12 +6,10 @@ export const getFolderTree = async (req: Request, res: Response) => {
     const tree = await fileSystemService.getFolderTree();
     res.json(tree);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Failed to get folder tree",
-        message: (error as Error).message,
-      });
+    res.status(500).json({
+      error: "Failed to get folder tree",
+      message: (error as Error).message,
+    });
   }
 };
 
@@ -27,12 +25,10 @@ export const createFolder = async (req: Request, res: Response) => {
     res.status(201).json({ message: "Folder created successfully", path });
   } catch (error) {
     console.error("Failed to create folder:", error);
-    res
-      .status(500)
-      .json({
-        error: "Failed to create folder",
-        message: (error as Error).message,
-      });
+    res.status(500).json({
+      error: "Failed to create folder",
+      message: (error as Error).message,
+    });
   }
 };
 
@@ -48,12 +44,10 @@ export const deleteFolder = async (req: Request, res: Response) => {
     await fileSystemService.deleteFolder(path);
     res.json({ message: "Folder deleted successfully", path });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Failed to delete folder",
-        message: (error as Error).message,
-      });
+    res.status(500).json({
+      error: "Failed to delete folder",
+      message: (error as Error).message,
+    });
   }
 };
 
@@ -70,12 +64,10 @@ export const renameFolder = async (req: Request, res: Response) => {
     await fileSystemService.renameFolder(oldPath, newPath);
     res.json({ message: "Folder renamed successfully", oldPath, newPath });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: "Failed to rename folder",
-        message: (error as Error).message,
-      });
+    res.status(500).json({
+      error: "Failed to rename folder",
+      message: (error as Error).message,
+    });
   }
 };
 
@@ -87,16 +79,30 @@ export const moveFolder = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "sourcePath is required" });
     }
     if (destinationParentPath === undefined) {
-      return res.status(400).json({ error: "destinationParentPath is required (use empty string for root)" });
+      return res
+        .status(400)
+        .json({
+          error:
+            "destinationParentPath is required (use empty string for root)",
+        });
     }
 
-    const newPath = await fileSystemService.moveFolder(sourcePath, destinationParentPath);
-    res.json({ message: "Folder moved successfully", oldPath: sourcePath, newPath });
+    const newPath = await fileSystemService.moveFolder(
+      sourcePath,
+      destinationParentPath,
+    );
+    res.json({
+      message: "Folder moved successfully",
+      oldPath: sourcePath,
+      newPath,
+    });
   } catch (error) {
     const msg = (error as Error).message;
-    const status = msg.includes("does not exist") ? 404
-      : msg.includes("already exists") || msg.includes("into itself") ? 409
-      : 500;
+    const status = msg.includes("does not exist")
+      ? 404
+      : msg.includes("already exists") || msg.includes("into itself")
+        ? 409
+        : 500;
     res.status(status).json({ error: "Failed to move folder", message: msg });
   }
 };

@@ -3,7 +3,10 @@ import multer from "multer";
 import path from "path";
 import fs from "fs/promises";
 import { DATA_DIR as DEFAULT_DATA_DIR } from "../services/fileSystem";
-import { fileTransferLimiter, fileOperationLimiter } from "../middleware/rateLimiters";
+import {
+  fileTransferLimiter,
+  fileOperationLimiter,
+} from "../middleware/rateLimiters";
 
 const router = Router();
 
@@ -42,7 +45,10 @@ const validatePath = (basePath: string, ...userPath: string[]): string => {
   const resolvedBase = path.resolve(basePath);
 
   // Ensure the resolved path is within the base directory
-  if (!fullPath.startsWith(resolvedBase + path.sep) && fullPath !== resolvedBase) {
+  if (
+    !fullPath.startsWith(resolvedBase + path.sep) &&
+    fullPath !== resolvedBase
+  ) {
     throw new Error("Path traversal detected");
   }
 
@@ -84,23 +90,28 @@ const upload = multer({
 });
 
 // Upload attachment
-router.post("/", fileTransferLimiter, upload.single("file"), async (req: Request, res: Response) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
+router.post(
+  "/",
+  fileTransferLimiter,
+  upload.single("file"),
+  async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
 
-    res.json({
-      name: req.file.filename,
-      originalName: req.file.originalname,
-      size: req.file.size,
-      path: req.file.path,
-    });
-  } catch (error) {
-    console.error("Upload error:", error);
-    res.status(500).json({ error: "Failed to upload file" });
-  }
-});
+      res.json({
+        name: req.file.filename,
+        originalName: req.file.originalname,
+        size: req.file.size,
+        path: req.file.path,
+      });
+    } catch (error) {
+      console.error("Upload error:", error);
+      res.status(500).json({ error: "Failed to upload file" });
+    }
+  },
+);
 
 // List attachments for a folder
 router.get("/", fileTransferLimiter, async (req: Request, res: Response) => {
@@ -142,88 +153,116 @@ router.get("/", fileTransferLimiter, async (req: Request, res: Response) => {
 });
 
 // Delete attachment
-router.delete("/:filename", fileOperationLimiter, async (req: Request, res: Response) => {
-  try {
-    const folderPath = getFolderQueryParam(req);
-    const filenameParam = req.params.filename;
+router.delete(
+  "/:filename",
+  fileOperationLimiter,
+  async (req: Request, res: Response) => {
+    try {
+      const folderPath = getFolderQueryParam(req);
+      const filenameParam = req.params.filename;
 
-    if (!filenameParam || Array.isArray(filenameParam)) {
-      return res.status(400).json({ error: "Invalid filename" });
+      if (!filenameParam || Array.isArray(filenameParam)) {
+        return res.status(400).json({ error: "Invalid filename" });
+      }
+
+      const filename = filenameParam;
+
+      const dataDir = getDataDir();
+
+      // Validate path to prevent traversal - this validates both folderPath and filename
+      const filePath = validatePath(
+        dataDir,
+        folderPath,
+        ".attachments",
+        filename,
+      );
+
+      await fs.unlink(filePath);
+      res.json({ success: true });
+    } catch (error: unknown) {
+      if ((error as { code?: string })?.code === "ENOENT") {
+        return res.status(404).json({ error: "File not found" });
+      }
+      if (
+        (error as { message?: string })?.message === "Path traversal detected"
+      ) {
+        return res.status(403).json({ error: "Invalid file path" });
+      }
+      console.error("Delete attachment error:", error);
+      res.status(500).json({ error: "Failed to delete file" });
     }
-
-    const filename = filenameParam;
-
-    const dataDir = getDataDir();
-
-    // Validate path to prevent traversal - this validates both folderPath and filename
-    const filePath = validatePath(dataDir, folderPath, ".attachments", filename);
-
-    await fs.unlink(filePath);
-    res.json({ success: true });
-  } catch (error: unknown) {
-    if ((error as { code?: string })?.code === "ENOENT") {
-      return res.status(404).json({ error: "File not found" });
-    }
-    if ((error as { message?: string })?.message === "Path traversal detected") {
-      return res.status(403).json({ error: "Invalid file path" });
-    }
-    console.error("Delete attachment error:", error);
-    res.status(500).json({ error: "Failed to delete file" });
-  }
-});
+  },
+);
 
 // Get/download attachment
-router.get("/:filename", fileTransferLimiter, async (req: Request, res: Response) => {
-  try {
-    const folderPath = getFolderQueryParam(req);
-    const filenameParam = req.params.filename;
+router.get(
+  "/:filename",
+  fileTransferLimiter,
+  async (req: Request, res: Response) => {
+    try {
+      const folderPath = getFolderQueryParam(req);
+      const filenameParam = req.params.filename;
 
-    if (!filenameParam || Array.isArray(filenameParam)) {
-      return res.status(400).json({ error: "Invalid filename" });
-    }
-
-    const filename = filenameParam;
-
-    const dataDir = getDataDir();
-
-    // Validate path to prevent traversal - this validates both folderPath and filename
-    const filePath = validatePath(dataDir, folderPath, ".attachments", filename);
-
-    // nosemgrep: javascript.express.security.audit.express-res-sendfile.express-res-sendfile
-    // Safe: filePath has been validated by validatePath() to prevent directory traversal
-    res.sendFile(filePath, { dotfiles: "allow" }, (error) => {
-      if (!error) {
-        return;
+      if (!filenameParam || Array.isArray(filenameParam)) {
+        return res.status(400).json({ error: "Invalid filename" });
       }
 
-      // `send` defaults to ignoring dotfiles; our attachments live under `.attachments`.
-      // Explicitly allow dotfiles above; remaining errors indicate missing/forbidden files.
-      if ((error as { code?: string; statusCode?: number }).code === "ENOENT" || (error as { code?: string; statusCode?: number }).statusCode === 404) {
-        if (!res.headersSent) {
-          res.status(404).json({ error: "File not found" });
+      const filename = filenameParam;
+
+      const dataDir = getDataDir();
+
+      // Validate path to prevent traversal - this validates both folderPath and filename
+      const filePath = validatePath(
+        dataDir,
+        folderPath,
+        ".attachments",
+        filename,
+      );
+
+      // nosemgrep: javascript.express.security.audit.express-res-sendfile.express-res-sendfile
+      // Safe: filePath has been validated by validatePath() to prevent directory traversal
+      res.sendFile(filePath, { dotfiles: "allow" }, (error) => {
+        if (!error) {
+          return;
         }
-        return;
-      }
 
-      if ((error as { code?: string; statusCode?: number }).code === "EACCES" || (error as { code?: string; statusCode?: number }).statusCode === 403) {
-        if (!res.headersSent) {
-          res.status(403).json({ error: "Forbidden" });
+        // `send` defaults to ignoring dotfiles; our attachments live under `.attachments`.
+        // Explicitly allow dotfiles above; remaining errors indicate missing/forbidden files.
+        if (
+          (error as { code?: string; statusCode?: number }).code === "ENOENT" ||
+          (error as { code?: string; statusCode?: number }).statusCode === 404
+        ) {
+          if (!res.headersSent) {
+            res.status(404).json({ error: "File not found" });
+          }
+          return;
         }
-        return;
-      }
 
-      console.error("Get attachment sendFile error:", error);
-      if (!res.headersSent) {
-        res.status(500).json({ error: "Failed to retrieve file" });
+        if (
+          (error as { code?: string; statusCode?: number }).code === "EACCES" ||
+          (error as { code?: string; statusCode?: number }).statusCode === 403
+        ) {
+          if (!res.headersSent) {
+            res.status(403).json({ error: "Forbidden" });
+          }
+          return;
+        }
+
+        console.error("Get attachment sendFile error:", error);
+        if (!res.headersSent) {
+          res.status(500).json({ error: "Failed to retrieve file" });
+        }
+      });
+    } catch (error: unknown) {
+      if (
+        (error as { message?: string })?.message === "Path traversal detected"
+      ) {
+        return res.status(403).json({ error: "Invalid file path" });
       }
-    });
-  } catch (error: unknown) {
-    if ((error as { message?: string })?.message === "Path traversal detected") {
-      return res.status(403).json({ error: "Invalid file path" });
+      console.error("Get attachment error:", error);
+      res.status(500).json({ error: "Failed to retrieve file" });
     }
-    console.error("Get attachment error:", error);
-    res.status(500).json({ error: "Failed to retrieve file" });
-  }
-});
+  },
+);
 
 export default router;

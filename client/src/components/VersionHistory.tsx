@@ -149,7 +149,9 @@ export default function VersionHistory({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="version-history-header">
-          <h2><History size={24} /> Version History</h2>
+          <h2>
+            <History size={24} /> Version History
+          </h2>
           <button className="close-btn" onClick={onClose}>
             <X size={20} />
           </button>

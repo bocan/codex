@@ -23,7 +23,10 @@ import {
   authLimiter,
 } from "./middleware/rateLimiters";
 import { GitService } from "./services/gitService";
-import { DATA_DIR as DEFAULT_DATA_DIR, FileSystemService } from "./services/fileSystem";
+import {
+  DATA_DIR as DEFAULT_DATA_DIR,
+  FileSystemService,
+} from "./services/fileSystem";
 
 const app: Express = express();
 const PORT = process.env.PORT || 3001;
@@ -183,8 +186,10 @@ app.get("/api", (req: Request, res: Response) => {
       },
       templates: {
         "GET /api/templates": {
-          description: "List available page templates (from the data/templates folder)",
-          returns: "Array of templates with path, template name, autoname, and content",
+          description:
+            "List available page templates (from the data/templates folder)",
+          returns:
+            "Array of templates with path, template name, autoname, and content",
           example: `curl ${baseUrl}/api/templates`,
         },
       },
@@ -275,12 +280,30 @@ app.get("/api/health", healthCheckLimiter, (req: Request, res: Response) => {
 });
 
 // Handle .well-known/* routes that aren't supported (for MCP clients doing OAuth discovery)
-app.get("/.well-known/oauth-authorization-server", healthCheckLimiter, (req: Request, res: Response) => {
-  res.status(404).json({ error: "OAuth not supported", message: "This server uses API key authentication" });
-});
-app.get("/.well-known/openid-configuration", healthCheckLimiter, (req: Request, res: Response) => {
-  res.status(404).json({ error: "OIDC not supported", message: "This server uses API key authentication" });
-});
+app.get(
+  "/.well-known/oauth-authorization-server",
+  healthCheckLimiter,
+  (req: Request, res: Response) => {
+    res
+      .status(404)
+      .json({
+        error: "OAuth not supported",
+        message: "This server uses API key authentication",
+      });
+  },
+);
+app.get(
+  "/.well-known/openid-configuration",
+  healthCheckLimiter,
+  (req: Request, res: Response) => {
+    res
+      .status(404)
+      .json({
+        error: "OIDC not supported",
+        message: "This server uses API key authentication",
+      });
+  },
+);
 
 // Serve static files in production
 if (process.env.NODE_ENV === "production") {

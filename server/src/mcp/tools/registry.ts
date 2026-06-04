@@ -3,11 +3,11 @@
  * Central registration point for all Codex MCP tools.
  */
 
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { config } from '../config';
-import type { RegisteredTool, ToolContext, ToolResult } from './types';
-import { asRegisteredTool } from './types';
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import { config } from "../config";
+import type { RegisteredTool, ToolContext, ToolResult } from "./types";
+import { asRegisteredTool } from "./types";
 
 // Import all tools
 import {
@@ -18,7 +18,7 @@ import {
   deletePageTool,
   renamePageTool,
   movePageTool,
-} from './pages';
+} from "./pages";
 
 import {
   listFoldersTool,
@@ -27,14 +27,14 @@ import {
   deleteFolderTool,
   renameFolderTool,
   moveFolderTool,
-} from './folders';
+} from "./folders";
 
 import {
   listAttachmentsTool,
   uploadAttachmentTool,
   deleteAttachmentTool,
   getAttachmentTool,
-} from './attachments';
+} from "./attachments";
 
 /**
  * All registered tools
@@ -66,7 +66,7 @@ export const tools: RegisteredTool[] = [
  * Get a tool by name
  */
 export function getTool(name: string): RegisteredTool | undefined {
-  return tools.find(t => t.name === name);
+  return tools.find((t) => t.name === name);
 }
 
 /**
@@ -75,13 +75,13 @@ export function getTool(name: string): RegisteredTool | undefined {
 export async function executeTool(
   name: string,
   args: Record<string, unknown>,
-  context: ToolContext
+  context: ToolContext,
 ): Promise<ToolResult> {
   const tool = getTool(name);
 
   if (!tool) {
     return {
-      content: [{ type: 'text', text: `Unknown tool: ${name}` }],
+      content: [{ type: "text", text: `Unknown tool: ${name}` }],
       isError: true,
     };
   }
@@ -89,7 +89,7 @@ export async function executeTool(
   // Check for cancellation
   if (context.signal?.aborted) {
     return {
-      content: [{ type: 'text', text: 'Operation was cancelled' }],
+      content: [{ type: "text", text: "Operation was cancelled" }],
       isError: true,
     };
   }
@@ -98,10 +98,10 @@ export async function executeTool(
   const parseResult = tool.inputSchema.safeParse(args);
   if (!parseResult.success) {
     const errors = parseResult.error.issues
-      .map(e => `${e.path.join('.')}: ${e.message}`)
-      .join(', ');
+      .map((e) => `${e.path.join(".")}: ${e.message}`)
+      .join(", ");
     return {
-      content: [{ type: 'text', text: `Invalid input: ${errors}` }],
+      content: [{ type: "text", text: `Invalid input: ${errors}` }],
       isError: true,
     };
   }
@@ -112,12 +112,14 @@ export async function executeTool(
   } catch (error) {
     if (context.signal?.aborted) {
       return {
-        content: [{ type: 'text', text: 'Operation was cancelled' }],
+        content: [{ type: "text", text: "Operation was cancelled" }],
         isError: true,
       };
     }
     return {
-      content: [{ type: 'text', text: `Tool error: ${(error as Error).message}` }],
+      content: [
+        { type: "text", text: `Tool error: ${(error as Error).message}` },
+      ],
       isError: true,
     };
   }
@@ -159,11 +161,13 @@ export function registerTools(server: McpServer): void {
 
         const result = await executeTool(tool.name, args, context);
         return result as CallToolResult;
-      }
+      },
     );
   }
 
   if (config.debug) {
-    console.log(`[MCP] Registered ${tools.length} tools: ${tools.map(t => t.name).join(', ')}`);
+    console.log(
+      `[MCP] Registered ${tools.length} tools: ${tools.map((t) => t.name).join(", ")}`,
+    );
   }
 }

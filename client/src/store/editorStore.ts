@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface EditorState {
   // Content state
@@ -6,7 +6,7 @@ interface EditorState {
   setContent: (content: string) => void;
 
   // Scroll sync state
-  scrollSource: 'editor' | 'preview' | null;
+  scrollSource: "editor" | "preview" | null;
   editorScrollPercent: number;
   previewScrollPercent: number;
 
@@ -17,7 +17,7 @@ interface EditorState {
 
 export const useEditorStore = create<EditorState>((set) => ({
   // Content
-  content: '',
+  content: "",
   setContent: (content) => set({ content }),
 
   // Scroll sync
@@ -27,13 +27,13 @@ export const useEditorStore = create<EditorState>((set) => ({
 
   scrollEditor: (percent) =>
     set({
-      scrollSource: 'editor',
+      scrollSource: "editor",
       editorScrollPercent: percent,
     }),
 
   scrollPreview: (percent) =>
     set({
-      scrollSource: 'preview',
+      scrollSource: "preview",
       previewScrollPercent: percent,
     }),
 

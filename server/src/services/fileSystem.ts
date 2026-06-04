@@ -90,7 +90,7 @@ export class FileSystemService {
    */
   private validatePath(relativePath: string): string {
     // Strip leading slashes to ensure it's treated as relative
-    let normalizedPath = relativePath.replace(/^\/+/, '');
+    let normalizedPath = relativePath.replace(/^\/+/, "");
 
     // Normalize empty paths and root indicators
     if (!normalizedPath || normalizedPath === "/" || normalizedPath === ".") {
@@ -105,7 +105,8 @@ export class FileSystemService {
     // Use path.relative to check if the path is within the data directory
     // If the relative path starts with "..", it's trying to escape
     const relativeToDataDir = path.relative(resolvedDataDir, fullPath);
-    const isOutside = relativeToDataDir.startsWith("..") || path.isAbsolute(relativeToDataDir);
+    const isOutside =
+      relativeToDataDir.startsWith("..") || path.isAbsolute(relativeToDataDir);
 
     if (isOutside) {
       throw new Error("Invalid path: path traversal detected");
@@ -170,7 +171,9 @@ export class FileSystemService {
     try {
       const entries = await fs.readdir(templatesDir, { withFileTypes: true });
       // Seed only when the directory is empty (ignore dotfiles like .DS_Store)
-      const visibleEntries = entries.filter((entry) => !entry.name.startsWith("."));
+      const visibleEntries = entries.filter(
+        (entry) => !entry.name.startsWith("."),
+      );
       shouldSeed = visibleEntries.length === 0;
     } catch (error: unknown) {
       if ((error as NodeJS.ErrnoException)?.code === "ENOENT") {
@@ -188,7 +191,9 @@ export class FileSystemService {
       await fs.mkdir(templatesDir, { recursive: true });
       const seedEntries = await fs.readdir(seedDir, { withFileTypes: true });
       const templateFiles = seedEntries
-        .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".md"))
+        .filter(
+          (entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".md"),
+        )
         .map((entry) => entry.name);
 
       for (const filename of templateFiles) {
@@ -287,7 +292,10 @@ export class FileSystemService {
     this.cache.invalidate(`page:${oldPath}`);
   }
 
-  async moveFolder(sourcePath: string, destinationParentPath: string): Promise<string> {
+  async moveFolder(
+    sourcePath: string,
+    destinationParentPath: string,
+  ): Promise<string> {
     if (!sourcePath || sourcePath === "/" || sourcePath === ".") {
       throw new Error("Cannot move root folder");
     }
@@ -310,7 +318,9 @@ export class FileSystemService {
       sourceStat = await fs.stat(sourceFullPath);
     } catch (error: unknown) {
       if ((error as NodeJS.ErrnoException)?.code === "ENOENT") {
-        throw new Error(`Source folder does not exist: ${sourcePath}`, { cause: error });
+        throw new Error(`Source folder does not exist: ${sourcePath}`, {
+          cause: error,
+        });
       }
       throw error;
     }
@@ -331,9 +341,13 @@ export class FileSystemService {
     const newRelativePath = path.relative(resolvedDataDir, newFullPath);
 
     // Prevent moving a folder into itself or a descendant (compare absolute paths).
-    if (newFullPath === sourceFullPath ||
-        newFullPath.startsWith(sourceFullPath + path.sep)) {
-      throw new Error("Cannot move a folder into itself or one of its subfolders");
+    if (
+      newFullPath === sourceFullPath ||
+      newFullPath.startsWith(sourceFullPath + path.sep)
+    ) {
+      throw new Error(
+        "Cannot move a folder into itself or one of its subfolders",
+      );
     }
 
     // Check destination doesn't already exist — guard immediately before the fs call.
@@ -351,12 +365,18 @@ export class FileSystemService {
     }
 
     // Ensure the destination parent directory exists — guard immediately before the fs call.
-    if (!destParentFullPath.startsWith(resolvedDataDir + path.sep) &&
-        destParentFullPath !== resolvedDataDir) {
-      throw new Error("Invalid path: destination parent is outside data directory");
+    if (
+      !destParentFullPath.startsWith(resolvedDataDir + path.sep) &&
+      destParentFullPath !== resolvedDataDir
+    ) {
+      throw new Error(
+        "Invalid path: destination parent is outside data directory",
+      );
     }
     // Append path.sep so that an exact match on resolvedDataDir also satisfies startsWith
-    const safeDestParent = destParentFullPath.startsWith(resolvedDataDir + path.sep)
+    const safeDestParent = destParentFullPath.startsWith(
+      resolvedDataDir + path.sep,
+    )
       ? destParentFullPath
       : resolvedDataDir;
     await fs.mkdir(safeDestParent, { recursive: true });

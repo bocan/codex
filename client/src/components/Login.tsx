@@ -29,7 +29,8 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     } catch (err: unknown) {
       console.error("Login failed:", err);
       setError(
-        (err as { response?: { data?: { error?: string } } })?.response?.data?.error || "Invalid password"
+        (err as { response?: { data?: { error?: string } } })?.response?.data
+          ?.error || "Invalid password",
       );
     } finally {
       setIsLoading(false);
@@ -40,7 +41,9 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1><NotebookPen size={28} /> {__APP_NAME__}</h1>
+          <h1>
+            <NotebookPen size={28} /> {__APP_NAME__}
+          </h1>
           <p>Enter your password to continue</p>
         </div>
 

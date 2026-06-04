@@ -106,9 +106,11 @@ export const PageList: React.FC<PageListProps> = ({
       if (sortField === "name") {
         comparison = a.name.localeCompare(b.name);
       } else if (sortField === "createdAt") {
-        comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        comparison =
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       } else if (sortField === "modifiedAt") {
-        comparison = new Date(a.modifiedAt).getTime() - new Date(b.modifiedAt).getTime();
+        comparison =
+          new Date(a.modifiedAt).getTime() - new Date(b.modifiedAt).getTime();
       }
       return sortDirection === "asc" ? comparison : -comparison;
     });
@@ -118,7 +120,8 @@ export const PageList: React.FC<PageListProps> = ({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Only handle if list has focus and we're not renaming
-      if (!listRef.current?.contains(document.activeElement) || renamingPage) return;
+      if (!listRef.current?.contains(document.activeElement) || renamingPage)
+        return;
 
       if (e.key === "ArrowDown" || e.key === "j") {
         e.preventDefault();
@@ -150,7 +153,8 @@ export const PageList: React.FC<PageListProps> = ({
     setError(null);
     try {
       // Treat null, undefined, or "/" as root folder
-      const folderPath = !selectedFolder || selectedFolder === "/" ? "" : selectedFolder;
+      const folderPath =
+        !selectedFolder || selectedFolder === "/" ? "" : selectedFolder;
       const data = await api.getPages(folderPath);
       setPages(data);
     } catch (err) {
@@ -352,7 +356,8 @@ export const PageList: React.FC<PageListProps> = ({
     } catch (err: unknown) {
       console.error("Failed to move page:", err);
       setError(
-        (err as { response?: { data?: { error?: string } } })?.response?.data?.error || "Failed to move page. Please try again.",
+        (err as { response?: { data?: { error?: string } } })?.response?.data
+          ?.error || "Failed to move page. Please try again.",
       );
       setMovingPage(null);
     } finally {
@@ -399,11 +404,19 @@ export const PageList: React.FC<PageListProps> = ({
             </select>
             <button
               className="sort-direction-btn"
-              onClick={() => setSortDirection(d => d === "asc" ? "desc" : "asc")}
+              onClick={() =>
+                setSortDirection((d) => (d === "asc" ? "desc" : "asc"))
+              }
               aria-label={`Sort ${sortDirection === "asc" ? "descending" : "ascending"}`}
-              title={sortDirection === "asc" ? "Oldest/A first" : "Newest/Z first"}
+              title={
+                sortDirection === "asc" ? "Oldest/A first" : "Newest/Z first"
+              }
             >
-              {sortDirection === "asc" ? <ArrowUp size={12} /> : <ArrowDown size={12} />}
+              {sortDirection === "asc" ? (
+                <ArrowUp size={12} />
+              ) : (
+                <ArrowDown size={12} />
+              )}
             </button>
           </div>
           <button
@@ -475,7 +488,11 @@ export const PageList: React.FC<PageListProps> = ({
               title={getPageTooltip(page)}
             >
               <span className="page-icon" aria-hidden="true">
-                {isDeleting === page.path ? <Loader2 size={14} className="loading-spinner" /> : <FileText size={14} />}
+                {isDeleting === page.path ? (
+                  <Loader2 size={14} className="loading-spinner" />
+                ) : (
+                  <FileText size={14} />
+                )}
               </span>
               {renamingPage === page.path ? (
                 <input
@@ -547,11 +564,19 @@ export const PageList: React.FC<PageListProps> = ({
             <p className="move-modal-subtitle">Select destination folder:</p>
             {isMoving ? (
               <div className="modal-loading" role="status" aria-live="polite">
-                <Loader2 size={24} className="loading-spinner" aria-hidden="true" />
+                <Loader2
+                  size={24}
+                  className="loading-spinner"
+                  aria-hidden="true"
+                />
                 <span>Moving page...</span>
               </div>
             ) : (
-              <div className="move-picker" role="listbox" aria-label="Destination folder">
+              <div
+                className="move-picker"
+                role="listbox"
+                aria-label="Destination folder"
+              >
                 <button
                   className={`move-picker-item move-picker-root ${moveDestination === "" ? "selected" : ""}`}
                   onClick={() => setMoveDestination("")}
@@ -597,13 +622,25 @@ export const PageList: React.FC<PageListProps> = ({
             <p>Choose a template</p>
 
             {templatesLoading ? (
-              <div className="modal-loading" role="status" aria-label="Loading templates">
-                <Loader2 size={24} className="loading-spinner" aria-hidden="true" />
+              <div
+                className="modal-loading"
+                role="status"
+                aria-label="Loading templates"
+              >
+                <Loader2
+                  size={24}
+                  className="loading-spinner"
+                  aria-hidden="true"
+                />
                 <span>Loading templates...</span>
               </div>
             ) : templatesError ? (
               <div className="error-state" role="alert">
-                <AlertTriangle size={32} className="error-icon" aria-hidden="true" />
+                <AlertTriangle
+                  size={32}
+                  className="error-icon"
+                  aria-hidden="true"
+                />
                 <span>{templatesError}</span>
               </div>
             ) : (

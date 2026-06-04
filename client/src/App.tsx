@@ -44,14 +44,14 @@ import "./App.css";
 // Simple encoding/decoding for API keys (obfuscation, not encryption)
 // This prevents casual observation and satisfies code scanners
 const encodeApiKey = (key: string): string => {
-  if (!key) return '';
-  return btoa(key.split('').reverse().join(''));
+  if (!key) return "";
+  return btoa(key.split("").reverse().join(""));
 };
 
 const decodeApiKey = (encoded: string): string => {
-  if (!encoded) return '';
+  if (!encoded) return "";
   try {
-    return atob(encoded).split('').reverse().join('');
+    return atob(encoded).split("").reverse().join("");
   } catch {
     // If decoding fails (e.g., already plain text from old version), return as-is
     return encoded;
@@ -59,16 +59,16 @@ const decodeApiKey = (encoded: string): string => {
 };
 
 const encodeAccounts = (accounts: AIAccount[]): AIAccount[] =>
-  accounts.map(acc => {
-    if (acc.type === 'anthropic') {
+  accounts.map((acc) => {
+    if (acc.type === "anthropic") {
       return { ...acc, apiKey: encodeApiKey(acc.apiKey) };
     }
     return acc;
   });
 
 const decodeAccounts = (accounts: AIAccount[]): AIAccount[] =>
-  accounts.map(acc => {
-    if (acc.type === 'anthropic') {
+  accounts.map((acc) => {
+    if (acc.type === "anthropic") {
       return { ...acc, apiKey: decodeApiKey(acc.apiKey) };
     }
     return acc;
@@ -112,29 +112,30 @@ function App() {
   const [showAbout, setShowAbout] = useState(false); // About modal visibility
   const [showSettings, setShowSettings] = useState(false); // Settings modal visibility
   const [enableAISearch, setEnableAISearch] = useState(() => {
-    const saved = localStorage.getItem('codex-enable-ai-search');
+    const saved = localStorage.getItem("codex-enable-ai-search");
     // Default to false - user must explicitly enable AI features
-    return saved === 'true' ? true : false;
+    return saved === "true" ? true : false;
   });
 
   // AI Accounts state
   const [aiAccounts, setAiAccounts] = useState<AIAccount[]>(() => {
-    const saved = localStorage.getItem('codex-ai-accounts');
+    const saved = localStorage.getItem("codex-ai-accounts");
     return saved ? decodeAccounts(JSON.parse(saved)) : [];
   });
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
-  const [newAccountType, setNewAccountType] = useState<AIAccountType>('anthropic');
-  const [newAccountName, setNewAccountName] = useState('');
-  const [newAccountApiKey, setNewAccountApiKey] = useState('');
-  const [newAccountHost, setNewAccountHost] = useState('localhost');
-  const [newAccountPort, setNewAccountPort] = useState('11434');
+  const [newAccountType, setNewAccountType] =
+    useState<AIAccountType>("anthropic");
+  const [newAccountName, setNewAccountName] = useState("");
+  const [newAccountApiKey, setNewAccountApiKey] = useState("");
+  const [newAccountHost, setNewAccountHost] = useState("localhost");
+  const [newAccountPort, setNewAccountPort] = useState("11434");
 
   // AI Chat state
   const [showAIChat, setShowAIChat] = useState(false);
   const [aiChatMessages, setAiChatMessages] = useState<ChatMessage[]>([]);
   const [aiChatHeight, setAiChatHeight] = useState(() => {
-    const saved = localStorage.getItem('codex-ai-chat-height');
+    const saved = localStorage.getItem("codex-ai-chat-height");
     return saved ? parseInt(saved, 10) : DEFAULT_CHAT_HEIGHT;
   });
 
@@ -175,27 +176,29 @@ function App() {
 
       // Determine current breakpoint bucket
       const breakpoint =
-        width <= MOBILE_BREAKPOINT ? 'mobile' :
-        width <= TABLET_BREAKPOINT ? 'tablet' :
-        'desktop';
+        width <= MOBILE_BREAKPOINT
+          ? "mobile"
+          : width <= TABLET_BREAKPOINT
+            ? "tablet"
+            : "desktop";
 
       // Only act when crossing a breakpoint boundary (including initial mount)
       if (breakpoint !== lastBreakpointRef.current) {
         const prev = lastBreakpointRef.current;
         lastBreakpointRef.current = breakpoint;
 
-        if (breakpoint === 'mobile') {
+        if (breakpoint === "mobile") {
           setLeftPaneCollapsed(true);
           setRightPaneCollapsed(true);
-        } else if (breakpoint === 'tablet') {
+        } else if (breakpoint === "tablet") {
           setRightPaneCollapsed(true);
-          if (prev === 'mobile') setLeftPaneCollapsed(false);
+          if (prev === "mobile") setLeftPaneCollapsed(false);
         } else {
           // Desktop: restore panes that were auto-collapsed
-          if (prev === 'mobile') {
+          if (prev === "mobile") {
             setLeftPaneCollapsed(false);
             setRightPaneCollapsed(false);
-          } else if (prev === 'tablet') {
+          } else if (prev === "tablet") {
             setRightPaneCollapsed(false);
           }
         }
@@ -293,11 +296,11 @@ function App() {
 
   // AI Account handlers
   const resetAccountForm = () => {
-    setNewAccountName('');
-    setNewAccountApiKey('');
-    setNewAccountHost('localhost');
-    setNewAccountPort('11434');
-    setNewAccountType('anthropic');
+    setNewAccountName("");
+    setNewAccountApiKey("");
+    setNewAccountHost("localhost");
+    setNewAccountPort("11434");
+    setNewAccountType("anthropic");
     setEditingAccountId(null);
   };
 
@@ -305,17 +308,17 @@ function App() {
     const id = editingAccountId || crypto.randomUUID();
     let account: AIAccount;
 
-    if (newAccountType === 'anthropic') {
+    if (newAccountType === "anthropic") {
       account = {
         id,
-        type: 'anthropic',
+        type: "anthropic",
         name: newAccountName.trim(),
         apiKey: newAccountApiKey.trim(),
       };
     } else {
       account = {
         id,
-        type: 'ollama',
+        type: "ollama",
         name: newAccountName.trim(),
         host: newAccountHost.trim(),
         port: parseInt(newAccountPort, 10) || 11434,
@@ -325,14 +328,19 @@ function App() {
     let updated: AIAccount[];
     if (editingAccountId) {
       // Update existing
-      updated = aiAccounts.map(acc => acc.id === editingAccountId ? account : acc);
+      updated = aiAccounts.map((acc) =>
+        acc.id === editingAccountId ? account : acc,
+      );
     } else {
       // Add new
       updated = [...aiAccounts, account];
     }
 
     setAiAccounts(updated);
-    localStorage.setItem('codex-ai-accounts', JSON.stringify(encodeAccounts(updated)));
+    localStorage.setItem(
+      "codex-ai-accounts",
+      JSON.stringify(encodeAccounts(updated)),
+    );
 
     // Reset form and close modal
     resetAccountForm();
@@ -343,12 +351,12 @@ function App() {
     setEditingAccountId(account.id);
     setNewAccountType(account.type);
     setNewAccountName(account.name);
-    if (account.type === 'anthropic') {
+    if (account.type === "anthropic") {
       setNewAccountApiKey(account.apiKey);
-      setNewAccountHost('localhost');
-      setNewAccountPort('11434');
+      setNewAccountHost("localhost");
+      setNewAccountPort("11434");
     } else {
-      setNewAccountApiKey('');
+      setNewAccountApiKey("");
       setNewAccountHost(account.host);
       setNewAccountPort(String(account.port));
     }
@@ -356,15 +364,19 @@ function App() {
   };
 
   const handleDeleteAccount = (id: string) => {
-    const updated = aiAccounts.filter(acc => acc.id !== id);
+    const updated = aiAccounts.filter((acc) => acc.id !== id);
     setAiAccounts(updated);
-    localStorage.setItem('codex-ai-accounts', JSON.stringify(encodeAccounts(updated)));
+    localStorage.setItem(
+      "codex-ai-accounts",
+      JSON.stringify(encodeAccounts(updated)),
+    );
   };
 
   const isAddAccountValid = () => {
     if (!newAccountName.trim()) return false;
-    if (newAccountType === 'anthropic' && !newAccountApiKey.trim()) return false;
-    if (newAccountType === 'ollama' && !newAccountHost.trim()) return false;
+    if (newAccountType === "anthropic" && !newAccountApiKey.trim())
+      return false;
+    if (newAccountType === "ollama" && !newAccountHost.trim()) return false;
     return true;
   };
 
@@ -381,10 +393,7 @@ function App() {
   }, [leftPaneWidth]);
 
   useEffect(() => {
-    localStorage.setItem(
-      "codex-right-pane-width",
-      rightPaneWidth.toString(),
-    );
+    localStorage.setItem("codex-right-pane-width", rightPaneWidth.toString());
   }, [rightPaneWidth]);
 
   useEffect(() => {
@@ -395,10 +404,7 @@ function App() {
   }, [folderTreeHeight]);
 
   useEffect(() => {
-    localStorage.setItem(
-      "codex-ai-chat-height",
-      aiChatHeight.toString(),
-    );
+    localStorage.setItem("codex-ai-chat-height", aiChatHeight.toString());
   }, [aiChatHeight]);
 
   // Apply theme to document
@@ -548,7 +554,8 @@ function App() {
       } catch (error: unknown) {
         console.error("Failed to check for README.md:", error);
         const message =
-          (error as { response?: { status?: number } })?.response?.status === 401
+          (error as { response?: { status?: number } })?.response?.status ===
+          401
             ? "Session expired. Please log in again."
             : `Failed to load pages from folder: ${path}`;
         setError(message);
@@ -626,7 +633,9 @@ function App() {
       <header className="app-header" role="banner">
         <div className="header-content">
           <div className="header-left">
-            <h1><NotebookPen size={24} /> {__APP_NAME__}</h1>
+            <h1>
+              <NotebookPen size={24} /> {__APP_NAME__}
+            </h1>
             <p className="tagline">{__APP_DESCRIPTION__}</p>
           </div>
           <nav className="breadcrumbs" aria-label="Breadcrumb navigation">
@@ -659,7 +668,9 @@ function App() {
               title={`Theme: ${theme} (click to cycle)`}
               aria-label={`Current theme: ${theme}. Click to cycle themes.`}
             >
-              <span aria-hidden="true" style={{ display: 'flex' }}>{getThemeIcon()}</span>
+              <span aria-hidden="true" style={{ display: "flex" }}>
+                {getThemeIcon()}
+              </span>
             </button>
             {authEnabled && (
               <button
@@ -700,10 +711,7 @@ function App() {
           aria-modal="true"
           aria-labelledby="about-title"
         >
-          <div
-            className="about-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="about-modal" onClick={(e) => e.stopPropagation()}>
             <button
               className="about-close"
               onClick={() => setShowAbout(false)}
@@ -711,7 +719,9 @@ function App() {
             >
               <X size={18} />
             </button>
-            <h2 id="about-title"><NotebookPen size={24} /> {__APP_NAME__}</h2>
+            <h2 id="about-title">
+              <NotebookPen size={24} /> {__APP_NAME__}
+            </h2>
             <p className="about-version">
               <a
                 href="https://github.com/bocan/codex/blob/main/CHANGELOG.md"
@@ -722,23 +732,53 @@ function App() {
                 Version {__APP_VERSION__}
               </a>
             </p>
-            <p className="about-author">Developed by <a href="https://chris.funderburg.me" target="_blank" rel="noopener noreferrer">Chris Funderburg</a></p>
+            <p className="about-author">
+              Developed by{" "}
+              <a
+                href="https://chris.funderburg.me"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Chris Funderburg
+              </a>
+            </p>
             <p className="about-description">
-              {__APP_DESCRIPTION__} — with real-time markdown editing,
-              live preview, and Git-based version control.
+              {__APP_DESCRIPTION__} — with real-time markdown editing, live
+              preview, and Git-based version control.
             </p>
             <h3>Features</h3>
             <ul className="about-features">
-              <li><FolderOpen size={14} /> Hierarchical folder organization</li>
-              <li><Pencil size={14} /> Live markdown editor</li>
-              <li><Eye size={14} /> Real-time synchronized preview</li>
-              <li><Highlighter size={14} /> Syntax highlighting for code blocks (auto-detect or specify language)</li>
-              <li><SearchIcon size={14} /> Full-text search across all documents</li>
-              <li><Paperclip size={14} /> File attachments with drag-and-drop</li>
-              <li><GitBranch size={14} /> Git-powered version history</li>
-              <li><SunMoon size={14} /> Light, dark, and high-contrast themes</li>
-              <li><Smartphone size={14} /> Responsive design for mobile devices</li>
-              <li><Lock size={14} /> Optional password protection</li>
+              <li>
+                <FolderOpen size={14} /> Hierarchical folder organization
+              </li>
+              <li>
+                <Pencil size={14} /> Live markdown editor
+              </li>
+              <li>
+                <Eye size={14} /> Real-time synchronized preview
+              </li>
+              <li>
+                <Highlighter size={14} /> Syntax highlighting for code blocks
+                (auto-detect or specify language)
+              </li>
+              <li>
+                <SearchIcon size={14} /> Full-text search across all documents
+              </li>
+              <li>
+                <Paperclip size={14} /> File attachments with drag-and-drop
+              </li>
+              <li>
+                <GitBranch size={14} /> Git-powered version history
+              </li>
+              <li>
+                <SunMoon size={14} /> Light, dark, and high-contrast themes
+              </li>
+              <li>
+                <Smartphone size={14} /> Responsive design for mobile devices
+              </li>
+              <li>
+                <Lock size={14} /> Optional password protection
+              </li>
             </ul>
           </div>
         </div>
@@ -753,10 +793,7 @@ function App() {
           aria-modal="true"
           aria-labelledby="settings-title"
         >
-          <div
-            className="settings-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
             <button
               className="settings-close"
               onClick={() => setShowSettings(false)}
@@ -764,7 +801,9 @@ function App() {
             >
               <X size={18} />
             </button>
-            <h2 id="settings-title"><Settings size={24} /> Settings</h2>
+            <h2 id="settings-title">
+              <Settings size={24} /> Settings
+            </h2>
 
             <section className="settings-group">
               <h3>AI Connectivity</h3>
@@ -774,16 +813,26 @@ function App() {
                   checked={enableAISearch}
                   onChange={(e) => {
                     setEnableAISearch(e.target.checked);
-                    localStorage.setItem('codex-enable-ai-search', String(e.target.checked));
+                    localStorage.setItem(
+                      "codex-enable-ai-search",
+                      String(e.target.checked),
+                    );
                   }}
                 />
                 <span className="settings-option-text">
-                  <span className="settings-option-label">Enable contextual AI searching</span>
-                  <span className="settings-option-description">Use AI to enhance search results with contextual understanding</span>
+                  <span className="settings-option-label">
+                    Enable contextual AI searching
+                  </span>
+                  <span className="settings-option-description">
+                    Use AI to enhance search results with contextual
+                    understanding
+                  </span>
                 </span>
               </label>
 
-              <div className={`ai-accounts-section ${!enableAISearch ? 'disabled' : ''}`}>
+              <div
+                className={`ai-accounts-section ${!enableAISearch ? "disabled" : ""}`}
+              >
                 <button
                   className="add-account-button"
                   onClick={() => {
@@ -800,16 +849,24 @@ function App() {
                     {aiAccounts.map((account) => (
                       <li key={account.id} className="ai-account-item">
                         <div className="ai-account-info">
-                          {account.type === 'anthropic' ? (
-                            <Bot size={16} className="ai-account-icon anthropic" />
+                          {account.type === "anthropic" ? (
+                            <Bot
+                              size={16}
+                              className="ai-account-icon anthropic"
+                            />
                           ) : (
-                            <Server size={16} className="ai-account-icon ollama" />
+                            <Server
+                              size={16}
+                              className="ai-account-icon ollama"
+                            />
                           )}
                           <div className="ai-account-details">
-                            <span className="ai-account-name">{account.name}</span>
+                            <span className="ai-account-name">
+                              {account.name}
+                            </span>
                             <span className="ai-account-type">
-                              {account.type === 'anthropic'
-                                ? 'Anthropic'
+                              {account.type === "anthropic"
+                                ? "Anthropic"
                                 : `Ollama (${account.host}:${account.port})`}
                             </span>
                           </div>
@@ -869,21 +926,25 @@ function App() {
               <X size={18} />
             </button>
             <h2 id="add-account-title">
-              {newAccountType === 'anthropic' ? <Bot size={24} /> : <Server size={24} />}
-              {editingAccountId ? 'Edit AI Account' : 'Add AI Account'}
+              {newAccountType === "anthropic" ? (
+                <Bot size={24} />
+              ) : (
+                <Server size={24} />
+              )}
+              {editingAccountId ? "Edit AI Account" : "Add AI Account"}
             </h2>
 
             <div className="account-type-selector">
               <button
-                className={`account-type-btn ${newAccountType === 'anthropic' ? 'active' : ''}`}
-                onClick={() => setNewAccountType('anthropic')}
+                className={`account-type-btn ${newAccountType === "anthropic" ? "active" : ""}`}
+                onClick={() => setNewAccountType("anthropic")}
               >
                 <Bot size={20} />
                 Anthropic
               </button>
               <button
-                className={`account-type-btn ${newAccountType === 'ollama' ? 'active' : ''}`}
-                onClick={() => setNewAccountType('ollama')}
+                className={`account-type-btn ${newAccountType === "ollama" ? "active" : ""}`}
+                onClick={() => setNewAccountType("ollama")}
               >
                 <Server size={20} />
                 Ollama
@@ -898,11 +959,15 @@ function App() {
                   type="text"
                   value={newAccountName}
                   onChange={(e) => setNewAccountName(e.target.value)}
-                  placeholder={newAccountType === 'anthropic' ? 'e.g., Personal Key' : 'e.g., Local Server'}
+                  placeholder={
+                    newAccountType === "anthropic"
+                      ? "e.g., Personal Key"
+                      : "e.g., Local Server"
+                  }
                 />
               </div>
 
-              {newAccountType === 'anthropic' ? (
+              {newAccountType === "anthropic" ? (
                 <div className="form-field">
                   <label htmlFor="api-key">API Key</label>
                   <input
@@ -954,7 +1019,7 @@ function App() {
                 onClick={handleSaveAccount}
                 disabled={!isAddAccountValid()}
               >
-                {editingAccountId ? 'Save Changes' : 'Add Account'}
+                {editingAccountId ? "Save Changes" : "Add Account"}
               </button>
             </div>
           </div>
@@ -981,7 +1046,10 @@ function App() {
             className={`panes-container ${isMobile && (!leftPaneCollapsed || !rightPaneCollapsed) ? "overlay-active" : ""}`}
             onClick={(e) => {
               // Only handle overlay clicks (not clicks on panes themselves)
-              if (e.target === e.currentTarget || (e.target as HTMLElement).classList.contains('panes-container')) {
+              if (
+                e.target === e.currentTarget ||
+                (e.target as HTMLElement).classList.contains("panes-container")
+              ) {
                 handleOverlayClick();
               }
             }}
@@ -998,7 +1066,13 @@ function App() {
             <aside
               ref={leftPaneRef}
               className={`left-pane ${leftPaneCollapsed ? "collapsed" : ""}`}
-              style={{ width: leftPaneCollapsed ? "0" : (isMobile ? undefined : `${leftPaneWidth}px`) }}
+              style={{
+                width: leftPaneCollapsed
+                  ? "0"
+                  : isMobile
+                    ? undefined
+                    : `${leftPaneWidth}px`,
+              }}
               aria-label="Folder and page navigation"
               aria-hidden={leftPaneCollapsed}
             >
@@ -1076,11 +1150,15 @@ function App() {
                   <ChevronLeft size={14} aria-hidden="true" />
                 </button>
               )}
-              <div className="editor-container" style={{ flex: showAIChat ? `1 1 calc(100% - ${aiChatHeight}px)` : '1 1 100%' }}>
-                <Editor
-                  pagePath={selectedPage}
-                  onClose={handleCloseEditor}
-                />
+              <div
+                className="editor-container"
+                style={{
+                  flex: showAIChat
+                    ? `1 1 calc(100% - ${aiChatHeight}px)`
+                    : "1 1 100%",
+                }}
+              >
+                <Editor pagePath={selectedPage} onClose={handleCloseEditor} />
                 {!showAIChat && enableAISearch && (
                   <button
                     className="expand-btn expand-btn-bottom"
@@ -1094,7 +1172,10 @@ function App() {
                 )}
               </div>
               {showAIChat && (
-                <div className="ai-chat-container" style={{ height: `${aiChatHeight}px` }}>
+                <div
+                  className="ai-chat-container"
+                  style={{ height: `${aiChatHeight}px` }}
+                >
                   <div
                     className="resize-handle resize-handle-top"
                     onMouseDown={handleChatResizeStart}
@@ -1118,7 +1199,11 @@ function App() {
             <aside
               className={`right-pane ${rightPaneCollapsed ? "collapsed" : ""}`}
               style={{
-                width: rightPaneCollapsed ? "0" : (isMobile ? undefined : `${rightPaneWidth}px`),
+                width: rightPaneCollapsed
+                  ? "0"
+                  : isMobile
+                    ? undefined
+                    : `${rightPaneWidth}px`,
               }}
               aria-label="Markdown preview"
               aria-hidden={rightPaneCollapsed}

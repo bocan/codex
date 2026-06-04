@@ -3,7 +3,7 @@
  * Based on the latest MCP SDK patterns.
  */
 
-import type { ZodObject, ZodRawShape, z } from 'zod';
+import type { ZodObject, ZodRawShape, z } from "zod";
 
 /**
  * Context passed to every tool handler.
@@ -25,7 +25,10 @@ export interface ToolContext {
  * Per MCP spec: content is always required, structuredContent when outputSchema defined.
  */
 export interface ToolResult {
-  content: Array<{ type: 'text'; text: string } | { type: 'image'; data: string; mimeType: string }>;
+  content: Array<
+    | { type: "text"; text: string }
+    | { type: "image"; data: string; mimeType: string }
+  >;
   structuredContent?: Record<string, unknown>;
   isError?: boolean;
 }
@@ -47,14 +50,17 @@ export interface ToolDefinition<T extends ZodRawShape> {
     /** Tool interacts with external systems */
     openWorldHint?: boolean;
   };
-  handler: (args: z.infer<ZodObject<T>>, context: ToolContext) => Promise<ToolResult>;
+  handler: (
+    args: z.infer<ZodObject<T>>,
+    context: ToolContext,
+  ) => Promise<ToolResult>;
 }
 
 /**
  * Helper to define a tool with proper typing.
  */
 export function defineTool<T extends ZodRawShape>(
-  definition: ToolDefinition<T>
+  definition: ToolDefinition<T>,
 ): ToolDefinition<T> {
   return definition;
 }
@@ -67,14 +73,17 @@ export interface RegisteredTool {
   description: string;
   inputSchema: ZodObject<ZodRawShape>;
   annotations?: Record<string, unknown>;
-  handler: (args: Record<string, unknown>, context: ToolContext) => Promise<ToolResult>;
+  handler: (
+    args: Record<string, unknown>,
+    context: ToolContext,
+  ) => Promise<ToolResult>;
 }
 
 /**
  * Convert a typed ToolDefinition to RegisteredTool.
  */
 export function asRegisteredTool<T extends ZodRawShape>(
-  tool: ToolDefinition<T>
+  tool: ToolDefinition<T>,
 ): RegisteredTool {
   return tool as unknown as RegisteredTool;
 }

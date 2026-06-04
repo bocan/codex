@@ -189,7 +189,12 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({
           tabIndex={hasChildren ? 0 : -1}
         >
           <span aria-hidden="true">
-            {hasChildren && (isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />)}
+            {hasChildren &&
+              (isExpanded ? (
+                <ChevronDown size={12} />
+              ) : (
+                <ChevronRight size={12} />
+              ))}
             {!hasChildren && (
               <span style={{ width: "12px", display: "inline-block" }}></span>
             )}
@@ -211,7 +216,15 @@ const FolderTreeItem: React.FC<FolderTreeProps> = ({
           />
         ) : (
           <span className="folder-name">
-            {isDeleting ? <Loader2 size={14} className="loading-spinner" aria-hidden="true" /> : <Folder size={14} aria-hidden="true" />}{" "}
+            {isDeleting ? (
+              <Loader2
+                size={14}
+                className="loading-spinner"
+                aria-hidden="true"
+              />
+            ) : (
+              <Folder size={14} aria-hidden="true" />
+            )}{" "}
             {node.name}
             {isCreating && (
               <span
@@ -300,7 +313,10 @@ const renderPickerNodes = (
   indent: number,
 ): React.ReactNode => {
   return node.children.map((child) => {
-    if (child.path === excludePath || child.path.startsWith(`${excludePath}/`)) {
+    if (
+      child.path === excludePath ||
+      child.path.startsWith(`${excludePath}/`)
+    ) {
       return null;
     }
     return (
@@ -314,7 +330,13 @@ const renderPickerNodes = (
         >
           <Folder size={14} aria-hidden="true" /> {child.name}
         </button>
-        {renderPickerNodes(child, excludePath, selectedPath, onSelect, indent + 1)}
+        {renderPickerNodes(
+          child,
+          excludePath,
+          selectedPath,
+          onSelect,
+          indent + 1,
+        )}
       </React.Fragment>
     );
   });
@@ -323,9 +345,13 @@ const renderPickerNodes = (
 export const FolderTree: React.FC<
   Omit<FolderTreeProps, "node"> & { root: FolderNode }
 > = ({ root, onSelectFolder, selectedFolder, onRefresh }) => {
-  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set([root.path]));
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
+    new Set([root.path]),
+  );
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [keyboardSelectedPath, setKeyboardSelectedPath] = useState<string | null>(root.path);
+  const [keyboardSelectedPath, setKeyboardSelectedPath] = useState<
+    string | null
+  >(root.path);
   const [moveSource, setMoveSource] = useState<string | null>(null);
   const [moveDestination, setMoveDestination] = useState<string>("");
   const [isMoving, setIsMoving] = useState(false);
@@ -402,9 +428,11 @@ export const FolderTree: React.FC<
       setMoveSource(null);
       onRefresh();
     } catch (err) {
-      const msg = err instanceof Error ? err.message
-        : (err as { response?: { data?: { message?: string } } })?.response?.data?.message
-        ?? "Failed to move folder";
+      const msg =
+        err instanceof Error
+          ? err.message
+          : ((err as { response?: { data?: { message?: string } } })?.response
+              ?.data?.message ?? "Failed to move folder");
       setMoveError(msg);
     } finally {
       setIsMoving(false);
@@ -441,11 +469,22 @@ export const FolderTree: React.FC<
         onRequestMove={handleRequestMove}
       />
       {moveSource && (
-        <div className="move-modal-overlay" role="dialog" aria-modal="true" aria-label="Move folder">
+        <div
+          className="move-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Move folder"
+        >
           <div className="move-modal">
-            <h3 className="move-modal-title">Move "{moveSource.split("/").pop()}"</h3>
+            <h3 className="move-modal-title">
+              Move "{moveSource.split("/").pop()}"
+            </h3>
             <p className="move-modal-subtitle">Select destination folder:</p>
-            <div className="move-picker" role="listbox" aria-label="Destination folder">
+            <div
+              className="move-picker"
+              role="listbox"
+              aria-label="Destination folder"
+            >
               <button
                 className={`move-picker-item move-picker-root ${moveDestination === "" ? "selected" : ""}`}
                 onClick={() => setMoveDestination("")}
@@ -454,9 +493,19 @@ export const FolderTree: React.FC<
               >
                 <Folder size={14} aria-hidden="true" /> Root (top level)
               </button>
-              {renderPickerNodes(root, moveSource, moveDestination, setMoveDestination, 1)}
+              {renderPickerNodes(
+                root,
+                moveSource,
+                moveDestination,
+                setMoveDestination,
+                1,
+              )}
             </div>
-            {moveError && <p className="move-modal-error" role="alert">{moveError}</p>}
+            {moveError && (
+              <p className="move-modal-error" role="alert">
+                {moveError}
+              </p>
+            )}
             <div className="move-modal-actions">
               <button
                 className="move-modal-cancel"
