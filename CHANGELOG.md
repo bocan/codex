@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.18](https://github.com/bocan/codex/compare/v2.24.17...v2.24.18) (2026-06-04)
+
+
+### Chores
+
+* **deps-dev:** bump concurrently from 9.2.1 to 10.0.3 ([025293e](https://github.com/bocan/codex/commit/025293eaeb6994cf6a35c8e8f7cd8705f530263b))
+* update depenencies and format ([3c25b48](https://github.com/bocan/codex/commit/3c25b485f627588fa7e717ffb38840adb71dc967))
+
 ## [2.24.17](https://github.com/bocan/codex/compare/v2.24.16...v2.24.17) (2026-06-04)
 
 
