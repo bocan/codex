@@ -44,7 +44,7 @@
     "@typescript-eslint/eslint-plugin": "^8.60.0",
     "@typescript-eslint/parser": "^8.59.2",
     "commit-and-tag-version": "^12.7.3",
-    "concurrently": "^9.2.1",
+    "concurrently": "^10.0.3",
     "eslint": "^10.4.1",
     "globals": "^17.6.0"
   }
