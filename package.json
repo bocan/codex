@@ -47,5 +47,9 @@
     "concurrently": "^10.0.3",
     "eslint": "^10.5.0",
     "globals": "^17.6.0"
+  },
+  "overrides": {
+    "test-exclude": "^8.0.0",
+    "glob": "^13.0.6"
   }
 }
