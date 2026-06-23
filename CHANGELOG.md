@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.20](https://github.com/bocan/codex/compare/v2.24.19...v2.24.20) (2026-06-23)
+
+
+### Chores
+
+* **deps-dev:** bump undici from 7.25.0 to 7.28.0 ([8ec1198](https://github.com/bocan/codex/commit/8ec1198b44506759799913e1069805de95b403db))
+* **deps:** bump @types/node from 25.9.3 to 26.0.0 ([c18edc6](https://github.com/bocan/codex/commit/c18edc64903e1e6f967605a45c78edbe127d78fb))
+* **deps:** bump actions/checkout from 6 to 7 ([584df6b](https://github.com/bocan/codex/commit/584df6b1ad0f87f9182fc60d6d3876890e665fd4))
+* **deps:** bump dompurify from 3.4.2 to 3.4.11 ([4a5765b](https://github.com/bocan/codex/commit/4a5765b1f2f7311020c4d1578a507ad5566cb607))
+* **deps:** bump esbuild from 0.28.0 to 0.28.1 ([4e50e7c](https://github.com/bocan/codex/commit/4e50e7c502cc0bfdb63e162409683598444a9fdf))
+* **deps:** bump form-data from 4.0.5 to 4.0.6 ([c742b29](https://github.com/bocan/codex/commit/c742b29e8242d0dfa0295772c77e3032840bca2f))
+* **deps:** bump hono from 4.12.23 to 4.12.26 ([df832ed](https://github.com/bocan/codex/commit/df832edb45816079c01f18fa4171deb4f71eff27))
+* **deps:** bump the minor-and-patch group with 6 updates ([5b3342a](https://github.com/bocan/codex/commit/5b3342a5f39f1b3bfa48cf6b7f96ba3840e921c8))
+* **deps:** bump the minor-and-patch group with 7 updates ([5985489](https://github.com/bocan/codex/commit/5985489d731a7e4927d7de0a405fe8797c2d1886))
+
 ## [2.24.19](https://github.com/bocan/codex/compare/v2.24.18...v2.24.19) (2026-06-07)
 
 
