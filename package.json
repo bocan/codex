@@ -23,7 +23,7 @@
     "release:major": "commit-and-tag-version --release-as major"
   },
   "dependencies": {
-    "@types/node": "^26.0.0",
+    "@types/node": "^26.0.1",
     "@types/supertest": "^7.2.0",
     "axios": "^1.18.0",
     "bcrypt": "^6.0.0",
@@ -45,7 +45,7 @@
     "@typescript-eslint/parser": "^8.59.2",
     "commit-and-tag-version": "^12.7.3",
     "concurrently": "^10.0.3",
-    "eslint": "^10.5.0",
+    "eslint": "^10.6.0",
     "globals": "^17.6.0"
   },
   "overrides": {
