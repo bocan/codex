@@ -29,14 +29,14 @@
     "bcrypt": "^6.0.0",
     "express-rate-limit": "^8.5.2",
     "express-session": "^1.19.0",
-    "helmet": "^8.2.0",
+    "helmet": "^8.3.0",
     "lucide-react": "^1.23.0",
     "morgan": "^1.11.0",
     "simple-git": "^3.36.0",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/eslintrc": "^3.3.6",
     "@eslint/js": "^10.0.1",
     "@types/bcrypt": "^6.0.0",
     "@types/express-session": "^1.19.0",
@@ -45,7 +45,7 @@
     "@typescript-eslint/parser": "^8.63.0",
     "commit-and-tag-version": "^12.7.3",
     "concurrently": "^10.0.3",
-    "eslint": "^10.6.0",
+    "eslint": "^10.7.0",
     "globals": "^17.6.0"
   },
   "overrides": {
