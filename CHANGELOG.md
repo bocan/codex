@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.26](https://github.com/bocan/codex/compare/v2.24.25...v2.24.26) (2026-07-20)
+
+
+### Chores
+
+* **deps:** ignore typescript major bumps until ts-jest supports TS 7 ([2c75ec1](https://github.com/bocan/codex/commit/2c75ec18e0a605495f61ed158a514d90631ae184))
+
 ## [2.24.25](https://github.com/bocan/codex/compare/v2.24.24...v2.24.25) (2026-07-20)
 
 
