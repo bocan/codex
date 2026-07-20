@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.24](https://github.com/bocan/codex/compare/v2.24.23...v2.24.24) (2026-07-20)
+
+
+### Bug Fixes
+
+* regenerate package-lock.json to restore platform-specific optional deps ([3a4a5c4](https://github.com/bocan/codex/commit/3a4a5c40dfe16485c3dbead050e8411bdb55096a)), closes [npm/cli#4828](https://github.com/npm/cli/issues/4828)
+
+
+### Chores
+
+* **deps:** bump actions/setup-node from 6 to 7 ([1b68698](https://github.com/bocan/codex/commit/1b686988056b02dba997f5e11cbbdf18b7cdb02c))
+
 ## [2.24.23](https://github.com/bocan/codex/compare/v2.24.22...v2.24.23) (2026-07-09)
 
 
