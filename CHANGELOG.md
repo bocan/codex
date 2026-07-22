@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.27](https://github.com/bocan/codex/compare/v2.24.26...v2.24.27) (2026-07-22)
+
+### Chores
+
+* bump dependencies ([326bf48](https://github.com/bocan/codex/commit/326bf48a3ab90012377dfafa6c2bdbcacf6e3980))
 ## [2.24.26](https://github.com/bocan/codex/compare/v2.24.25...v2.24.26) (2026-07-20)
 
 
