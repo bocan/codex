@@ -41,9 +41,9 @@
     "@types/bcrypt": "^6.0.0",
     "@types/express-session": "^1.19.0",
     "@types/morgan": "^1.9.10",
-    "@typescript-eslint/eslint-plugin": "^8.64.0",
-    "@typescript-eslint/parser": "^8.63.0",
-    "commit-and-tag-version": "^12.7.3",
+    "@typescript-eslint/eslint-plugin": "^8.65.0",
+    "@typescript-eslint/parser": "^8.65.0",
+    "commit-and-tag-version": "^13.1.0",
     "concurrently": "^10.0.3",
     "eslint": "^10.7.0",
     "globals": "^17.6.0"
