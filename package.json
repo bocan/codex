@@ -30,7 +30,7 @@
     "express-rate-limit": "^8.6.0",
     "express-session": "^1.19.0",
     "helmet": "^8.3.0",
-    "lucide-react": "^1.25.0",
+    "lucide-react": "^1.27.0",
     "morgan": "^1.11.0",
     "simple-git": "^3.36.0",
     "zustand": "^5.0.14"
@@ -44,8 +44,8 @@
     "@typescript-eslint/eslint-plugin": "^8.65.0",
     "@typescript-eslint/parser": "^8.65.0",
     "commit-and-tag-version": "^13.1.0",
-    "concurrently": "^10.0.3",
-    "eslint": "^10.7.0",
+    "concurrently": "^10.0.4",
+    "eslint": "^10.8.0",
     "globals": "^17.6.0"
   },
   "overrides": {
