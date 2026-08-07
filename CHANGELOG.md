@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.29](https://github.com/bocan/codex/compare/v2.24.28...v2.24.29) (2026-08-07)
+
+### Chores
+
+* **deps-dev:** bump undici from 7.28.0 to 7.29.0 ([8732b2f](https://github.com/bocan/codex/commit/8732b2fdac197ea25077ea711a979c69d7cb35ff))
+* **deps:** bump dompurify from 3.4.12 to 3.4.13 ([05921db](https://github.com/bocan/codex/commit/05921db33d9ae921782a8941ba4b67a8de9f7880))
+* **deps:** bump fast-uri from 3.1.4 to 3.1.5 ([d82ebe6](https://github.com/bocan/codex/commit/d82ebe68e6b885ed313e82e1bbb0bfa751eff67d))
+* **deps:** bump ip-address from 10.2.0 to 10.4.0 ([89e0425](https://github.com/bocan/codex/commit/89e042507e78ee97bde64c60e17e878295aa8c21))
+* **deps:** bump mermaid from 11.16.0 to 11.16.1 ([5bc5241](https://github.com/bocan/codex/commit/5bc5241ded17bc2a3e11357357bc978888738924))
 ## [2.24.28](https://github.com/bocan/codex/compare/v2.24.27...v2.24.28) (2026-08-07)
 
 ### Chores
