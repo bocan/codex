@@ -23,14 +23,14 @@
     "release:major": "commit-and-tag-version --release-as major"
   },
   "dependencies": {
-    "@types/node": "^26.1.2",
+    "@types/node": "^26.2.0",
     "@types/supertest": "^7.2.1",
     "axios": "^1.19.0",
     "bcrypt": "^6.0.0",
-    "express-rate-limit": "^8.6.1",
+    "express-rate-limit": "^8.6.2",
     "express-session": "^1.19.0",
     "helmet": "^8.3.0",
-    "lucide-react": "^1.28.0",
+    "lucide-react": "^1.30.0",
     "morgan": "^1.11.0",
     "simple-git": "^3.36.0",
     "zustand": "^5.0.14"
@@ -41,12 +41,12 @@
     "@types/bcrypt": "^6.0.0",
     "@types/express-session": "^1.19.0",
     "@types/morgan": "^1.9.10",
-    "@typescript-eslint/eslint-plugin": "^8.65.0",
-    "@typescript-eslint/parser": "^8.65.0",
+    "@typescript-eslint/eslint-plugin": "^8.66.0",
+    "@typescript-eslint/parser": "^8.66.0",
     "commit-and-tag-version": "^13.1.2",
     "concurrently": "^10.0.4",
     "eslint": "^10.8.0",
-    "globals": "^17.8.0"
+    "globals": "^17.9.0"
   },
   "overrides": {
     "test-exclude": "^8.0.0",
