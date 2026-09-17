@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.29](https://github.com/bocan/codex/compare/v2.24.28...v2.24.29) (2026-09-17)
+
+### Chores
+
+* bump library versions ([8742dca](https://github.com/bocan/codex/commit/8742dca0d203098520174d584267ceda082b5e3a))
+* **deps-dev:** bump @testing-library/jest-dom from 6.9.1 to 7.0.0 ([03a3f04](https://github.com/bocan/codex/commit/03a3f0447842044629fb6684f301f237b59d1914))
+* **deps-dev:** bump baseline-browser-mapping from 2.10.42 to 2.11.21 ([828156e](https://github.com/bocan/codex/commit/828156e9935d39fb6bbbd1e1103bf87a2f8d41ad))
+* **deps-dev:** bump browserslist from 4.28.5 to 4.28.9 ([7a4d912](https://github.com/bocan/codex/commit/7a4d9128d977d28ef1a3e08468724db5be498007))
+* **deps-dev:** bump jsdom from 29.1.1 to 30.0.1 ([0651956](https://github.com/bocan/codex/commit/0651956aebffe4801a379b9877c81ab287d8761c))
+* **deps-dev:** bump undici from 7.28.0 to 7.29.0 ([8732b2f](https://github.com/bocan/codex/commit/8732b2fdac197ea25077ea711a979c69d7cb35ff))
+* **deps:** bump dompurify from 3.4.12 to 3.4.13 ([05921db](https://github.com/bocan/codex/commit/05921db33d9ae921782a8941ba4b67a8de9f7880))
+* **deps:** bump fast-uri from 3.1.4 to 3.1.5 ([d82ebe6](https://github.com/bocan/codex/commit/d82ebe68e6b885ed313e82e1bbb0bfa751eff67d))
+* **deps:** bump fast-uri from 3.1.5 to 3.1.7 ([634b890](https://github.com/bocan/codex/commit/634b890353a2c7764bdff5d30ac2cb81a2ed9357))
+* **deps:** bump hono from 4.12.28 to 4.13.1 ([db2f491](https://github.com/bocan/codex/commit/db2f4918b0cfb868c7fc0a47ba94311ce0ac20b5))
+* **deps:** bump hono from 4.13.1 to 4.13.7 ([07938ac](https://github.com/bocan/codex/commit/07938acaac4b908c5b0b77d94f4d3d88184cb9be))
+* **deps:** bump ip-address from 10.2.0 to 10.4.0 ([89e0425](https://github.com/bocan/codex/commit/89e042507e78ee97bde64c60e17e878295aa8c21))
+* **deps:** bump mermaid from 11.16.0 to 11.16.1 ([5bc5241](https://github.com/bocan/codex/commit/5bc5241ded17bc2a3e11357357bc978888738924))
+* **deps:** bump qs from 6.15.3 to 6.16.0 ([2a93b0c](https://github.com/bocan/codex/commit/2a93b0cbb23fd77e4304181fcf366e248dfb74e2))
+* **deps:** bump the minor-and-patch group across 1 directory with 15 updates ([bf97faa](https://github.com/bocan/codex/commit/bf97faafdef85754c30d7ae802005090c17d7b87))
+* **deps:** bump the minor-and-patch group across 1 directory with 20 updates ([96e261f](https://github.com/bocan/codex/commit/96e261f5fa6c7e20c03f590747cdbc9ddce898ab))
+* update dependencies ([8057356](https://github.com/bocan/codex/commit/80573567ba079c90c23cdb95b06a3d36e64dae99))
+* update dependencies 2 ([479bf7d](https://github.com/bocan/codex/commit/479bf7d2221187480096858026cafd78dc037765))
+
 ## [2.24.28](https://github.com/bocan/codex/compare/v2.24.27...v2.24.28) (2026-08-07)
 
 ### Chores
