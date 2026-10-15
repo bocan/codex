@@ -12,7 +12,7 @@ import path from 'path';
 
 // Import MCP components for unit testing
 import { SessionStore, sessionStore as globalSessionStore } from '../src/mcp/sessions';
-import { loadConfig } from '../src/mcp/config';
+import { config, loadConfig } from '../src/mcp/config';
 import { tools, getTool, executeTool } from '../src/mcp/tools/registry';
 import { createMcpHttpServer } from '../src/mcp/server';
 import { AddressInfo } from 'net';
@@ -215,6 +215,70 @@ describe('MCP Session Store', () => {
       }
 
       expect(store.count()).toBe(6);
+    });
+  });
+
+  describe('Delete Listeners', () => {
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should notify listeners on explicit delete', () => {
+      const listener = jest.fn();
+      store.onDelete(listener);
+      const session = store.create('test-api-key');
+
+      store.delete(session.id);
+
+      expect(listener).toHaveBeenCalledTimes(1);
+      expect(listener).toHaveBeenCalledWith(session.id);
+    });
+
+    it('should not notify listeners when deleting a non-existent session', () => {
+      const listener = jest.fn();
+      store.onDelete(listener);
+
+      store.delete('non-existent');
+
+      expect(listener).not.toHaveBeenCalled();
+    });
+
+    it('should notify listeners when a session is evicted by the per-key limit', () => {
+      const listener = jest.fn();
+      store.onDelete(listener);
+      const oldest = store.create('same-api-key');
+      for (let i = 0; i < config.maxSessionsPerKey; i++) {
+        store.create('same-api-key');
+      }
+
+      expect(listener).toHaveBeenCalledWith(oldest.id);
+    });
+
+    it('should notify listeners when get() finds an expired session', () => {
+      jest.useFakeTimers({ now: Date.now() });
+      const listener = jest.fn();
+      store.onDelete(listener);
+      const session = store.create('test-api-key');
+
+      jest.setSystemTime(Date.now() + config.sessionTtlMs + 1);
+
+      expect(store.get(session.id)).toBeUndefined();
+      expect(listener).toHaveBeenCalledWith(session.id);
+    });
+
+    it('should notify listeners when the cleanup interval removes an expired session', () => {
+      jest.useFakeTimers({ now: Date.now() });
+      // Create after faking timers so the cleanup interval is faked too
+      const timedStore = new SessionStore();
+      const listener = jest.fn();
+      timedStore.onDelete(listener);
+      const session = timedStore.create('test-api-key');
+
+      jest.advanceTimersByTime(config.sessionTtlMs + 60000);
+
+      expect(timedStore.count()).toBe(0);
+      expect(listener).toHaveBeenCalledWith(session.id);
+      timedStore.stopCleanup();
     });
   });
 });
@@ -717,6 +781,60 @@ describe('MCP Session Status Codes', () => {
     expect(response.status).toBe(200);
     expect(response.headers.get('content-type')).toContain('text/event-stream');
     controller.abort();
+  });
+
+  async function getWithSession(sessionId: string): Promise<Response> {
+    return fetch(baseUrl, {
+      headers: {
+        ...authHeaders,
+        Accept: 'text/event-stream',
+        'Mcp-Session-Id': sessionId,
+      },
+    });
+  }
+
+  it('should return 404 after the session is terminated with DELETE', async () => {
+    const sessionId = await initializeSession();
+
+    const deleteResponse = await fetch(baseUrl, {
+      method: 'DELETE',
+      headers: { ...authHeaders, 'Mcp-Session-Id': sessionId },
+    });
+    expect(deleteResponse.status).toBe(204);
+    expect(globalSessionStore.validate(sessionId)).toBe(false);
+
+    const response = await getWithSession(sessionId);
+    expect(response.status).toBe(404);
+  });
+
+  it('should return 404 after the session store drops the session', async () => {
+    const sessionId = await initializeSession();
+
+    // Same path as TTL expiry and the cleanup interval
+    globalSessionStore.delete(sessionId);
+
+    const response = await getWithSession(sessionId);
+    expect(response.status).toBe(404);
+  });
+
+  it('should return 404 for a session evicted by the per-key limit', async () => {
+    const oldestId = await initializeSession();
+    for (let i = 0; i < config.maxSessionsPerKey; i++) {
+      await initializeSession();
+    }
+
+    const response = await fetch(baseUrl, {
+      method: 'POST',
+      headers: {
+        ...authHeaders,
+        'Content-Type': 'application/json',
+        Accept: 'application/json, text/event-stream',
+        'Mcp-Session-Id': oldestId,
+      },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 3, method: 'tools/list' }),
+    });
+
+    expect(response.status).toBe(404);
   });
 });
 

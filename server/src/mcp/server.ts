@@ -138,6 +138,27 @@ interface SessionContext {
 }
 const sessions = new Map<string, SessionContext>();
 
+// sessionStore owns TTL and per-key limits. Close the transport whenever
+// it drops a session, so the two maps never drift apart.
+sessionStore.onDelete((sessionId) => {
+  const sessionCtx = sessions.get(sessionId);
+  if (!sessionCtx) return;
+
+  sessions.delete(sessionId);
+  sessionCtx.transport.close().catch((error) => {
+    console.error("[MCP] Error closing transport:", error);
+  });
+});
+
+/**
+ * Look up a live session. Goes through sessionStore so each request
+ * refreshes the TTL and an expired session is dropped.
+ */
+function getActiveSession(sessionId: string): SessionContext | undefined {
+  if (!sessionStore.validate(sessionId)) return undefined;
+  return sessions.get(sessionId);
+}
+
 /**
  * Create the MCP HTTP server without starting it
  */
@@ -214,11 +235,7 @@ export function createMcpHttpServer(): Server {
         // Handle DELETE - session termination
         if (req.method === "DELETE") {
           if (sessionId) {
-            const sessionCtx = sessions.get(sessionId);
-            if (sessionCtx) {
-              await sessionCtx.transport.close();
-              sessions.delete(sessionId);
-            }
+            // The onDelete listener closes the transport
             sessionStore.delete(sessionId);
           }
           res.writeHead(204);
@@ -232,17 +249,15 @@ export function createMcpHttpServer(): Server {
             // Get or create transport for this session
             let transport: StreamableHTTPServerTransport;
 
-            if (sessionId && sessions.has(sessionId)) {
+            if (sessionId) {
               // Existing session - reuse transport
-              const sessionCtx = sessions.get(sessionId);
+              const sessionCtx = getActiveSession(sessionId);
               if (!sessionCtx) {
-                throw new Error("Session not found despite has() check");
+                // Unknown, expired, or evicted session
+                sendSessionNotFound(res);
+                return;
               }
               transport = sessionCtx.transport;
-            } else if (sessionId) {
-              // Session ID provided but transport not found - session expired
-              sendSessionNotFound(res);
-              return;
             } else {
               // No session ID - this should be an initialize request
               // Create new MCP server instance for this session
@@ -302,7 +317,7 @@ export function createMcpHttpServer(): Server {
             return;
           }
 
-          const sessionCtx = sessions.get(sessionId);
+          const sessionCtx = getActiveSession(sessionId);
           if (!sessionCtx) {
             sendSessionNotFound(res);
             return;
