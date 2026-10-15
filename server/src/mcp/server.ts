@@ -13,7 +13,7 @@
  * Protocol versions: 2025-03-26, 2024-11-05
  */
 
-import { createServer, IncomingMessage, ServerResponse } from "http";
+import { createServer, IncomingMessage, Server, ServerResponse } from "http";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { config } from "./config";
@@ -97,6 +97,22 @@ function sendJson(res: ServerResponse, status: number, data: unknown): void {
 }
 
 /**
+ * Send 404 for an unknown or expired session.
+ * Per the MCP spec, clients must re-initialize when they receive this.
+ * Matches the SDK's own session-not-found response.
+ */
+function sendSessionNotFound(res: ServerResponse): void {
+  sendJson(res, 404, {
+    jsonrpc: "2.0",
+    error: {
+      code: -32001,
+      message: "Session not found",
+    },
+    id: null,
+  });
+}
+
+/**
  * Parse request body as JSON
  */
 function parseBody(req: IncomingMessage): Promise<unknown> {
@@ -123,10 +139,10 @@ interface SessionContext {
 const sessions = new Map<string, SessionContext>();
 
 /**
- * Start the MCP server
+ * Create the MCP HTTP server without starting it
  */
-export function startMcpServer(): void {
-  const server = createServer(
+export function createMcpHttpServer(): Server {
+  return createServer(
     async (req: IncomingMessage, res: ServerResponse) => {
       // CORS headers
       res.setHeader("Access-Control-Allow-Origin", "*");
@@ -225,14 +241,7 @@ export function startMcpServer(): void {
               transport = sessionCtx.transport;
             } else if (sessionId) {
               // Session ID provided but transport not found - session expired
-              sendJson(res, 400, {
-                jsonrpc: "2.0",
-                error: {
-                  code: -32000,
-                  message: "Bad Request: Session not found or expired",
-                },
-                id: null,
-              });
+              sendSessionNotFound(res);
               return;
             } else {
               // No session ID - this should be an initialize request
@@ -283,16 +292,19 @@ export function startMcpServer(): void {
 
         // Handle GET - SSE streaming (for server-initiated messages)
         if (req.method === "GET") {
-          if (!sessionId || !sessions.has(sessionId)) {
-            sendJson(res, 400, {
-              error: "Session ID required for SSE connection",
+          // No session: we offer no standalone SSE stream, so per the MCP
+          // spec answer 405 rather than 400
+          if (!sessionId) {
+            res.setHeader("Allow", "POST, DELETE");
+            sendJson(res, 405, {
+              error: "SSE stream requires an initialized session",
             });
             return;
           }
 
           const sessionCtx = sessions.get(sessionId);
           if (!sessionCtx) {
-            sendJson(res, 400, { error: "Session not found" });
+            sendSessionNotFound(res);
             return;
           }
           await sessionCtx.transport.handleRequest(req, res);
@@ -308,6 +320,13 @@ export function startMcpServer(): void {
       sendJson(res, 404, { error: "Not found" });
     },
   );
+}
+
+/**
+ * Start the MCP server
+ */
+export function startMcpServer(): void {
+  const server = createMcpHttpServer();
 
   server.listen(config.port, config.host, () => {
     console.log(
