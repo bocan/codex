@@ -15,6 +15,11 @@ permissions:
   id-token: write  # Required for cosign keyless signing
   packages: write  # Required for GHCR (optional, but good to have)
 
+# Run one release at a time. Rapid merges queue up instead of racing for the same tag.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -23,6 +28,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
         with:
+          ref: main  # Latest main, so a queued run includes the previous run's release commit
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -47,7 +53,7 @@ jobs:
 
       - name: Push changes
         run: |
-          git push --follow-tags origin main
+          git push --atomic --follow-tags origin main
 
       - name: Extract version from package.json
         id: extract_version
