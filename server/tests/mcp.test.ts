@@ -12,8 +12,10 @@ import path from 'path';
 
 // Import MCP components for unit testing
 import { SessionStore, sessionStore as globalSessionStore } from '../src/mcp/sessions';
-import { loadConfig } from '../src/mcp/config';
+import { config, loadConfig } from '../src/mcp/config';
 import { tools, getTool, executeTool } from '../src/mcp/tools/registry';
+import { createMcpHttpServer } from '../src/mcp/server';
+import { AddressInfo } from 'net';
 
 const TEST_DATA_DIR = path.join(__dirname, '../test-data-mcp');
 
@@ -213,6 +215,70 @@ describe('MCP Session Store', () => {
       }
 
       expect(store.count()).toBe(6);
+    });
+  });
+
+  describe('Delete Listeners', () => {
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('should notify listeners on explicit delete', () => {
+      const listener = jest.fn();
+      store.onDelete(listener);
+      const session = store.create('test-api-key');
+
+      store.delete(session.id);
+
+      expect(listener).toHaveBeenCalledTimes(1);
+      expect(listener).toHaveBeenCalledWith(session.id);
+    });
+
+    it('should not notify listeners when deleting a non-existent session', () => {
+      const listener = jest.fn();
+      store.onDelete(listener);
+
+      store.delete('non-existent');
+
+      expect(listener).not.toHaveBeenCalled();
+    });
+
+    it('should notify listeners when a session is evicted by the per-key limit', () => {
+      const listener = jest.fn();
+      store.onDelete(listener);
+      const oldest = store.create('same-api-key');
+      for (let i = 0; i < config.maxSessionsPerKey; i++) {
+        store.create('same-api-key');
+      }
+
+      expect(listener).toHaveBeenCalledWith(oldest.id);
+    });
+
+    it('should notify listeners when get() finds an expired session', () => {
+      jest.useFakeTimers({ now: Date.now() });
+      const listener = jest.fn();
+      store.onDelete(listener);
+      const session = store.create('test-api-key');
+
+      jest.setSystemTime(Date.now() + config.sessionTtlMs + 1);
+
+      expect(store.get(session.id)).toBeUndefined();
+      expect(listener).toHaveBeenCalledWith(session.id);
+    });
+
+    it('should notify listeners when the cleanup interval removes an expired session', () => {
+      jest.useFakeTimers({ now: Date.now() });
+      // Create after faking timers so the cleanup interval is faked too
+      const timedStore = new SessionStore();
+      const listener = jest.fn();
+      timedStore.onDelete(listener);
+      const session = timedStore.create('test-api-key');
+
+      jest.advanceTimersByTime(config.sessionTtlMs + 60000);
+
+      expect(timedStore.count()).toBe(0);
+      expect(listener).toHaveBeenCalledWith(session.id);
+      timedStore.stopCleanup();
     });
   });
 });
@@ -604,6 +670,171 @@ describe('MCP HTTP Server Integration', () => {
 
       expect(response.status).toBe(204);
     });
+  });
+});
+
+// ============================================================================
+// Integration Tests: MCP Session Status Codes (real server)
+// ============================================================================
+
+describe('MCP Session Status Codes', () => {
+  let server: Server;
+  let baseUrl: string;
+
+  // Only needed when MCP_API_KEY is set in the environment
+  const authHeaders: Record<string, string> = process.env.MCP_API_KEY
+    ? { Authorization: `Bearer ${process.env.MCP_API_KEY}` }
+    : {};
+
+  beforeAll(async () => {
+    server = createMcpHttpServer();
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', () => resolve()));
+    const { port } = server.address() as AddressInfo;
+    baseUrl = `http://127.0.0.1:${port}/mcp`;
+  });
+
+  afterAll(async () => {
+    server.closeAllConnections();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  });
+
+  async function initializeSession(): Promise<string> {
+    const response = await fetch(baseUrl, {
+      method: 'POST',
+      headers: {
+        ...authHeaders,
+        'Content-Type': 'application/json',
+        Accept: 'application/json, text/event-stream',
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'initialize',
+        params: {
+          protocolVersion: '2025-06-18',
+          capabilities: {},
+          clientInfo: { name: 'codex-test', version: '1.0.0' },
+        },
+      }),
+    });
+
+    expect(response.status).toBe(200);
+    const sessionId = response.headers.get('mcp-session-id');
+    if (!sessionId) throw new Error('No session ID returned');
+    return sessionId;
+  }
+
+  it('should return 405 for GET without a session ID', async () => {
+    const response = await fetch(baseUrl, {
+      headers: { ...authHeaders, Accept: 'text/event-stream' },
+    });
+
+    expect(response.status).toBe(405);
+    expect(response.headers.get('allow')).toBe('POST, DELETE');
+  });
+
+  it('should return 404 for GET with an unknown session ID', async () => {
+    const response = await fetch(baseUrl, {
+      headers: {
+        ...authHeaders,
+        Accept: 'text/event-stream',
+        'Mcp-Session-Id': 'unknown-session',
+      },
+    });
+    const data = await response.json() as { error: { code: number } };
+
+    expect(response.status).toBe(404);
+    expect(data.error.code).toBe(-32001);
+  });
+
+  it('should return 404 for POST with an unknown session ID', async () => {
+    const response = await fetch(baseUrl, {
+      method: 'POST',
+      headers: {
+        ...authHeaders,
+        'Content-Type': 'application/json',
+        Accept: 'application/json, text/event-stream',
+        'Mcp-Session-Id': 'unknown-session',
+      },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'tools/list' }),
+    });
+    const data = await response.json() as { error: { code: number } };
+
+    expect(response.status).toBe(404);
+    expect(data.error.code).toBe(-32001);
+  });
+
+  it('should open an SSE stream for GET with a valid session ID', async () => {
+    const sessionId = await initializeSession();
+    const controller = new AbortController();
+
+    const response = await fetch(baseUrl, {
+      headers: {
+        ...authHeaders,
+        Accept: 'text/event-stream',
+        'Mcp-Session-Id': sessionId,
+        'Mcp-Protocol-Version': '2025-06-18',
+      },
+      signal: controller.signal,
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toContain('text/event-stream');
+    controller.abort();
+  });
+
+  async function getWithSession(sessionId: string): Promise<Response> {
+    return fetch(baseUrl, {
+      headers: {
+        ...authHeaders,
+        Accept: 'text/event-stream',
+        'Mcp-Session-Id': sessionId,
+      },
+    });
+  }
+
+  it('should return 404 after the session is terminated with DELETE', async () => {
+    const sessionId = await initializeSession();
+
+    const deleteResponse = await fetch(baseUrl, {
+      method: 'DELETE',
+      headers: { ...authHeaders, 'Mcp-Session-Id': sessionId },
+    });
+    expect(deleteResponse.status).toBe(204);
+    expect(globalSessionStore.validate(sessionId)).toBe(false);
+
+    const response = await getWithSession(sessionId);
+    expect(response.status).toBe(404);
+  });
+
+  it('should return 404 after the session store drops the session', async () => {
+    const sessionId = await initializeSession();
+
+    // Same path as TTL expiry and the cleanup interval
+    globalSessionStore.delete(sessionId);
+
+    const response = await getWithSession(sessionId);
+    expect(response.status).toBe(404);
+  });
+
+  it('should return 404 for a session evicted by the per-key limit', async () => {
+    const oldestId = await initializeSession();
+    for (let i = 0; i < config.maxSessionsPerKey; i++) {
+      await initializeSession();
+    }
+
+    const response = await fetch(baseUrl, {
+      method: 'POST',
+      headers: {
+        ...authHeaders,
+        'Content-Type': 'application/json',
+        Accept: 'application/json, text/event-stream',
+        'Mcp-Session-Id': oldestId,
+      },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 3, method: 'tools/list' }),
+    });
+
+    expect(response.status).toBe(404);
   });
 });
 

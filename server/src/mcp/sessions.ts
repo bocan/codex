@@ -14,11 +14,14 @@ interface Session {
   initialized: boolean;
 }
 
+type SessionDeleteListener = (sessionId: string) => void;
+
 /**
  * Simple in-memory session store with TTL and limits
  */
 export class SessionStore {
   private sessions = new Map<string, Session>();
+  private deleteListeners: SessionDeleteListener[] = [];
   private cleanupInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
@@ -93,17 +96,31 @@ export class SessionStore {
   }
 
   /**
+   * Register a callback that runs whenever a session is removed
+   * (explicit delete, TTL expiry, or per-key eviction)
+   */
+  onDelete(listener: SessionDeleteListener): void {
+    this.deleteListeners.push(listener);
+  }
+
+  /**
    * Delete a session
    */
   delete(sessionId: string): boolean {
     const deleted = this.sessions.delete(sessionId);
-    if (deleted && config.debug) {
+    if (!deleted) return false;
+
+    if (config.debug) {
       // Sanitize sessionId before logging to prevent log injection (CWE-117)
       // eslint-disable-next-line no-control-regex
       const safeId = sessionId.replace(/[\r\n\t\x00-\x1f\x7f]/g, "_");
       console.log(`[MCP] Session deleted: ${safeId}`);
     }
-    return deleted;
+
+    for (const listener of this.deleteListeners) {
+      listener(sessionId);
+    }
+    return true;
   }
 
   /**
@@ -131,7 +148,7 @@ export class SessionStore {
 
     for (const [id, session] of this.sessions) {
       if (now - session.lastAccessedAt > config.sessionTtlMs) {
-        this.sessions.delete(id);
+        this.delete(id);
         cleaned++;
       }
     }
