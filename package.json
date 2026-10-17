@@ -32,7 +32,7 @@
     "helmet": "^8.3.0",
     "lucide-react": "^1.53.0",
     "morgan": "^1.12.1",
-    "simple-git": "^3.36.0",
+    "simple-git": "^4.0.1",
     "tsx": "^4.23.15",
     "zustand": "^5.0.15"
   },
