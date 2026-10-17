@@ -1,4 +1,4 @@
-import simpleGit, { SimpleGit, LogResult } from "simple-git";
+import { simpleGit, SimpleGit, LogResult } from "simple-git";
 import path from "path";
 import fs from "fs/promises";
 
