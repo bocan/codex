@@ -17,7 +17,7 @@
     "github-slugger": "^2.0.0",
     "html-docx-js-typescript": "^0.1.5",
     "lucide-react": "^1.53.0",
-    "mermaid": "^11.17.2",
+    "mermaid": "^12.2.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-markdown": "^10.1.0",
