@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.30](https://github.com/bocan/codex/compare/v2.24.29...v2.24.30) (2026-10-17)
+
+### Bug Fixes
+
+* **mcp:** close transports when the session store drops a session ([5685291](https://github.com/bocan/codex/commit/568529156906fca655c57b0ff427a02cfa01d4f4))
+* **mcp:** return 405/404 per spec for sessionless and unknown-session requests ([801fa31](https://github.com/bocan/codex/commit/801fa31905ce2a0e1966f4a5551cd9a33461a899))
+* **server:** use named simpleGit import for simple-git 4 ([7b57058](https://github.com/bocan/codex/commit/7b57058a5d87f6e646f51c49f9df3f80c427438d))
+
+### Chores
+
+* **deps-dev:** bump handlebars from 4.7.9 to 4.7.10 ([6aceddb](https://github.com/bocan/codex/commit/6aceddb7f4382dcb9b6093a1df51ee12091aba82))
+* **deps-dev:** bump source-map-js from 1.2.1 to 1.2.2 ([44dc22c](https://github.com/bocan/codex/commit/44dc22cd050cf93171a6e1bf0b2c8108e70f3c55))
+* **deps-dev:** bump vitest from 4.1.11 to 5.0.4 ([b3da8e3](https://github.com/bocan/codex/commit/b3da8e32cf5183238060072ee2e225ac878a0306))
+* **deps:** bump @simple-git/argv-parser and simple-git ([0492c8c](https://github.com/bocan/codex/commit/0492c8c3179dcd5764d1a13c96432621ec57c5d8))
+* **deps:** bump brace-expansion ([2ab50c5](https://github.com/bocan/codex/commit/2ab50c5abd3b60ff75103b5918e8b38452543aa5))
+* **deps:** bump dompurify from 3.4.13 to 3.4.17 ([1bcff5f](https://github.com/bocan/codex/commit/1bcff5fa86f34eb7b731f553199d205fc3172cc2))
+* **deps:** bump fast-uri from 3.1.7 to 3.1.8 ([82ed0ca](https://github.com/bocan/codex/commit/82ed0caf18464afe5ca961699c7dc095f518abbb))
+* **deps:** bump ip-address from 10.4.0 to 10.7.2 ([091f8a4](https://github.com/bocan/codex/commit/091f8a4279fe36e380be340ff05e30d5372a8cfb))
+* **deps:** bump katex and mermaid ([dd37526](https://github.com/bocan/codex/commit/dd37526deb0a03b45edb99dc0e79dd62e346b3c0))
+* **deps:** bump proxy-addr from 2.0.7 to 2.0.8 ([dd59181](https://github.com/bocan/codex/commit/dd591813d939fed41d5dc5602a51df14cc96f186))
+* **deps:** bump shell-quote and concurrently ([8a33ff2](https://github.com/bocan/codex/commit/8a33ff22b377a2612307761953971a76ec4b5a59))
+* **deps:** bump the minor-and-patch group across 1 directory with 19 updates ([c55e11e](https://github.com/bocan/codex/commit/c55e11e338d7b6e9fb8718956760ff3e48667cbb))
+* **deps:** dedupe lockfile to a single @types/react ([9770ba5](https://github.com/bocan/codex/commit/9770ba514e9dca90711ecd420fe77c15817659cd))
+
+### CI/CD
+
+* **release:** serialize runs and push tag atomically ([69a9757](https://github.com/bocan/codex/commit/69a97575c615c28a41a70bd7edbc86e181666c66))
+
 ## [2.24.29](https://github.com/bocan/codex/compare/v2.24.28...v2.24.29) (2026-09-17)
 
 ### Chores
