@@ -17,7 +17,6 @@ import {
   staticFileLimiter,
   aiLimiter,
   readLimiter,
-  fileOperationLimiter,
   searchLimiter,
   fileTransferLimiter,
   authLimiter,
@@ -267,8 +266,9 @@ app.get("/api", (req: Request, res: Response) => {
 
 // Routes
 app.use("/api/auth", authLimiter, authRoutes); // Auth routes (public, rate limited)
-app.use("/api/folders", fileOperationLimiter, requireAuth, folderRoutes); // Protected
-app.use("/api/pages", fileOperationLimiter, requireAuth, pageRoutes); // Protected
+// Folder and page routes set their own limiters per route (read vs write)
+app.use("/api/folders", requireAuth, folderRoutes); // Protected
+app.use("/api/pages", requireAuth, pageRoutes); // Protected
 app.use("/api/templates", readLimiter, requireAuth, templatesRoutes); // Protected
 app.use("/api/search", searchLimiter, requireAuth, searchRoutes); // Protected
 app.use("/api/attachments", fileTransferLimiter, requireAuth, attachmentRoutes); // Protected
