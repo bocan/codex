@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.31](https://github.com/bocan/codex/compare/v2.24.30...v2.24.31) (2026-10-18)
+
+### Bug Fixes
+
+* **server:** stop rate limiting page and folder reads as writes ([de90f39](https://github.com/bocan/codex/commit/de90f392a457cb564d9501cd32080849265f1a38))
+
 ## [2.24.30](https://github.com/bocan/codex/compare/v2.24.29...v2.24.30) (2026-10-17)
 
 ### Bug Fixes
