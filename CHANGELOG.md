@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.34](https://github.com/bocan/codex/compare/v2.24.33...v2.24.34) (2026-10-26)
+
+### Chores
+
+* **deps:** bump @anthropic-ai/sdk from 0.134.0 to 1.1.0 ([2f77c45](https://github.com/bocan/codex/commit/2f77c45dcfa0143ef727270a11cac414a6db14ea))
+* **deps:** bump body-parser from 2.3.0 to 2.4.0 ([68524c1](https://github.com/bocan/codex/commit/68524c1561e34878c8b263603fe288d34c65acbf))
+* **deps:** bump fast-uri from 3.1.8 to 3.1.9 ([1b11bd1](https://github.com/bocan/codex/commit/1b11bd18018b2072d43621dcd995a9368aae29b9))
+* **deps:** bump follow-redirects from 1.16.0 to 1.16.1 ([073c0c2](https://github.com/bocan/codex/commit/073c0c203928cab58d291709786b91dda60a762e))
+* **deps:** bump hono from 4.13.7 to 4.13.13 ([48c8964](https://github.com/bocan/codex/commit/48c896483304a75a96f2457e2708df1f3ac12bdb))
+* **deps:** bump ip-address from 10.7.2 to 10.7.5 ([af3498e](https://github.com/bocan/codex/commit/af3498e99936093a2f62efaf3844620faa73e037))
+* **deps:** bump multer from 2.4.0 to 2.5.0 ([5b44712](https://github.com/bocan/codex/commit/5b44712f2e16675f72ff54122e370ee69984cc52))
+
 ## [2.24.33](https://github.com/bocan/codex/compare/v2.24.32...v2.24.33) (2026-10-26)
 
 ### Chores
