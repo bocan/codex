@@ -51,7 +51,7 @@
   },
   "overrides": {
     "test-exclude": "^8.0.0",
-    "glob": "^13.0.6"
+    "glob": "^14.0.0"
   },
   "allowScripts": {
     "bcrypt@6.0.0": true,
