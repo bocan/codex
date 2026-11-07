@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.38](https://github.com/bocan/codex/compare/v2.24.37...v2.24.38) (2026-11-07)
+
+### Chores
+
+* **deps:** update dependency @vitejs/plugin-react to v6.2.1 ([c5598b6](https://github.com/bocan/codex/commit/c5598b66c9359c946fe7529c3c4ab13ca68898cb))
+* **deps:** update dependency eslint to v10.14.0 ([0803756](https://github.com/bocan/codex/commit/080375642cc5df22d3ba5380c764664372637de9))
+* **deps:** update dependency express-rate-limit to v8.7.3 ([3aca332](https://github.com/bocan/codex/commit/3aca332bbe282c7b1b75ca495012a612882006ca))
+* **deps:** update dependency glob to v14 ([8a8143e](https://github.com/bocan/codex/commit/8a8143eb73b9df77176aa15bc363697c10cb430e))
+* **deps:** update dependency globals to v17.14.0 ([56cf2f7](https://github.com/bocan/codex/commit/56cf2f722ec0e916dcb3c2f441e9df10c3be8113))
+* **deps:** update dependency jsdom to v31 ([510ec45](https://github.com/bocan/codex/commit/510ec455810ceba3750d6cc77af050ed0192f7f9))
+* **deps:** update dependency lucide-react to v1.70.0 ([9bb7bac](https://github.com/bocan/codex/commit/9bb7bacfb8c79190919dfb35934a34abfdc89991))
+* **deps:** update dependency zustand to v5.1.0 ([42f7f87](https://github.com/bocan/codex/commit/42f7f8774ef16f9d04f70484decabdcd2d08c210))
+* **deps:** update sigstore/cosign-installer action to v4 ([d3e4b8b](https://github.com/bocan/codex/commit/d3e4b8b006f34f0cd9fce88250e8d8146ecd5eec))
+
 ## [2.24.37](https://github.com/bocan/codex/compare/v2.24.36...v2.24.37) (2026-11-07)
 
 ## [2.24.36](https://github.com/bocan/codex/compare/v2.24.35...v2.24.36) (2026-11-07)
