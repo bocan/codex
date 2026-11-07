@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.36](https://github.com/bocan/codex/compare/v2.24.35...v2.24.36) (2026-11-07)
+
+### Chores
+
+* **deps:** bump @hono/node-server from 2.1.0 to 2.1.6 ([1c300bc](https://github.com/bocan/codex/commit/1c300bc2464a1e303050a6236ac6c055edbbbc4e))
+* **deps:** bump follow-redirects from 1.16.1 to 1.16.2 ([a61a18b](https://github.com/bocan/codex/commit/a61a18bf410ae8969fc83d99907fb011b904922c))
+
 ## [2.24.35](https://github.com/bocan/codex/compare/v2.24.34...v2.24.35) (2026-11-02)
 
 ### Chores
