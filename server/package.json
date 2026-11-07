@@ -33,6 +33,6 @@
     "supertest": "^7.3.1",
     "ts-jest": "^29.4.15",
     "tsx": "^4.23.15",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.0"
   }
 }
