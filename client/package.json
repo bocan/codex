@@ -17,7 +17,7 @@
     "github-slugger": "^2.0.0",
     "html-docx-js-typescript": "^0.1.5",
     "lucide-react": "^1.64.0",
-    "mermaid": "^12.2.0",
+    "mermaid": "^12.3.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-markdown": "^10.1.0",
@@ -37,7 +37,7 @@
     "@vitejs/plugin-react": "^6.1.2",
     "jsdom": "^31.0.0",
     "typescript": "^6.0.3",
-    "vite": "^8.3.5",
-    "vitest": "^5.0.5"
+    "vite": "^8.3.6",
+    "vitest": "^5.1.0"
   }
 }
