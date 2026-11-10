@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.39](https://github.com/bocan/codex/compare/v2.24.38...v2.24.39) (2026-11-10)
+
+### Chores
+
+* **deps:** bump the minor-and-patch group with 4 updates ([53f3523](https://github.com/bocan/codex/commit/53f35233ffc4ed1e9ce4521dc4a1af56c36c33ad))
+* **deps:** update dependency axios to v1.21.1 ([4787122](https://github.com/bocan/codex/commit/478712295dfb10cd44d55351ad33b42459dfa2e1))
+* **deps:** update dependency concurrently to v10.0.7 ([5da3162](https://github.com/bocan/codex/commit/5da31620f4b0fa26138efe5d179dac7d4c3101f3))
+* **deps:** update dependency express-rate-limit to v8.7.4 ([0eddc65](https://github.com/bocan/codex/commit/0eddc65c205cd7c822e89e0f949dfc84dacd21b9))
+* **deps:** update dependency lucide-react to v1.71.0 ([7da5ccb](https://github.com/bocan/codex/commit/7da5ccb480ea276a871e8065d7b3eddb1b971729))
+* **deps:** update typescript-eslint monorepo to v8.72.2 ([bc76d70](https://github.com/bocan/codex/commit/bc76d709652ef6d9532765eb0b4c120162810114))
+
 ## [2.24.38](https://github.com/bocan/codex/compare/v2.24.37...v2.24.38) (2026-11-07)
 
 ### Chores
