@@ -14,7 +14,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^1.5.0",
+    "@anthropic-ai/sdk": "^1.8.0",
     "@modelcontextprotocol/sdk": "^1.32.2",
     "cors": "^2.8.6",
     "express": "^5.3.0",
@@ -30,7 +30,7 @@
     "@types/node": "^26.6.6",
     "@types/supertest": "^7.2.1",
     "jest": "^30.5.2",
-    "supertest": "^7.3.1",
+    "supertest": "^7.3.2",
     "ts-jest": "^29.4.15",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3"
