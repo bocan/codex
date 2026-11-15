@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [2.24.40](https://github.com/bocan/codex/compare/v2.24.39...v2.24.40) (2026-11-15)
+
+### Chores
+
+* **deps-dev:** bump fast-xml-parser from 5.10.1 to 5.12.0 ([e234592](https://github.com/bocan/codex/commit/e234592c41a7248b61beb44202e97e2e13497c30))
+* **deps:** bump hono from 4.13.13 to 4.13.18 ([95dcb24](https://github.com/bocan/codex/commit/95dcb2436311c044a46da526678d0a0a300aa2e2))
+* **deps:** bump the minor-and-patch group with 5 updates ([a192dd5](https://github.com/bocan/codex/commit/a192dd5ed57f18070c5926e620a67f93929749b9))
+* **deps:** update dependency eslint to v10.15.0 ([4acce69](https://github.com/bocan/codex/commit/4acce698c409dad7a47085b1921929ce8c7801ae))
+* **deps:** update dependency lucide-react to v1.72.0 ([39f2928](https://github.com/bocan/codex/commit/39f29282b3a35d37f7579b2cd6f2e25b4a0312fa))
+* **deps:** update dependency lucide-react to v1.73.0 ([1e0649d](https://github.com/bocan/codex/commit/1e0649d0231534d799b23fef1265847ead55c30f))
+
 ## [2.24.39](https://github.com/bocan/codex/compare/v2.24.38...v2.24.39) (2026-11-10)
 
 ### Chores
