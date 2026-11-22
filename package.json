@@ -30,7 +30,7 @@
     "express-rate-limit": "^8.7.1",
     "express-session": "^1.19.0",
     "helmet": "^8.3.0",
-    "lucide-react": "^1.64.0",
+    "lucide-react": "^1.76.0",
     "morgan": "^1.12.1",
     "simple-git": "^4.0.2",
     "tsx": "^4.23.15",
